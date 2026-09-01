@@ -21,13 +21,25 @@ environment.
 
 ## Turning it into a `.kth` theme
 
-Keynote cannot be scripted into producing a theme: its AppleScript dictionary can
-create slides from existing masters but cannot create or edit masters themselves.
-So the last step is manual and takes about a minute:
+Takes about a minute:
 
-1. Open `shinyreact-dark.pptx` in Keynote.
+1. Open `shinyreact-dark.pptx` in Keynote. It shows a pptx-import warnings
+   window — dismiss it.
 2. **File → Save Theme…** → *Add to Theme Chooser*.
 3. Name it `shinyreact dark`.
+
+Keynote's AppleScript dictionary has no theme export (`export … as` offers PDF,
+images, PowerPoint and Keynote '09, not `.kth`), but the menu item is reachable
+through System Events if you ever want this automated:
+
+```applescript
+tell application "System Events" to tell process "Keynote"
+  click menu item "Save Theme…" of menu "File" of menu bar 1
+end tell
+```
+
+That needs Accessibility permission for whatever runs it — more setup than three
+clicks are worth for a theme that changes rarely.
 
 New presentations then start from it. The five slides become the ones you
 duplicate — Keynote's master-slide system is not used, deliberately: the layouts
