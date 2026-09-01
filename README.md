@@ -20,8 +20,8 @@ Shiny developers have long been limited to Bootstrap and a handful of pre-built 
 
 ## Proposed Abstract
 
-Shiny makes it easy to build interactive applications in R and Python. But when an app needs a truly custom interface, authors often end up building markup, styling, and interaction details in the same language as their reactive logic. This talk introduces `{shinyreact}` which keeps Shiny's reactive engine and uses React's proven component ecosystem for the interface.
+Shiny makes it easy to build interactive applications in R and Python. But when an app needs a truly custom user interface, authors often end up building markup, styling, and interaction details in the same language as their reactive logic. This talk introduces `{shinyreact}` which keeps Shiny's reactive engine and uses React's proven component ecosystem for the UI.
 
-Using the familiar Old Faithful app, we will rebuild a standard Shiny histogram as a React interface while keeping the reactive calculation in R. Then we will see why that boundary is especially useful with coding agents: describe the interface, let an agent build the React client, and retain ownership of reactive logic in your familiar language.
+In this talk, we'll learn the basics by converting the familiar Old Faithful app into a `{shinyreact}` app by moving the UI from R into React JavaScript. We will see why that boundary is especially useful with coding agents: describe the interface in plain text, let an agent handle the busy-work UI details, and keep important logic in your familiar language.
 
 You will leave with a practical model for adding fully custom React UI to Shiny without giving up Shiny's reactive core.
