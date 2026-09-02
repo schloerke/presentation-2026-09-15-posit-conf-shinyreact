@@ -1,4 +1,5 @@
 
+> Today I want to talk about using reactjs within your shiny applications. But before I do that, I want to talk about my favorite Shiny application. _Everyone remembers their first... app_, and mine was Old Faithful.
 
 * Demo
   * ** show's app on screen
@@ -8,10 +9,10 @@
 
 
 * Old faithful
-  > Let's dig into the code for Old Faithful
+  > Let's dig into the code
 
   * UI
-    * > Historically, shiny requires you to own both the UI and server definitions
+    * > Traditionally, shiny requires you to own both the UI and server definitions
     *
       ```r
         ui <- bslib::page_sidebar(
@@ -23,26 +24,24 @@
       ```
 
     * R owns both the UI definition and reactive computation
+      * > For an app like this, the R UI is wonderful. bslib gets us from nothing to something to be proud of in just a small set of functions.
+      * > But when a request comes in for a distinctive interface, richer interaction, or a component from a modern design system...
+        > You're suddenly authoring an up-hill battle of markup, styling, and interactions details.
 
-      *
-      * > For an app like this, the R UI is wonderful.
-      * > But when working with larger teams, you may want to hand off some of the responsibility to a colleague or LMM.
-      * TODO: > But when a request comes in for a distinctive interface, richer interaction, or a component from a modern design system... You are suddenly authoring markup, styling, and interaction details too.
-
-      * > Still want to keep Shiny's reactive model. This is your domain expertise!
-      * > I do not want to replace Shiny. I want to keep Shiny for reactive computation while using a modern UI ecosystem for the interface.
-
-      * TODO: What are people expecting?
-        * bslib covers 80% with a small set of functions... but customizations are MUCH harder
+      * > But you want to keep Shiny's reactive data model... Its your domain expertise!
+      * >
+      * > So... I do not want to replace Shiny. I want to keep Shiny for reactive computation while using a modern UI ecosystem (such as react.js) for the interface.
 
 
 * React.js
-  * >> The library for web and native user interfaces
-  * >> ... build user interfaces out of individual pieces called components
+  * "The library for web and native user interfaces"
+  * "... build user interfaces out of individual pieces called components"
   * Why React?
     * > MASSIVE ecosystem of proven components ready for production environments
     * > ... dwarfs what R/python readily has available
-  * TODO: DEMO SLIDE
+    * > show off existing libraries
+
+  * DEMO SLIDE
     * UI is assembled given data's state
       * > React is _REALLY_ good at just taking JSON at mapping data to UI
       * > Don't worry about managing the transitions from one data state to another!
@@ -50,11 +49,8 @@
   TODO: better placement
   * Why Shiny + React?
     * > If you've found yourself writing custom HTML and JavaScript, React.js is a perfect framework to help scale your larger projects
-  * TODO: Move You expect me to write JavaScript?!?
-    * With baby pink logo for react.js
     * "We picked it up off the shelf to not write JS.. Happy with the tradeoffs"
     * AI does better when building on top of existing frameworks is safer.
-
 
 * Animation: shiny + react. Hex logo creation slide
 
@@ -68,7 +64,14 @@
   * Build the whole UI from the ground up using react / typescript
     * > Experimental package for the brave few
 
-    <!-- * > "Similar to working on cars... " you know that using the right tool will save you time and energy. -->
+> At this point you might be thinking... "You want me to write JavaScript?!?"
+> >With baby pink logo for shinyreact
+* "You want me to write JavaScript?!?"
+  * Joe: "Shiny authors shouldn't need to write JavaScript"
+    * Barret: I believe this still holds true!
+  * > Agents today have far more examples of mainstream React patterns than custom Shiny UI apps. I trust any frontier model to write react.js code better than I can
+    * > That narrow IDs and JSON contract makes the client boundary practical to review and maintain
+  * > You need to be able to describe your UI and review the result.
 
 
 * Old Faithful w/ `shinyreact`
@@ -179,18 +182,18 @@
     * TODO: > Inputs still travel to the Shiny server. Outputs now travel back as data.
     * > IDs and JSON are the contract
 
-> At this point you might be thinking... "You want me to write JavaScript?!?"
-* "You want me to write JavaScript?!?"
-  * Joe: "Shiny authors shouldn't need to write JavaScript"
-    * Barret: I believe this still holds true!
+* Test coverage!
   * > Agents today have far more examples of mainstream React patterns than custom Shiny UI apps. I trust any frontier model to write react.js code better than I can
     * > That narrow IDs and JSON contract makes the client boundary practical to review and maintain
   * > You need to be able to describe your UI and review the result.
-
-  * Q: Can I use existing outputs?
-    * A: Yup. Use regular render methods, just like normal. But pair them with `<ShinyOutput id="distPlot" />` in your React.js code. Do not reinvent the wheel
-    * A: Then your UI app is more about layout than it is Outputs
-
+  * within server - test_server()
+    * set inputs, confirm output values
+  * from server to client - wire_tap
+    * assert shinyreact messages within the websocket
+  * within client - js unit tests
+    * _Agent's choice_
+  * confirm client - _features.md_
+    * nested list of features that you can read and other agents can confirm
 
 * Future work
   * Incremental adoption: Embed react components into existing apps
@@ -214,3 +217,6 @@
     * A: The logic that you care about is in the server-side code. You can review it, defend it, and write independent tests. But I'm comfortable delegating busy-work UI details off to the LLM
   * Q: What can I do for existing apps?
     * A: Agent Skills are available to convert your Shiny apps to use shinyreact
+  * Q: Can I use existing outputs?
+    * A: Yup. Use regular render methods, just like normal. But pair them with `<ShinyOutput id="distPlot" />` in your React.js code. Do not reinvent the wheel
+    * A: Then your UI app is more about layout than it is Outputs
