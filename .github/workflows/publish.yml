@@ -29,17 +29,45 @@ jobs:
       # `mermaid-format: svg` pre-renders the diagram with headless Chrome.
       - run: quarto install chromium --no-prompt
 
-      - uses: r-lib/actions/setup-r@v2
+      # `cache: always` keeps the package cache even when the render fails,
+      # which is the whole reason for using this over setup-r-dependencies.
+      # There is no package here, so `packages` replaces the `local::.` default.
+      - uses: rstudio/shiny-workflows/setup-r-package@v1
         with:
           # Must match webR's R series - see the wasm-repo/ notes in CLAUDE.md.
           r-version: "4.5"
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
+          cache: always
           packages: |
             any::shinylive
             posit-dev/shinyreact/pkg-r
 
+      # The shinylive R package unpacks ~700 MB of web assets outside the R
+      # library, on first use rather than at install time - so the package
+      # cache above does not cover it.
+      - name: Locate the shinylive assets
+        id: shinylive
+        shell: Rscript {0}
+        run: |
+          cat(
+            "dir=", tools::R_user_dir("shinylive", "cache"), "\n",
+            "version=", as.character(shinylive::assets_version()), "\n",
+            sep = "", file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE
+          )
+      - uses: actions/cache/restore@v4
+        id: shinylive-cache
+        with:
+          path: ${{ steps.shinylive.outputs.dir }}
+          key: shinylive-${{ runner.os }}-${{ steps.shinylive.outputs.version }}
+
       - run: quarto render
+
+      # Saved even if the render failed, and skipped on a hit: restore/save
+      # rather than `actions/cache` so a red PR still leaves the assets behind.
+      - uses: actions/cache/save@v4
+        if: always() && steps.shinylive-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.shinylive.outputs.dir }}
+          key: shinylive-${{ runner.os }}-${{ steps.shinylive.outputs.version }}
 
       - uses: actions/configure-pages@v5
         if: github.event_name != 'pull_request'
