@@ -13,9 +13,10 @@
 repo <- "wasm-repo/bin/emscripten/contrib/4.5"
 pkgs <- c("shinyreact", "brio") # brio: the one shinyreact Import not in the image
 
-webr_dir <- Sys.glob(
-  "slides_files/libs/quarto-contrib/shinylive-*/shinylive/webr"
-)
+webr_dir <- Sys.glob(file.path(
+  Sys.getenv("QUARTO_PROJECT_OUTPUT_DIR", "."),
+  "*_files/libs/quarto-contrib/shinylive-*/shinylive/webr"
+))
 if (length(webr_dir) != 1) {
   stop("expected exactly one shinylive webr asset dir, found: ", length(webr_dir))
 }

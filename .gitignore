@@ -4,9 +4,7 @@ __pycache__/
 *.pyc
 
 # quarto render output
-slides.html
-slides_files/
-shinylive-sw.js
+_site/
 .quarto/
 
 # playwright mcp scratch (screenshots, console logs, snapshots)
