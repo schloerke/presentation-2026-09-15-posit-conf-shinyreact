@@ -8,11 +8,14 @@ document to support future sessions.
 
 ```
 outline.md                 the talk's narrative, in speaker-note form
+bundle-wasm.R              post-render: vendors wasm-repo/ into the render
 slides.qmd                 the deck (Quarto revealjs) - primary authoring surface
 theme/DESIGN.md            the design spec - single source of truth for the look
 theme/shinyreact-dark.scss revealjs theme, ported from DESIGN.md
 theme/shinyreact-dark.highlight.theme  pandoc code colours (DESIGN.md 4.1)
 theme/build_theme.py       generates the Keynote/pptx theme from the same spec
+theme/fonts.scss           the DESIGN.md faces, inlined as data URIs (generated)
+theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
 theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 apps/                      runnable Shiny apps demoed live in the talk
@@ -156,8 +159,19 @@ back into the theme, not to keep.
 
 ### Live code and apps
 
-`_extensions/drop` gives a webR console on the backtick key, with state kept
-across slides. It is a **console**, not a Shiny runner.
+`_extensions/r-wasm/drop` gives a webR console on the backtick key, with state
+kept across slides. It is a **console**, not a Shiny runner. It is installed but
+**commented out in `slides.qmd`** (both the `drop:` config and the
+`revealjs-plugins` entry — it needs both), because its webR comes off
+`https://webr.r-wasm.org/v0.4.0/` with the base URL hardcoded in the bundle: no
+option to point it at local assets, ~30 MB over the venue's wifi, and dead
+without wifi. Files are left on disk so it is a two-line re-enable.
+
+`drop-runtime.js` is **patched** (marked `/* patched: … */`) to start its engine
+on the first console open instead of at page load — upstream calls
+`Rw(el, packages)` straight from `init`, which fired that CDN download on every
+page load whether or not you ever pressed backtick. Keep the patch if you
+re-enable the plugin; re-applying the extension will wipe it.
 
 Plain-Shiny demos run in-browser via `_extensions/quarto-ext/shinylive`
 (`filters: [shinylive]`), so no local server is needed:
@@ -172,9 +186,17 @@ Plain-Shiny demos run in-browser via `_extensions/quarto-ext/shinylive`
 ````
 
 The `{{< include >}}` keeps the slide and `apps/` from drifting — includes
-resolve before the shinylive filter runs. webR loads `shiny`/`bslib` from CDN on
-first visit (a few seconds); the `preload error:` console lines are just
-bslib's masking messages on stderr.
+resolve before the shinylive filter runs. The `preload error:` console lines are
+just bslib's masking messages on stderr.
+
+Both apps start **at page load**, not on reveal: shinylive's
+`run-python-blocks.js` walks every `.shinylive-r` block when its script runs and
+calls `runApp()` there and then. Reveal's `display: none` on far-off slides does
+not gate it, and there is no IntersectionObserver anywhere in the bundle. So
+there is nothing to "preload" — measured cold on a served render, every asset is
+in and both apps are interactive **~4.5s** after load, sitting on the title
+slide. If a demo looks like it is loading when you arrive, it is because you got
+there inside that window, not because it waited for you.
 
 The `shinyreact` demo runs in shinylive too, with its `www/` files passed as
 extra `## file:` entries in the same block. There are no iframes in the deck any
@@ -209,34 +231,36 @@ Four things had to line up. If any one regresses, the slide goes blank.
    build would be the wrong series. (Verified by probing shinylive's own
    `webr.mjs`: `R version 4.5.1`, `wasm32-unknown-emscripten`.)
 
-2. **The app installs it at runtime**, from the slide block:
+   `wasm-repo/` also carries **`brio`** — the one `shinyreact` Import that is
+   not already in shinylive's library image. It needs no local build; it is the
+   prebuilt wasm binary, fetched once:
 
-   ```r
-   webr::install(
-     "shinyreact",
-     repos = c("../../../../../../wasm-repo", "https://repo.r-wasm.org")
-   )
+   ```bash
+   curl -O https://repo.r-wasm.org/bin/emscripten/contrib/4.5/brio_1.1.5.tgz
    ```
 
-   Keep repo.r-wasm.org in that vector. `webr::install()` *replaces* the repo
-   list, and dropping it makes the Imports (`brio`, `cli`, `rlang`, …) fail with
-   "Requested package brio not found in webR binary repo".
+   (Re-run `write_PACKAGES` after adding anything.)
 
-   The relative URL resolves against webR's asset directory
-   (`slides_files/libs/quarto-contrib/shinylive-*/shinylive/webr/`), so six
-   levels up is always the folder holding `slides.html` — it travels with the
-   deck wherever it is served. It does assume that path depth, which is fixed by
-   shinylive's layout.
+2. **`bundle-wasm.R` copies both into the render** as a quarto `post-render`
+   step, writing the `packages/metadata.rds` that shinylive's runtime
+   `.mount_vfs_images()` reads. That runs *before* `.start_app()`'s "install
+   anything the app imports" loop, so by the time the loop looks, both packages
+   are installed and it asks no repo for anything.
 
-3. **`_quarto.yml` + `_environment`** carry `SHINYLIVE_WASM_PACKAGES=0`. Without
+   This replaced a `webr::install("shinyreact", repos = …)` call in the slide
+   block. Don't put it back: it ran *after* `.start_app()` had already tried and
+   failed to find `shinyreact` on repo.r-wasm.org, i.e. one guaranteed off-origin
+   request on the venue's wifi before the local install could rescue it.
+
+3. **`_environment`** carries `SHINYLIVE_WASM_PACKAGES=0`. Without
    it the render *fails*: shinylive sees `shinyreact` installed from a GitHub
    remote and calls `get_github_wasm_assets()`, which looks for a GitHub release
    tagged with the install's `RemoteRef` (`HEAD`) carrying `library.data` +
    `library.js.metadata` assets. `posit-dev/shinyreact` has no releases, so
-   `gh::gh()` 404s. The env var skips render-time wasm bundling entirely;
-   packages are fetched at runtime instead, which this deck already did.
-   `_quarto.yml` exists **only** so quarto reads `_environment` — it does that
-   for projects, not single-file renders.
+   `gh::gh()` 404s. The env var skips render-time wasm bundling entirely, and
+   `bundle-wasm.R` does the bundling instead. `_quarto.yml` exists so quarto
+   reads `_environment` (it does that for projects, not single-file renders) and
+   to hold the `post-render` hook.
 
 4. **The `www/` files ship as `## file:` entries** in the block, because
    `page_react_html()` does `brio::read_file("www/index.html")` inside the webR
@@ -249,31 +273,53 @@ and steps 1–3 all delete. Adding the package to an r-universe does *not* help 
 r-universe wasm builds are currently R 4.6 only (`bin/emscripten/contrib/4.6/`),
 and shinylive keys off GitHub releases rather than the r-universe repo.
 
-Expect ~30–45s for the first load of that slide (webR pulls shiny, bslib, brio,
-…). The `preload error:` console lines are webR writing to stderr, not failures;
+The `preload error:` console lines are webR writing to stderr, not failures;
 `package 'shinyreact' was built under R version 4.5.2` is a harmless warning
 from the local build.
 
-### Running the demos offline
+### Running the demos offline — done, keep it that way
 
-The deck ships **only base R**. The bundled webR VFS image
-(`shinylive/webr/library.data.gz`, 1920 files) has no `shiny`, `bslib`,
-`htmltools`, … — those come off repo.r-wasm.org at runtime, so the live slides
-currently need network.
+**A served render makes zero requests outside its own origin.** Verified at the
+CDP level (which sees webR's worker traffic, unlike `performance.getEntries`):
+no `repo.r-wasm.org`, no `webr.r-wasm.org`, no fonts, no CDN. Assume nothing
+about venue wifi; if you add anything that reaches off-origin, you have broken
+the demo, so re-check with the browser's network panel filtered to
+`-localhost`.
 
-Bundling them into the deck works, but re-enabling `SHINYLIVE_WASM_PACKAGES` is
-**not** sufficient: `shinylive:::download_wasm_packages()` `setdiff`s the Shiny
-stack (`shiny`, `bslib`, `renv` *and their recursive deps*) out of the bundle
-list, which is why `packages/metadata.rds` renders as an empty 46 bytes. You
-also need `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` naming the **full recursive
-set** — measured at 30 packages / 20 MB, after which a served deck makes zero
-requests outside its own origin. Regenerate that list with
-`tools::package_dependencies(c("shiny","bslib","renv"), recursive = TRUE, which = c("Depends","Imports","LinkingTo"))`.
+The four things that hold it up:
 
-Blocked for now: bundling resolves from the wasm binary repo, so it can't pick
-`shinyreact` out of `wasm-repo/`. Needs posit-dev/shinyreact#268 first. Details
-and caveats (version skew, `watcher` has no wasm build) are on
-schloerke/presentation-2026-09-15-posit-conf-shinyreact#7.
+1. **shinylive's own library image already has the Shiny stack.** Contrary to
+   what this file used to say, `shinylive/webr/library.data.gz` (0.10.8, 31 MB
+   unpacked) ships `shiny`, `bslib`, `htmltools`, `cli`, `jsonlite`, `rlang`,
+   `sass`, `renv`, … 35 packages. List them with:
+
+   ```bash
+   python3 -c "import json;print(sorted({f['filename'].split('/')[1] for f in json.load(open('slides_files/libs/quarto-contrib/shinylive-0.10.8/shinylive/webr/library.js.metadata'))['files']}))"
+   ```
+
+   So `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` and the 30-package / 20 MB
+   recursive-dependency bundling described on issue #7 are **not needed** — the
+   only gaps were `shinyreact` and `brio`.
+
+2. **`bundle-wasm.R`** puts those two in the render (above).
+
+3. **Fonts are inlined.** `theme/fonts.scss` is generated by
+   `theme/build_fonts.py`: the DESIGN.md 5.1 faces as variable-weight woff2
+   data URIs (latin + latin-ext, ~250 KB of SCSS), replacing a
+   `@import url(fonts.googleapis.com…)`. Data URIs rather than files next to
+   the SCSS because the compiled CSS lands under
+   `slides_files/libs/revealjs/dist/theme/` and no relative path from there
+   survives both `quarto preview` and a served render. Without this the deck
+   silently falls back to Helvetica offline, which breaks every measured size
+   in DESIGN.md.
+
+4. **`html-math-method: plain`** in the qmd. Quarto's revealjs default pulls
+   MathJax off jsdelivr; the deck has no math.
+
+`quarto-drop` was the last offline hole and is **commented out** (below).
+
+Still needs a server (`quarto preview`, or `python3 -m http.server` next to
+`slides.html`) — shinylive uses a service worker, so `file://` will not do.
 
 `apps/01-shinyreact` is upstream's `examples/01-hello` with the bundle renamed
 `app.js`/`app.tsx`, so upstream is the reference when something is missing —

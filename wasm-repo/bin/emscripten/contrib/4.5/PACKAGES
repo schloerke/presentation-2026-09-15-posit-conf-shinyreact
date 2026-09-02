@@ -1,3 +1,10 @@
+Package: brio
+Version: 1.1.5
+Depends: R (>= 3.6)
+Suggests: covr, testthat (>= 3.0.0)
+License: MIT + file LICENSE
+MD5sum: f4534d12e1727224e4f9f58a2c831ccd
+
 Package: shinyreact
 Version: 0.0.0.9000
 Imports: brio, cli, htmltools, jsonlite, rlang, shiny (>= 1.13.0),

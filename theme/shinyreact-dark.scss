@@ -28,7 +28,9 @@ $margin:    96px;
 $footer-y:  60px;
 
 // -- 5.1 faces ---------------------------------------------------------------
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Code+Pro:wght@400;600&display=swap');
+// Inlined faces, not a Google Fonts @import: the deck must render with no
+// network at the venue. Regenerate with `python3 theme/build_fonts.py`.
+@import "fonts";
 
 $font-family-sans-serif: Inter, "Helvetica Neue", Arial, sans-serif !default;
 $font-family-monospace: "Source Code Pro", Menlo, "Courier New", monospace !default;

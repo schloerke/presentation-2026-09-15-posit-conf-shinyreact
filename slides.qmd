@@ -8,6 +8,9 @@ author:
 format:
   revealjs:
     theme: [dark, theme/shinyreact-dark.scss]
+    # No math in the deck, and the default MathJax comes off a CDN - which the
+    # venue may not have. `plain` keeps the render fully self-contained.
+    html-math-method: plain
     highlight-style: theme/shinyreact-dark.highlight.theme
     # 1920x1080 so every px in DESIGN.md and shinyreact-dark.scss is literal.
     width: 1920
@@ -21,14 +24,14 @@ format:
     code-line-numbers: false
     code-copy: false
     incremental: true
-    drop:
-      engine: webr
-      button: true
+    # drop:                      # quarto-drop; off - it loads webR from a CDN.
+    #   engine: webr             # See CLAUDE.md.
+    #   button: true
     include-after-body:
       - theme/fit-width.html
       - theme/jsx-tokens.html
 revealjs-plugins:
-  - drop
+  # - drop       # quarto-drop (webR console on backtick). See CLAUDE.md.
   # - editable   # quarto-revealjs-editable; needs both lists. See CLAUDE.md.
 filters:
   - shinylive
@@ -386,17 +389,8 @@ R computes the value; React decides how it looks.
 #| viewerHeight: 1080
 
 ## file: app.R
-# `shinyreact` isn't on repo.r-wasm.org, so install it from the wasm-repo/ that
-# ships next to slides.html. The relative URL resolves against webR's asset
-# directory (slides_files/libs/quarto-contrib/shinylive-*/shinylive/webr/), so
-# six levels up is always the folder holding slides.html - wherever the deck is
-# served from. See CLAUDE.md for how wasm-repo/ is rebuilt.
-# repo.r-wasm.org stays in the list or the Imports (brio, cli, rlang, ...)
-# resolve against wasm-repo/ alone and fail.
-webr::install(
-  "shinyreact",
-  repos = c("../../../../../../wasm-repo", "https://repo.r-wasm.org")
-)
+# `shinyreact` (and `brio`) are mounted from the deck's own assets by
+# bundle-wasm.R, so nothing is installed at runtime. See CLAUDE.md.
 {{< include apps/01-shinyreact/app.R >}}
 
 ## file: www/index.html
