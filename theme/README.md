@@ -4,6 +4,8 @@ Built from [`DESIGN.md`](DESIGN.md). Dark mode only.
 
 ```
 build_theme.py        generator (the source of truth - edit this, not the .pptx)
+highlight-r/-python/-tsx  syntax-highlight code to the clipboard as RTF
+_highlight.py         shared logic for those three
 shinyreact-dark.pptx  5 masters + 5 example slides
 preview/slide-N.png       the example slides
 preview/master-N-blank.png a fresh slide from each master - what you actually get
@@ -59,7 +61,7 @@ file-save panel resists scripting; *Add to Theme Chooser* is one click and works
 
 | Master | Static furniture | Editable |
 |---|---|---|
-| Title | orbit, hex plate + logo, kicker, swoosh, conf/QR/speaker lockup | title, subtitle |
+| Title | orbit, hex ring + logo, kicker, swoosh, conf/QR/speaker lockup | title, subtitle |
 | Section divider | orbit, swoosh | section name, number |
 | Content | swoosh, footer | title, bullets (cyan bar) |
 | Code two-up | two elevated panels, footer | title, 2x filename, 2x code |
@@ -67,6 +69,36 @@ file-save panel resists scripting; *Add to Theme Chooser* is one click and works
 
 Bullets are a cyan `▍` bullet character, not a drawn rectangle, so they stay
 aligned when a bullet wraps to two lines.
+
+## Styling code chunks
+
+Keynote has no syntax highlighting, and a theme cannot add any — but Keynote
+*does* keep colour on a rich-text paste. So highlight to RTF in the theme's
+colours, then paste:
+
+```bash
+./highlight-r      app.R          # from a file
+./highlight-python app.py
+./highlight-tsx    ui.tsx
+./highlight-r                     # or highlight whatever is on the clipboard
+```
+
+Then click into a code placeholder and press **Cmd-V**. Use plain paste —
+*Paste and Match Style* (Cmd-Shift-Option-V) strips the colours, which defeats
+the point.
+
+Each executable declares its dependency inline (PEP 723), so `uv` fetches
+pygments on first run and there is nothing to install. Shared logic lives in
+`_highlight.py`.
+
+Colours come from DESIGN.md §4.1, so pasted code matches the rest of the theme
+and clears 7:1 contrast — including the comment colour, where the conventional
+`#6B7280` measures 3.77:1 and vanishes at the back of a room.
+
+One deliberate deviation from stock Pygments: any name followed by `(` is
+coloured as a function call. Pygments only tags names the lexer *knows* are
+functions, so `useShinyInput(...)` and most R calls would otherwise come out as
+plain text, and the design puts call sites in cyan.
 
 ## Fonts
 
