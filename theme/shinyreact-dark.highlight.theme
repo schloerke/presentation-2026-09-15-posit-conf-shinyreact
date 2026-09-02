@@ -1,0 +1,46 @@
+{
+  "_comment": "Pandoc/KDE highlight theme. Colours are DESIGN.md 4.1, measured against the #141519 code panel; every one clears 7:1. Sibling of shinyreact-dark.theme (the `highlight` Lua file used for Keynote clipboard pastes) - keep the two in sync.",
+  "text-color": "#f2f4f8",
+  "background-color": "#141519",
+  "line-number-color": "#9aa3b2",
+  "line-number-background-color": "#141519",
+  "text-styles": {
+    "Normal":         { "text-color": "#f2f4f8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Other":          { "text-color": "#f2f4f8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Operator":       { "text-color": "#f2f4f8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Variable":       { "text-color": "#f2f4f8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "SpecialChar":    { "text-color": "#f2f4f8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Extension":      { "text-color": "#f2f4f8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "RegionMarker":   { "text-color": "#9aa3b2", "background-color": null, "bold": false, "italic": false, "underline": false },
+
+    "Keyword":        { "text-color": "#c7a0ff", "background-color": null, "bold": true,  "italic": false, "underline": false },
+    "ControlFlow":    { "text-color": "#c7a0ff", "background-color": null, "bold": true,  "italic": false, "underline": false },
+    "Preprocessor":   { "text-color": "#c7a0ff", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Import":         { "text-color": "#c7a0ff", "background-color": null, "bold": false, "italic": false, "underline": false },
+
+    "Function":       { "text-color": "#6fd4e8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "BuiltIn":        { "text-color": "#6fd4e8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "DataType":       { "text-color": "#6fd4e8", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Attribute":      { "text-color": "#6fd4e8", "background-color": null, "bold": false, "italic": false, "underline": false },
+
+    "String":         { "text-color": "#9fe88d", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Char":           { "text-color": "#9fe88d", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "SpecialString":  { "text-color": "#9fe88d", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "VerbatimString": { "text-color": "#9fe88d", "background-color": null, "bold": false, "italic": false, "underline": false },
+
+    "DecVal":         { "text-color": "#ffb86c", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "BaseN":          { "text-color": "#ffb86c", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Float":          { "text-color": "#ffb86c", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Constant":       { "text-color": "#ffb86c", "background-color": null, "bold": false, "italic": false, "underline": false },
+
+    "Comment":        { "text-color": "#9aa3b2", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "CommentVar":     { "text-color": "#9aa3b2", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Documentation":  { "text-color": "#9aa3b2", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Annotation":     { "text-color": "#9aa3b2", "background-color": null, "bold": false, "italic": false, "underline": false },
+    "Information":    { "text-color": "#9aa3b2", "background-color": null, "bold": false, "italic": false, "underline": false },
+
+    "Alert":          { "text-color": "#ffb86c", "background-color": null, "bold": true,  "italic": false, "underline": false },
+    "Warning":        { "text-color": "#ffb86c", "background-color": null, "bold": true,  "italic": false, "underline": false },
+    "Error":          { "text-color": "#ffb86c", "background-color": null, "bold": true,  "italic": false, "underline": true  }
+  }
+}

@@ -1,0 +1,347 @@
+/*-- scss:defaults --*/
+
+// shinyreact dark - reveal.js port of DESIGN.md.
+//
+// The canvas is 1920x1080 (set `width`/`height` in the qmd), so every px here
+// is the same px as in DESIGN.md 5.2 and build_theme.py. Do not "convert" the
+// sizes; reveal scales the whole canvas to the viewport for you.
+
+// -- 4.1 dark tokens ---------------------------------------------------------
+$ink:        #1c1d22;
+$ink-deep:   #141519;
+$hex-plate:  #23252c;
+$text:       #f2f4f8;
+$muted:      #a3acbb;
+$cyan:       #00d8ff; // graphic only - fringes on letterforms, see DESIGN.md 4.1
+$cyan-text:  #6fd4e8;
+
+// -- 4.3 chart series (fixed order, never cycled) ----------------------------
+$series-1: #0e9dba;
+$series-2: #e2622b;
+$series-3: #3d8ae0;
+$series-4: #74a012;
+$series-5: #c74bd1;
+
+// -- 6 layout ----------------------------------------------------------------
+$margin:    96px;
+$footer-y:  60px;
+
+// -- 5.1 faces ---------------------------------------------------------------
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Code+Pro:wght@400;600&display=swap');
+
+$font-family-sans-serif: Inter, "Helvetica Neue", Arial, sans-serif !default;
+$font-family-monospace: "Source Code Pro", Menlo, "Courier New", monospace !default;
+
+$body-bg: $ink !default;
+$body-color: $text !default;
+$link-color: $cyan-text !default;
+$link-color-hover: lighten($cyan-text, 10%) !default;
+$selection-bg: rgba($cyan, .3) !default;
+
+// -- 5.2 type scale ----------------------------------------------------------
+$presentation-font-size-root: 52px !default; // bullet / body
+$presentation-line-height: 1.3 !default;
+$presentation-h1-font-size: 128px !default;
+$presentation-h2-font-size: 84px !default;  // content head
+$presentation-h3-font-size: 52px !default;
+$presentation-heading-font: $font-family-sans-serif !default;
+$presentation-heading-color: $text !default;
+$presentation-heading-line-height: 1.05 !default;
+$presentation-heading-font-weight: 800 !default;
+$code-block-font-size: 34px !default;
+
+$presentation-slide-text-align: left !default;
+$presentation-block-margin: 44px !default;
+
+/*-- scss:mixins --*/
+
+// The logo's swoosh: the exact bezier from build_theme.py, as a background
+// image so it can never absolutely-position itself onto the lede (DESIGN.md 6).
+@mixin swoosh($width) {
+  content: "";
+  display: block;
+  width: $width;
+  height: $width * 40 / 520;
+  background: no-repeat left top / 100% 100%
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 40"><path d="M4 34 C150 6 340 6 516 20" fill="none" stroke="%2300D8FF" stroke-width="8" stroke-linecap="round"/></svg>');
+}
+
+// Three ellipses at 0/60/120deg - the React orbit. Watermark only.
+@mixin orbit($size, $alpha) {
+  content: "";
+  position: absolute;
+  width: $size * 1.84;
+  height: $size * 1.84;
+  background: no-repeat center / 100% 100%
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200"><g fill="none" stroke="%2300D8FF" stroke-width="3"><ellipse rx="92" ry="35" vector-effect="non-scaling-stroke"/><ellipse rx="92" ry="35" transform="rotate(60)" vector-effect="non-scaling-stroke"/><ellipse rx="92" ry="35" transform="rotate(120)" vector-effect="non-scaling-stroke"/></g></svg>');
+  opacity: $alpha;
+  pointer-events: none;
+}
+
+/*-- scss:rules --*/
+
+.reveal {
+  font-weight: 500;
+
+  // border-box is load-bearing: reveal sets an explicit height:1080px on every
+  // section, so content-box padding would make each slide 1396px tall and push
+  // everything off the bottom of the canvas.
+  .slides section {
+    box-sizing: border-box;
+    // Reveal leaves `top: auto` on non-centered slides and lets the static
+    // position decide, which lands some of them a full canvas down. Every
+    // master here places its own content with padding, so pin the box.
+    top: 0 !important;
+    padding: 176px $margin 140px;
+  }
+
+  // 8: swoosh sits under a headline, once. Content masters only - the code and
+  // data masters have none, and a divider draws its own.
+  section:not(.divider):not(.code-slide):not(.data-slide) > h2::after {
+    @include swoosh(440px);
+    margin-top: 36px;
+  }
+
+  h2, h3 { margin-bottom: 0; }
+
+  // 6: bullets are a 5px cyan rule with 42px of padding, running the height of
+  // the item, so a wrapped bullet stays aligned.
+  ul, ol { margin: 60px 0 0; }
+  ul { list-style: none; }
+  ul > li {
+    position: relative;
+    padding-left: 42px;
+    margin-bottom: $presentation-block-margin;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .18em;
+      bottom: .18em;
+      width: 5px;
+      background: $cyan;
+    }
+    ul > li { font-size: 46px; color: $muted; }
+  }
+
+  // 4.1: emphasis inside a bullet, at weight 700
+  strong { color: $cyan-text; font-weight: 700; }
+  em { color: $muted; font-style: normal; }
+
+  .muted  { color: $muted; }
+  .lede   { font-size: 46px; font-weight: 400; color: $muted; }
+  .kicker {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: $cyan-text;
+  }
+}
+
+// -- master 1: title ---------------------------------------------------------
+#title-slide {
+  // Reveal leaves the title slide's height on `auto`, so the speaker lockup's
+  // `bottom` would resolve against the text block instead of the canvas.
+  height: 100%;
+
+  // No `position: relative` here or on .divider: reveal already makes every
+  // section positioned, and making one relative drops it back into flow, which
+  // pushes the whole slide down the canvas.
+  padding: 250px $margin 0 !important;
+
+  &::before { @include orbit(550px, .07); top: -180px; right: -420px; }
+
+  // Hex ring, right (DESIGN.md 6.1). A stroke, not a fill: the logo PNG bakes
+  // in its own #1C1D22 hex, so a fill behind it would show as a patch. The logo
+  // itself is `title-slide-attributes: data-background-image` in the qmd -
+  // paths in compiled SCSS do not resolve back to the project root.
+  &::after {
+    content: "";
+    position: absolute;
+    top: 247px; right: 130px;
+    width: 560px; height: 647px;
+    background: no-repeat center / 100% 100%
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2323252C" stroke-width="4"/></svg>');
+  }
+
+  h1.title {
+    max-width: 1100px;
+    font-size: $presentation-h1-font-size;
+    line-height: .98;
+
+    // kicker (master 1). ::before because ::after is the swoosh and ::before on
+    // the section itself is the orbit.
+    &::before {
+      content: "POSIT::CONF(2026)";
+      display: block;
+      margin-bottom: 22px;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      color: $cyan-text;
+    }
+    &::after { @include swoosh(520px); margin-top: 42px; }
+  }
+  .subtitle {
+    max-width: 1100px;
+    margin-top: 42px;
+    font-size: 46px;
+    font-weight: 400;
+    line-height: 1.35;
+    color: $muted;
+  }
+  // Speaker lockup, bottom right (master 1). Fed by `author:` in the qmd - one
+  // author entry per line.
+  .quarto-title-authors {
+    position: absolute;
+    right: $margin;
+    bottom: 30px;
+    display: block;
+    text-align: right;
+    .quarto-title-author {
+      display: block;
+      font-size: 30px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: $muted;
+    }
+  }
+  .date { display: none; }
+
+  // ponytail: no QR block - it needs a real QR image, not a white square. Add
+  // it as a second data-background-image in the qmd when the URL is known.
+}
+
+// -- master 2: section divider -----------------------------------------------
+.reveal section.divider {
+  background: $ink-deep;
+  padding: 636px $margin 0 !important; // heading baseline, per master 2
+
+  &::before { @include orbit(750px, .10); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+  // Ghost number from `data-number`. Decorative - the section name carries the
+  // meaning, so it is exempt from the 7:1 text floor (DESIGN.md 6.2).
+  &[data-number]::after {
+    content: attr(data-number);
+    position: absolute;
+    left: $margin;
+    top: 340px;
+    font-size: 240px;
+    font-weight: 900;
+    line-height: 1;
+    color: rgba($cyan, .22);
+  }
+  h1, h2 {
+    font-size: 96px;
+    &::after { @include swoosh(640px); margin-top: 44px; }
+  }
+}
+// Master 2 has no footer, and master 1 carries its own lockup instead.
+.reveal:has(section.divider.present) .footer,
+.reveal:has(#title-slide.present) .footer { display: none !important; }
+
+// -- master 4: code ----------------------------------------------------------
+.reveal section.code-slide {
+  padding-top: 96px;
+  h2 { font-size: 76px; margin-bottom: 44px; }
+}
+
+.reveal {
+  // 6.4: the panel. Radius 20, 40/44 padding, cyan hairline at 18%. Only `pre`
+  // draws it - quarto nests pre inside div.sourceCode inside .code-with-filename,
+  // and styling more than one of those gives you concentric boxes.
+  pre {
+    background: $ink-deep;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 20px;
+    box-shadow: none;
+    width: 100%;
+    margin: 0;
+    padding: 40px 44px;
+    font-size: $code-block-font-size;
+    line-height: 1.35;
+    code { background: none; padding: 0; max-height: none; }
+  }
+  div.sourceCode, .code-with-filename {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+  }
+  code { font-family: $font-family-monospace; }
+  p code, li code { color: $cyan-text; }
+
+  // 6.4: filename as an uppercase letter-spaced label above the block. Quarto
+  // ships its own chrome for this (grey bar, mono, border) at equal specificity,
+  // so these have to be !important to land.
+  .code-with-filename .code-with-filename-file {
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 0 16px 4px !important;
+    font-family: $font-family-sans-serif !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: $cyan-text !important;
+    // quarto wraps the name in <pre><strong>, which .reveal pre would otherwise
+    // re-style as a code panel.
+    p, pre, strong {
+      margin: 0 !important;
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
+      font-family: inherit !important;
+      font-size: inherit !important;
+      font-weight: inherit !important;
+      line-height: inherit;
+      color: inherit !important;
+    }
+  }
+
+  // Panels are equal-width; pad the shorter listing with blank lines rather
+  // than letting the panels differ in height.
+  .columns { gap: 48px; align-items: stretch; }
+  .column > .code-with-filename, .column > div.sourceCode { height: 100%; }
+}
+
+// -- master 5: data ----------------------------------------------------------
+.reveal section.data-slide {
+  padding-top: 96px;
+  h2 { font-size: 76px; margin-bottom: 12px; }
+  > p:first-of-type { font-size: 30px; font-weight: 500; color: $muted; }
+}
+
+.reveal .stats {
+  display: flex;
+  gap: 120px;
+  margin: 48px 0;
+  .stat-value { font-size: 132px; font-weight: 800; line-height: 1; color: $cyan-text; }
+  .stat-label { font-size: 30px; color: $muted; }
+}
+
+// -- 6: footer ---------------------------------------------------------------
+.reveal .footer {
+  bottom: $footer-y;
+  padding: 0 $margin;
+  font-size: 30px;
+  color: $muted;
+  text-align: right;
+}
+
+// -- chrome ------------------------------------------------------------------
+.reveal .progress { color: $cyan; height: 5px; }
+.reveal .controls { color: $cyan-text; }
+.reveal .slide-number { font-size: 24px; color: $muted; background: none; }
+
+// A live app or site, sized to the content area under a code-slide head.
+.reveal iframe.app {
+  width: 100%;
+  height: 660px;
+  border: 2px solid rgba($cyan, .18);
+  border-radius: 20px;
+  background: $ink-deep;
+}
