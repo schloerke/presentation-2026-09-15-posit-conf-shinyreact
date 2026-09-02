@@ -24,20 +24,6 @@ server <- function(input, output, session) {
     # I() keeps length-1 vectors as JSON arrays (n = 1) instead of scalars.
     list(breaks = I(info$breaks), counts = I(info$counts))
   })
-
-  output$dist_caption <- reactive_output({
-    n <- bins()
-    if (is.null(n)) {
-      return(NULL)
-    }
-    paste0(
-      length(x),
-      " eruptions in ",
-      n,
-      " bin",
-      if (n == 1) "" else "s"
-    )
-  })
 }
 
 shinyApp(ui, server)

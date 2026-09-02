@@ -1,0 +1,7 @@
+# Only here so quarto reads `_environment` (it does that for projects, not for
+# single-file renders) - that file carries SHINYLIVE_WASM_PACKAGES=0, which the
+# shinyreact shinylive app needs. See CLAUDE.md.
+project:
+  type: default
+  render:
+    - slides.qmd

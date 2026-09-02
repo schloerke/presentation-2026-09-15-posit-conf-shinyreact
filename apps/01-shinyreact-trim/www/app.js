@@ -143,7 +143,6 @@ function App() {
   const initialized = useShinyInitialized();
   const [bins, setBins] = useShinyInput("bins", 30);
   const data = useShinyOutputValue("dist_data", null);
-  const caption = useShinyOutputValue("dist_caption", null);
   const status = useShinyOutputStatus("dist_data");
 
   if (!initialized) return null;
@@ -169,7 +168,6 @@ function App() {
       "section",
       { className: "panel" },
       h("h1", null, "Hello Shiny!"),
-      h("p", { className: "caption" }, caption ?? " "),
       // Keep the chart mounted while the server recomputes — only show the
       // placeholder before the first value has ever arrived.
       data
