@@ -1,0 +1,67 @@
+name: Publish slides
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # On a PR this is the whole workflow: render it, prove it still builds, stop
+  # short of uploading anything.
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          tinytex: false
+      # `mermaid-format: svg` pre-renders the diagram with headless Chrome.
+      - run: quarto install chromium --no-prompt
+
+      # `cache: always` keeps the package cache even when the render fails,
+      # which is the whole reason for using this over setup-r-dependencies.
+      # There is no package here, so `packages` replaces the `local::.` default.
+      - uses: rstudio/shiny-workflows/setup-r-package@v1
+        with:
+          # Must match webR's R series - see the wasm-repo/ notes in CLAUDE.md.
+          r-version: "4.5"
+          cache: always
+          packages: |
+            any::shinylive
+            posit-dev/shinyreact/pkg-r
+
+      # shinylive's web assets are deliberately *not* cached. They live outside
+      # the R library (`~/.cache/shinylive`), so the package cache above misses
+      # them - but measured in this job the download is 2s and the unzip 2s,
+      # against ~740 MB unpacked. Caching that is slower than fetching it, and
+      # it would crowd the R package cache out of the repo's 10 GB.
+      - run: quarto render
+
+      - uses: actions/configure-pages@v6
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
+        with:
+          path: _site
+
+  deploy:
+    needs: render
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deploy

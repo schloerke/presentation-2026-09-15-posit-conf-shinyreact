@@ -5,6 +5,10 @@ author:
   - "Barret Schloerke"
   - "posit / Shiny Team"
   - "@schloerke"
+# Nothing here is executed: the `shinylive-r` blocks are handled by a filter and
+# mermaid by quarto itself. Say so, or quarto sees `{shinylive-r}`, guesses
+# jupyter, and a machine without nbformat fails the render.
+engine: markdown
 format:
   revealjs:
     theme: [dark, theme/shinyreact-dark.scss]

@@ -4,7 +4,13 @@
 project:
   type: default
   render:
-    - slides.qmd
+    - index.qmd
+  # Everything the render needs lands in _site/, so publishing is "upload
+  # _site/". `apps/` is a resource because slide 02 loads it in an iframe by
+  # relative path.
+  output-dir: _site
+  resources:
+    - apps/**
   # Bundles wasm-repo/ into the render so the deck runs with no network.
   post-render:
     - bundle-wasm.R

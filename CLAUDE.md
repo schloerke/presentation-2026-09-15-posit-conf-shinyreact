@@ -9,7 +9,7 @@ document to support future sessions.
 ```
 outline.md                 the talk's narrative, in speaker-note form
 bundle-wasm.R              post-render: vendors wasm-repo/ into the render
-slides.qmd                 the deck (Quarto revealjs) - primary authoring surface
+index.qmd                  the deck (Quarto revealjs) - primary authoring surface
 theme/DESIGN.md            the design spec - single source of truth for the look
 theme/shinyreact-dark.scss revealjs theme, ported from DESIGN.md
 theme/shinyreact-dark.highlight.theme  pandoc code colours (DESIGN.md 4.1)
@@ -30,16 +30,20 @@ first, then both ports — otherwise they silently drift.
 ## Working on the deck
 
 ```bash
-quarto preview slides.qmd     # live reload while writing
-quarto render slides.qmd
+quarto preview index.qmd     # live reload while writing
+quarto render                 # whole project -> _site/ (see Publishing)
 ```
+
+The deck is `index.qmd`, not `slides.qmd`, so the published site's root *is*
+the deck. Render output goes to `_site/`, with `apps/` copied in as a project
+resource (slide 02 loads it in an iframe by relative path).
 
 ### Looking at a slide
 
 Checking a layout or a colour means rendering and *looking*, not reading the
 SCSS. Serve the render and drive it with a browser tool; every slide has an id
-from its heading, so `slides.html#/two-hooks-are-the-whole-api` lands on one
-directly. The browser caches `slides.html` hard between renders — add a
+from its heading, so `index.html#/two-hooks-are-the-whole-api` lands on one
+directly. The browser caches `index.html` hard between renders — add a
 `?v=N` that changes, or a re-render appears to have done nothing.
 
 **Screenshots go in `.context/`, which is gitignored.** Never leave a debug
@@ -221,14 +225,14 @@ to hide it.
 Click **Modify** to edit the current slide; `.editable` on a div or image
 pre-marks it. Save Edits writes back absolute geometry
 (`{.absolute width=… left=…}`), which is at odds with every master in
-DESIGN.md — treat anything it writes into `slides.qmd` as something to fold
+DESIGN.md — treat anything it writes into `index.qmd` as something to fold
 back into the theme, not to keep.
 
 ### Live code and apps
 
 `_extensions/r-wasm/drop` gives a webR console on the backtick key, with state
 kept across slides. It is a **console**, not a Shiny runner. It is installed but
-**commented out in `slides.qmd`** (both the `drop:` config and the
+**commented out in `index.qmd`** (both the `drop:` config and the
 `revealjs-plugins` entry — it needs both), because its webR comes off
 `https://webr.r-wasm.org/v0.4.0/` with the base URL hardcoded in the bundle: no
 option to point it at local assets, ~30 MB over the venue's wifi, and dead
@@ -272,7 +276,7 @@ extra `## file:` entries in the same block.
 Shiny at all**, so shinylive has nothing to run. It is a static page the slide
 loads in an `<iframe>` — the one iframe in the deck. That still keeps the rule
 that nothing has to be *running* for the slides to work: the src is a relative
-path under `apps/`, served by whatever already serves `slides.html`, and React
+path under `apps/`, served by whatever already serves `index.html`, and React
 18's UMD build is vendored into `www/vendor/` so the page makes no off-origin
 request. (React 18 because 19 dropped the UMD build, and UMD is what lets the
 demo skip a bundler.)
@@ -383,7 +387,7 @@ The four things that hold it up:
    `sass`, `renv`, … 35 packages. List them with:
 
    ```bash
-   python3 -c "import json;print(sorted({f['filename'].split('/')[1] for f in json.load(open('slides_files/libs/quarto-contrib/shinylive-0.10.8/shinylive/webr/library.js.metadata'))['files']}))"
+   python3 -c "import json;print(sorted({f['filename'].split('/')[1] for f in json.load(open('_site/index_files/libs/quarto-contrib/shinylive-0.10.8/shinylive/webr/library.js.metadata'))['files']}))"
    ```
 
    So `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` and the 30-package / 20 MB
@@ -397,7 +401,7 @@ The four things that hold it up:
    data URIs (latin + latin-ext, ~250 KB of SCSS), replacing a
    `@import url(fonts.googleapis.com…)`. Data URIs rather than files next to
    the SCSS because the compiled CSS lands under
-   `slides_files/libs/revealjs/dist/theme/` and no relative path from there
+   `_site/index_files/libs/revealjs/dist/theme/` and no relative path from there
    survives both `quarto preview` and a served render. Without this the deck
    silently falls back to Helvetica offline, which breaks every measured size
    in DESIGN.md.
@@ -407,8 +411,22 @@ The four things that hold it up:
 
 `quarto-drop` was the last offline hole and is **commented out** (below).
 
-Still needs a server (`quarto preview`, or `python3 -m http.server` next to
-`slides.html`) — shinylive uses a service worker, so `file://` will not do.
+Still needs a server (`quarto preview`, or `python3 -m http.server` inside
+`_site/`) — shinylive uses a service worker, so `file://` will not do.
+
+## Publishing
+
+`.github/workflows/publish.yml` renders on every push to `main` and deploys
+`_site/` to GitHub Pages (Settings → Pages → Source: **GitHub Actions**). It
+needs the same three things a local render does, which is all the workflow is:
+
+- Quarto, plus `quarto install chromium` — `mermaid-format: svg` pre-renders
+  the diagram with headless Chrome.
+- R 4.5 with `shinylive` and `shinyreact` installed (the shinylive filter reads
+  the app's installed packages).
+- `wasm-repo/`, which is checked in, so `bundle-wasm.R` has nothing to fetch.
+  Building it in CI with <https://github.com/r-wasm/actions> instead is the
+  alternative, and only worth it if the checked-in binary goes stale.
 
 `apps/01-shinyreact` is upstream's `examples/01-hello` with the bundle renamed
 `app.js`/`app.tsx`, so upstream is the reference when something is missing —
