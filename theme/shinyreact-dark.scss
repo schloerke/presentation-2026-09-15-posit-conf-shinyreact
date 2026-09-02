@@ -100,7 +100,7 @@ $presentation-block-margin: 44px !default;
 
   // 8: swoosh sits under a headline, once. Content masters only - the code and
   // data masters have none, and a divider draws its own.
-  section:not(.divider):not(.code-slide):not(.data-slide) > h2::after {
+  section:not(.divider):not(.code-slide):not(.data-slide):not(.cycle-slide) > h2::after {
     @include swoosh(440px);
     margin-top: 36px;
   }
@@ -403,6 +403,44 @@ $presentation-block-margin: 44px !default;
   margin: 48px 0;
   .stat-value { font-size: 132px; font-weight: 800; line-height: 1; color: $cyan-text; }
   .stat-label { font-size: 30px; color: $muted; }
+}
+
+// -- deck-local: mermaid cycle diagram ---------------------------------------
+// Quarto pre-renders mermaid to an svg whose node boxes are sized to the text
+// *as mermaid measured it*. Reveal then restyles the labels (they are html in a
+// foreignObject), so the text no longer fits the boxes it was measured for:
+// `inherit` hands it back to mermaid's own inline style on the svg root. The
+// font in the `%%{init}%%` block has to be one the render host also has, so
+// Inter (a webfont) is out.
+.reveal section.cycle-slide {
+  // The diagram needs every pixel of height it can get (see the svg rule), so
+  // this master trims the top pad and drops the swoosh under the headline —
+  // the code and data masters have none either.
+  padding: 76px $margin 56px;
+  .cell, .cell-output-display, figure, figure > div { margin: 0; }
+  // Both dimensions are pinned: the box is what the drawing is scaled to fit
+  // (`preserveAspectRatio` centres it), and left to itself the svg takes its
+  // aspect ratio from quarto's 960x480 width/height attributes rather than the
+  // viewBox and floats the graph in the middle of a too-tall box.
+  svg[id^="mermaid"] {
+    width: 100%;
+    max-width: none;
+    // The sequence renderer writes its font size (16px) inline, so how big the
+    // labels read is set by how far the whole svg scales up: 800px on a
+    // 810x420-unit graph is a x1.9 fit, putting them at 30px. Every extra row
+    // (a `Note`, a split self-message) or unit of width shrinks them — the
+    // whole layout is tuned to keep this fit near x2.
+    height: 800px !important;
+    margin: 0 !important;
+    // A few px of measurement drift shouldn't decapitate a label.
+    foreignObject { overflow: visible; }
+    p, span, div {
+      font-size: inherit !important;
+      font-family: inherit !important;
+      line-height: 1.5 !important;
+      margin: 0 !important;
+    }
+  }
 }
 
 // -- 6: footer ---------------------------------------------------------------

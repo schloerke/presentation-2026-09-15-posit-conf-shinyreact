@@ -30,6 +30,9 @@ format:
     include-after-body:
       - theme/fit-width.html
       - theme/jsx-tokens.html
+    # Pre-render mermaid to svg: left to the browser, mermaid measures its
+    # labels while reveal has the slide display:none'd and draws empty boxes.
+    mermaid-format: svg
 revealjs-plugins:
   # - drop       # quarto-drop (webR console on backtick). See CLAUDE.md.
   # - editable   # quarto-revealjs-editable; needs both lists. See CLAUDE.md.
@@ -406,18 +409,36 @@ R computes the value; React decides how it looks.
 {{< include apps/01-shinyreact/www/app.js >}}
 ```
 
-## The data cycle
+## The data cycle {.cycle-slide .nostretch}
 
-- **Shiny (classic):** `input$value` → `reactive()` → `renderFn()`
-- **shinyreact server:** `input$value` → `reactive()` → `reactive_output()`
-- **shinyreact browser:** `useShinyInput()` in, `useShinyOutputValue()` out
-- Inputs still travel to the Shiny server; outputs travel back **as data**
-- Keep R / Python for data work and reactivity
-- **IDs and JSON are the contract**
+```{mermaid}
+%%{init: {"theme":"base","fontFamily":"Helvetica, Arial, sans-serif",
+  "sequence":{"actorMargin":100,"width":300,"boxMargin":10,"height":50,
+  "messageMargin":30,"mirrorActors":false},
+  "themeVariables":{
+  "actorBkg":"#141519","actorBorder":"#6FD4E8","actorTextColor":"#F2F4F8",
+  "actorLineColor":"#A3ACBB","signalColor":"#00D8FF","signalTextColor":"#F2F4F8",
+  "noteBkgColor":"#141519","noteBorderColor":"#A3ACBB","noteTextColor":"#F2F4F8",
+  "labelBoxBkgColor":"#141519","labelTextColor":"#F2F4F8",
+  "activationBkgColor":"#23252C","activationBorderColor":"#6FD4E8"}}}%%
+sequenceDiagram
+  participant B as browser · React
+  participant S as server · R / Python
+  B->>B: useShinyInput()
+  B->>S: IDs + JSON
+  S->>S: input$value → reactive() → reactive_output()
+  S-->>B: IDs + JSON
+  B->>B: useShinyOutputValue()
+```
 
 ::: {.notes}
-In Shiny for R or Python, the server goes `input$value` → `reactive()` →
-`renderFn()`.
+Top to bottom: a value leaves the browser through `useShinyInput()`, arrives as
+`input$value`, moves through `reactive()` to `reactive_output()`, and comes back
+to the browser as data through `useShinyOutputValue()`.
+
+In Shiny for R or Python, that middle box is the app you already write:
+`input$value` → `reactive()` → `renderFn()`. The only change is the last hop —
+`reactive_output()` in place of `renderFn()`.
 
 Keep R / Python for data work and reactivity. Inputs still travel to the Shiny
 server; outputs now travel back as data.
