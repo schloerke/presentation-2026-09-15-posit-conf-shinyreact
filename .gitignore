@@ -13,3 +13,5 @@ shinylive-sw.js
 .playwright-mcp/
 
 **/*.quarto_ipynb
+
+/.quarto/
