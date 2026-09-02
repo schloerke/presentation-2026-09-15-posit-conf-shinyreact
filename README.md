@@ -11,7 +11,7 @@ Slides: https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/
 
 
 
--------------------------------
+---
 
 ## Abstract
 
