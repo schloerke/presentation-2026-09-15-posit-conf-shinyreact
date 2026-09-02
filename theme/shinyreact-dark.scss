@@ -153,17 +153,23 @@ $presentation-block-margin: 44px !default;
 
   &::before { @include orbit(550px, .07); top: -180px; right: -420px; }
 
-  // Hex ring, right (DESIGN.md 6.1). A stroke, not a fill: the logo PNG bakes
-  // in its own #1C1D22 hex, so a fill behind it would show as a patch. The logo
-  // itself is `title-slide-attributes: data-background-image` in the qmd -
-  // paths in compiled SCSS do not resolve back to the project root.
+  // Hex ring + logo, right (DESIGN.md 6.1). A stroke, not a fill: the logo PNG
+  // bakes in its own #1C1D22 hex, so a fill behind it would show as a patch.
+  // The logo is a second background layer here rather than
+  // `title-slide-attributes: data-background-image`, because reveal's
+  // background element is the *viewport*, not the 1920x1080 canvas - so the
+  // background version drifted out of the ring at every window size but one.
+  // The url() walks back out of the compiled theme
+  // (slides_files/libs/revealjs/dist/theme/) to the folder holding slides.html.
   &::after {
     content: "";
     position: absolute;
     top: 247px; right: 130px;
     width: 560px; height: 647px;
-    background: no-repeat center / 100% 100%
-      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2323252C" stroke-width="4"/></svg>');
+    background:
+      no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
+      no-repeat center / 100% 100%
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2323252C" stroke-width="4"/></svg>');
   }
 
   h1.title {

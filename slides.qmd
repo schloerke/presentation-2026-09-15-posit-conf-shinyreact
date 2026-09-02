@@ -1,6 +1,6 @@
 ---
-title: "Shiny + React"
-subtitle: "Own the frontend without giving up the server"
+title: "Beyond Bootstrap"
+subtitle: "Building Custom Shiny UI with React"
 author:
   - "Barret Schloerke"
   - "posit / Shiny Team"
@@ -25,10 +25,6 @@ format:
       engine: webr
       button: true
     include-after-body: theme/fit-width.html
-title-slide-attributes:
-  data-background-image: theme/shiny-react.png
-  data-background-size: 520px
-  data-background-position: right 150px top 270px
 revealjs-plugins:
   - drop
 filters:
