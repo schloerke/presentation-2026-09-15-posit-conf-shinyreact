@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Old Faithful — shinyreact</title>
+    <!-- Shiny's and shinyreact's script/link tags are inserted here. It is a
+         plain <meta> tag, so this file stays valid HTML. -->
+    <meta name="shiny-dependency-placeholder" content="">
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <!-- The mount point. Visible until React takes over, so a slow bundle
+         shows something other than a blank page. The styling goes on an inner
+         div that React replaces - a class on #root itself would survive the
+         mount, and `.placeholder`'s fixed height would then crop the app. -->
+    <div id="root"><div class="placeholder">Loading…</div></div>
+    <!-- `defer`, not a bare script: the shinyreact bundle in <head> is
+         deferred, and deferred scripts run in document order. A non-deferred
+         script here would run first and find no `window.shinyreact`. -->
+    <script src="app.js" defer></script>
+  </body>
+</html>

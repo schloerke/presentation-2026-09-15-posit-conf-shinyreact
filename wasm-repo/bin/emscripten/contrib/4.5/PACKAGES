@@ -1,0 +1,7 @@
+Package: shinyreact
+Version: 0.0.0.9000
+Imports: brio, cli, htmltools, jsonlite, rlang, shiny (>= 1.13.0),
+        utils
+Suggests: shinytest2, testthat (>= 3.0.0), withr
+License: MIT + file LICENSE
+MD5sum: e517c1c341876506de56a70171abc5fa

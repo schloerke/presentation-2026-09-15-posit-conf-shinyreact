@@ -270,6 +270,17 @@ $presentation-block-margin: 44px !default;
     padding: 0;
     margin: 0;
   }
+
+  // `code-line-numbers="|5|6"` steps: quarto-line-highlight clones the <code>
+  // once per step and stacks the clones with `position: absolute; top: 0`,
+  // which resolves against pre's *padding* box - so every step after the first
+  // jumped up by pre's 40px padding-top. Making pre a grid and pinning every
+  // <code> to the same cell moves that containing block to the grid area, which
+  // sits inside the padding. No magic numbers to keep in sync with 6.4.
+  div.sourceCode pre:has(> code.fragment) {
+    display: grid;
+    > code { grid-area: 1 / 1; }
+  }
   code { font-family: $font-family-monospace; }
   p code, li code { color: $cyan-text; }
 
@@ -336,12 +347,3 @@ $presentation-block-margin: 44px !default;
 .reveal .progress { color: $cyan; height: 5px; }
 .reveal .controls { color: $cyan-text; }
 .reveal .slide-number { font-size: 24px; color: $muted; background: none; }
-
-// A live app or site, sized to the content area under a code-slide head.
-.reveal iframe.app {
-  width: 100%;
-  height: 660px;
-  border: 2px solid rgba($cyan, .18);
-  border-radius: 20px;
-  background: $ink-deep;
-}
