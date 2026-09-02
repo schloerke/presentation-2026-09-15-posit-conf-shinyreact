@@ -238,8 +238,9 @@ two feet. Anything you cannot read is what the back row cannot read.
    those were tried and cut per §3.2. Emphasis inside a bullet uses
    `--cyan-text` at weight 700.
 4. **Code, two-up** — two panels, `--ink-deep` on a 2px `rgba(0,216,255,.18)`
-   hairline, 20px radius, 40/44px padding. Filename as an uppercase
-   letter-spaced `--cyan-text` label above the block. Panels are equal-width;
+   hairline, 20px radius, 40/44px padding. Filename as a letter-spaced
+   `--cyan-text` label above the block, in whatever casing the slide wrote —
+   `app.R` is a filename, not a heading, so nothing upper-cases it. Panels are equal-width;
    pad the shorter listing with blank lines rather than letting the panels differ
    in height.
 5. **Data** — optional stat row (number in `--cyan-text`, label in `--muted`

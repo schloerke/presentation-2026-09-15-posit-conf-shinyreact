@@ -428,9 +428,9 @@ def master_code(lay):
         set_alpha(panel.line.color, 18)
 
         f, tf = textbox(sh, x + 44, 290, pw - 88, 40)
-        style(tf.paragraphs[0], "FILE", size=28, color=CYAN_TEXT, font=BOLD, spacing=4)
+        style(tf.paragraphs[0], "app.R", size=36, color=CYAN_TEXT, font=BOLD, spacing=4)
         no_bullet(tf.paragraphs[0])
-        ph_defaults(f, size=28, color="6FD4E8", font=BOLD, spacing=4)
+        ph_defaults(f, size=36, color="6FD4E8", font=BOLD, spacing=4)
         as_placeholder(f, "body", 1 + i * 2)
 
         c, tf = textbox(sh, x + 44, 358, pw - 88, 512)
@@ -560,9 +560,9 @@ def build_examples(prs, layouts):
 
     s = prs.slides.add_slide(code_l)
     fill(s.shapes.title, "Two files, one app", size=76, color=TEXT, font=DISPLAY)
-    fill(by_idx(s, 1), "UI.TSX", size=28, color=CYAN_TEXT, font=BOLD, spacing=4)
+    fill(by_idx(s, 1), "ui.tsx", size=36, color=CYAN_TEXT, font=BOLD, spacing=4)
     fill_code(by_idx(s, 2), UI_TSX)
-    fill(by_idx(s, 3), "APP.PY", size=28, color=CYAN_TEXT, font=BOLD, spacing=4)
+    fill(by_idx(s, 3), "app.py", size=36, color=CYAN_TEXT, font=BOLD, spacing=4)
     fill_code(by_idx(s, 4), APP_PY)
 
     s = prs.slides.add_slide(data_l)

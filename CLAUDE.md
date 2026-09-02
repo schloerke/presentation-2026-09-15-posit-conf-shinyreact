@@ -78,8 +78,17 @@ slides on `##`, and it carries the slide id and speaker notes) but hidden, and
 padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
 Pair it with `#| viewerHeight: 1080`.
 
-Code fences take `filename="app.R"`, which renders as the uppercase cyan label
-from DESIGN.md 6.4.
+Code fences take `filename="app.R"`, which renders as the cyan label from
+DESIGN.md 6.4, in whatever casing you wrote — nothing upper-cases it.
+
+A `.code-slide` usually opens with one **lead-in bullet** above the panel, in
+`::: {.incremental}` so it lands on its own click, with the block(s) below it
+wrapped in `.fragment` so they come after. The bullet is a caption, not a list:
+`.code-slide ul` therefore drops the content master's 60px above and runs 32px
+below, and the heading's margin shrinks to 16px. That rhythm is what makes a
+13-line block fit — the list defaults put it 80px off the bottom of the slide,
+which reads on a projector as the code simply ending early. Check the tail of
+the longest block after any change here.
 
 ### Reveal quirks this theme already works around
 
