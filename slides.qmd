@@ -1,0 +1,124 @@
+---
+title: "Shiny + React"
+subtitle: "Own the frontend without giving up the server"
+author:
+  - "Barret Schloerke"
+  - "posit / Shiny Team"
+  - "@schloerke"
+format:
+  revealjs:
+    theme: [dark, theme/shinyreact-dark.scss]
+    highlight-style: theme/shinyreact-dark.highlight.theme
+    # 1920x1080 so every px in DESIGN.md and shinyreact-dark.scss is literal.
+    width: 1920
+    height: 1080
+    margin: 0
+    min-scale: 0.2
+    max-scale: 2
+    center: false
+    slide-number: c
+    footer: "posit::conf(2026) · @schloerke"
+    code-line-numbers: false
+    code-copy: false
+    drop:
+      engine: webr
+      button: true
+    include-after-body: theme/fit-width.html
+title-slide-attributes:
+  data-background-image: theme/shiny-react.png
+  data-background-size: 520px
+  data-background-position: right 150px top 270px
+revealjs-plugins:
+  - drop
+---
+
+## Old Faithful {.divider data-number="01"}
+
+## Historically, you own both halves
+
+- Shiny defines the **UI** and the **server**
+- One language, one mental model
+- The UI vocabulary is *whatever Shiny ships*
+
+## The app {.code-slide}
+
+::: {.columns}
+::: {.column width="50%"}
+```{.r filename="app.R"}
+ui <- page_sidebar(
+  sidebar = sidebar(
+    sliderInput("bins", "Bins:",
+                min = 1, max = 50,
+                value = 30)
+  ),
+  plotOutput("distPlot")
+)
+```
+:::
+::: {.column width="50%"}
+```{.r filename="server"}
+server <- function(input, output) {
+  output$distPlot <- renderPlot({
+    x <- faithful$waiting
+    hist(x, breaks = input$bins)
+  })
+}
+```
+:::
+:::
+
+## Shiny React {.divider data-number="02"}
+
+## Same server, your frontend {.code-slide}
+
+::: {.columns}
+::: {.column width="50%"}
+```{.tsx filename="app.tsx"}
+const [n, setN] = useShinyInput(
+  "bins", 30
+);
+const plot = useShinyOutputValue(
+  "hist"
+);
+
+return <Slider value={n}
+  onChange={setN} />;
+```
+:::
+::: {.column width="50%"}
+```{.r filename="app.R"}
+ui <- page_react_html("www/index.html")
+
+server <- function(input, output) {
+  output$hist <- reactive_output({
+    req(input$bins)
+    hist_data(x, input$bins)
+  })
+}
+```
+:::
+:::
+
+## Live {.code-slide}
+
+<!-- Run it first: R -e 'shiny::runApp("apps/01-shinyreact", port = 8080)' -->
+<iframe class="app" src="http://127.0.0.1:8080"></iframe>
+
+## Numbers {.data-slide}
+
+Bundle size, measured on the trimmed apps
+
+::: {.stats}
+::: {}
+[42 kB]{.stat-value}<br>[gzipped]{.stat-label}
+:::
+::: {}
+[1]{.stat-value}<br>[websocket]{.stat-label}
+:::
+:::
+
+::: {.lede}
+Press `` ` `` for a live R console — it keeps its state across slides.
+:::
+
+## Thanks {.divider data-number="03"}

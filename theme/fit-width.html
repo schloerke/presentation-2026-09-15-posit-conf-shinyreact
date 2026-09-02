@@ -1,0 +1,40 @@
+<script>
+  // Scale to fit the WIDTH, not the window.
+  //
+  // Reveal picks scale = min(winW/canvasW, winH/canvasH), so a window that is
+  // not 16:9 gets letterboxed and the deck stops tracking the width. Pinning
+  // the canvas width at 1920 and letting its height follow the window's aspect
+  // ratio makes width the binding constraint, so scale is always winW/1920:
+  // narrower window, smaller everything; wider window, bigger everything.
+  //
+  // Slides are laid out from the top (see the padding in shinyreact-dark.scss),
+  // so the extra or missing canvas height lands at the bottom, where the footer
+  // is anchored. On a real 16:9 projector this is a no-op.
+  (function () {
+    var CANVAS_WIDTH = 1920;
+    var MIN_CANVAS_HEIGHT = 1080; // the height the masters are drawn for
+
+    function fitWidth() {
+      // Floor the canvas at 1080: a short, wide window would otherwise get a
+      // canvas shorter than the design and silently clip the bottom of every
+      // slide. Below the floor reveal goes back to letterboxing, which loses
+      // nothing.
+      var h = Math.max(
+        MIN_CANVAS_HEIGHT,
+        Math.round(CANVAS_WIDTH * window.innerHeight / window.innerWidth)
+      );
+      if (Reveal.getConfig().height !== h) Reveal.configure({ height: h });
+    }
+
+    function start() {
+      if (!window.Reveal || !Reveal.isReady()) return false;
+      fitWidth();
+      window.addEventListener('resize', fitWidth);
+      return true;
+    }
+
+    // Quarto initialises Reveal in its own inline script, which may run after
+    // this one; retry on load and then give up rather than poll forever.
+    if (!start()) window.addEventListener('load', start);
+  })();
+</script>
