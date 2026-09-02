@@ -177,6 +177,49 @@ React is *REALLY* good at just taking JSON and mapping data to UI.
 Don't worry about managing the transitions from one data state to another!
 :::
 
+## Old Faithful, React only {.demo-slide}
+
+<!-- A static page, not shinylive: no server, no webR. `.demo-slide > iframe`
+     in the theme sizes it to the full 1920x1080. -->
+<iframe src="apps/02-react-only/www/index.html" title="Old Faithful, React only"></iframe>
+
+::: {.notes}
+Same app, no Shiny at all — this is 100% React, and the data is baked into the
+page.
+
+Drag the slider. Every bar moves. I did not write a single line that adds,
+removes, or resizes a bar.
+:::
+
+## The UI is a function of `bins` {.code-slide}
+
+```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3|10"}
+function App() {
+  const [bins, setBins] = useState(30);
+  const data = useMemo(() => bin_data(waiting, bins), [bins]);
+
+  return (
+    <main className="layout">
+      <label htmlFor="bins">Number of bins:</label>
+      <input id="bins" type="range" value={bins}
+             onChange={(e) => setBins(Number(e.target.value))} />
+      <Histogram data={data} />
+    </main>
+  );
+}
+```
+
+::: {.notes}
+`bins` is the only state in the app. `data` is *derived* from it — React
+recomputes it when, and only when, `bins` changes.
+
+Then the whole UI is described once, for whatever `bins` happens to be. New
+state, new description, and React works out the difference.
+
+Hold on to those two lines. In a few minutes the only thing that changes is
+*where they get their values from*.
+:::
+
 ## Why Shiny **+** React?
 
 - If you've found yourself writing custom HTML and JavaScript, React is the framework that scales those projects

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Old Faithful — React only</title>
+    <link rel="stylesheet" href="app.css" />
+    <!-- Vendored React 18 UMD (the last release that ships one), so this page
+         runs from a plain file server with no build step and no network. -->
+    <script src="vendor/react.production.min.js"></script>
+    <script src="vendor/react-dom.production.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
