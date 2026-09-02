@@ -414,6 +414,23 @@ The four things that hold it up:
 Still needs a server (`quarto preview`, or `python3 -m http.server` inside
 `_site/`) — shinylive uses a service worker, so `file://` will not do.
 
+## Commits and PRs
+
+Commit messages and PR titles use [Conventional Commits](https://www.conventionalcommits.org/):
+`type(scope): summary`, imperative mood, no trailing period.
+
+Types in use here: `feat` (new slide, demo, or app), `fix`, `docs` (this file,
+`outline.md`, `DESIGN.md` prose), `style` (theme/SCSS/typography), `refactor`,
+`chore` (CI, deps, vendored assets), `build`.
+
+Scopes are the repo's own nouns: `deck`, `theme`, `apps`, `wasm`, `ci`, `keynote`.
+
+```
+feat(deck): add a React-only Old Faithful demo
+fix(theme): stop code-line-numbers clones jumping by pre's padding
+chore(wasm): refresh the vendored shinyreact build for R 4.5
+```
+
 ## Publishing
 
 `.github/workflows/publish.yml` renders on every push to `main` and deploys
