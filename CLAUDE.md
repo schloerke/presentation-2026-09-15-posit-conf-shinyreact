@@ -56,6 +56,7 @@ Master equivalents, applied as classes on a `##` heading:
 | Code two-up | `## Name {.code-slide}` + `.columns` with two fenced blocks |
 | Data | `## Name {.data-slide}` + caption, `.stats`, one chart |
 | (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
+| (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 
 `.demo-slide` is for live apps: the heading is kept in the source (quarto splits
 slides on `##`, and it carries the slide id and speaker notes) but hidden, and
@@ -102,6 +103,63 @@ Do not "clean these up" — each one silently breaks the layout:
   correctly too. Quarto's `data-fragment-index` escape hatch in that plugin is
   no help: it reads the attribute off the `<code>`, and a block attribute lands
   on the wrapping `div.sourceCode`.
+
+### Mermaid (the one diagram, on "The data cycle")
+
+**TODO — Barret does not like this diagram.** It is checked in to unblock the
+rest of the deck, not because it is right. The layout went flowchart (two
+columns, too wide) → vertical flowchart (needed two `browser` boxes, which ruins
+the point) → this sequence diagram, and each step traded away something. If it
+gets another pass, the honest options are hand-authored svg/html for this one
+slide (full control of a real cycle, at the cost of custom CSS) or `block-beta`
+(manual grid placement, still beta). The notes below are what mermaid will and
+will not do, so a rewrite does not have to rediscover them.
+
+`mermaid-format: svg` in the yaml is load-bearing: without it quarto leaves the
+diagram to client-side mermaid, which measures its labels in a slide reveal has
+`display: none`d and renders boxes with no text in them. With it, quarto
+pre-renders the svg at build time. Everything else follows from that svg being
+sized at build time and re-styled at display time:
+
+- It is a **`sequenceDiagram`**, not a flowchart, and that is the whole reason
+  the slide works. A flowchart cannot show the round trip with one browser box
+  and one server box: dagre gives a cluster the bounding box of its members, so
+  a browser box holding both hooks encloses the server box sitting between them.
+  A sequence diagram gets both boxes plus time down the page for free.
+- Each side's names sit on its own lifeline as **self-messages** (`B->>B:`,
+  `S->>S:`), not as `Note`s. Notes are their own rows *and* render at 14px
+  rather than 16px, and they overhang the lifelines, so they cost both of the
+  budgets below at once: the note version measured 1200x447 units against this
+  one's 810x420.
+- The sequence renderer writes its font size **inline** (16px messages, 14px
+  notes); the `sequence` config's `actorFontSize`/`messageFontSize` are ignored
+  (both numbers and `"32px"` strings were tried). How big the labels read is
+  therefore set by how far the whole svg is scaled up — `800px / 420 units` ≈
+  x1.9, so 30px. Keep the graph narrow (`actorMargin: 100`) and short (five
+  rows) and the text stays large; every extra row or unit of width shrinks it.
+  Splitting the server's three steps into three self-messages, for instance,
+  takes the graph to 713 units tall and the labels down to 19px.
+- `.cycle-slide` pins **both** svg dimensions. Left to itself the svg takes its
+  aspect ratio from quarto's 960x480 `width`/`height` attributes rather than
+  from the viewBox, and the drawing floats in the middle of an 864px-tall box.
+  (`%%| fig-height:` would change those attributes, but only if it comes
+  *before* `%%{init}%%` — cell options first, or they are silently dropped.)
+- Mermaid does **not** widen the diagram to fit message labels, so a label
+  longer than the gap between the lifelines just overhangs them. That is fine
+  here — there is empty slide either side — but it is why the two hops are one
+  label each rather than a sentence.
+- `.cycle-slide` trims the top pad to 76px and drops the swoosh under the
+  headline, purely to hand those pixels to the diagram's height.
+- The `%%{init}%%` block is JSON: no `//` comments in it, they break the parse.
+  Set `fontFamily` at its top level, **not** in `themeVariables`, where it
+  silently drops the font-family declarations from the generated css. It must
+  also be a font the build host has — Inter is a webfont, so this uses
+  Helvetica/Arial.
+- The flowchart-specific rules in `.cycle-slide` (`foreignObject` overflow, the
+  `font-size: inherit` handback) are still there because a flowchart's labels
+  are html in a `foreignObject` sized to the text *as mermaid measured it*, and
+  reveal restyles them afterwards. Needed again if this ever goes back to
+  `flowchart`; harmless for the sequence renderer, which uses svg `<text>`.
 
 ### Editing slides during the talk (installed, off)
 
