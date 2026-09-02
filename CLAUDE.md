@@ -55,6 +55,12 @@ Master equivalents, applied as classes on a `##` heading:
 | Content | `## Name` + a bullet list |
 | Code two-up | `## Name {.code-slide}` + `.columns` with two fenced blocks |
 | Data | `## Name {.data-slide}` + caption, `.stats`, one chart |
+| (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
+
+`.demo-slide` is for live apps: the heading is kept in the source (quarto splits
+slides on `##`, and it carries the slide id and speaker notes) but hidden, and
+padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
+Pair it with `#| viewerHeight: 1080`.
 
 Code fences take `filename="app.R"`, which renders as the uppercase cyan label
 from DESIGN.md 6.4.
@@ -84,6 +90,18 @@ Do not "clean these up" — each one silently breaks the layout:
   padding. The theme fixes it by making such a `pre` a grid and pinning every
   `> code` to cell `1 / 1`; an abspos grid item's containing block is its grid
   area, which sits inside the padding. Don't "fix" it with a hardcoded `top`.
+- A trailing `|` in `code-line-numbers` ("|6|7|4,8|") adds a step that clears
+  the highlight. Use one before an `auto-animate` pair so the transition only
+  has to move the changed lines instead of un-highlighting *and* rewriting.
+- To land text on the *same* click as one of those steps, do **not** reach for
+  `.fragment fragment-index=N`. Reveal's `sortFragments` puts every
+  explicitly-indexed fragment ahead of the unindexed ones, and the
+  line-highlight clones are unindexed, so the text jumps to the front of the
+  slide. The theme's `.after-code` keys off the last clone instead
+  (`section:has(pre > code.fragment:last-of-type.visible)`), which reverses
+  correctly too. Quarto's `data-fragment-index` escape hatch in that plugin is
+  no help: it reads the attribute off the `<code>`, and a block attribute lands
+  on the wrapping `div.sourceCode`.
 
 ### Editing slides during the talk (installed, off)
 
