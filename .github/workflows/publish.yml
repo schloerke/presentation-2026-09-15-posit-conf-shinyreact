@@ -13,8 +13,7 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Only supersede a running publish; let every PR render finish.
-  cancel-in-progress: ${{ github.event_name != 'pull_request' }}
+  cancel-in-progress: true
 
 jobs:
   # On a PR this is the whole workflow: render it, prove it still builds, stop
@@ -22,7 +21,7 @@ jobs:
   render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
