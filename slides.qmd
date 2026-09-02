@@ -33,7 +33,7 @@ filters:
   # - editable
 ---
 
-## Old Faithful {.divider data-number="01"}
+## [Old Faithful]{.fragment} {.divider data-number="DEMO"}
 
 <!-- Notes before the first `##` become their own blank slide, so the opening
      narration lives on this divider rather than the title slide. -->
@@ -41,15 +41,7 @@ filters:
 Today I want to talk about using React.js within your Shiny applications. But
 before I do that, I want to talk about my favorite Shiny application. *Everyone
 remembers their first… app*, and mine was Old Faithful.
-:::
 
-## Everyone remembers their first app
-
-- Building Shiny apps since **2016**, on the Shiny team since **2018**
-- One input, one plot — a complete interactive app in a few lines of R
-- Old Faithful in both senses: *dependable, familiar, the UI we've all seen*
-
-::: {.notes}
 I have been building Shiny apps since 2016 and been on the Shiny Team since
 2018. The Old Faithful app is the kind of app that made me love Shiny: one
 input, one plot, a complete interactive application in just a few lines of R.
@@ -58,12 +50,12 @@ And this app is still Old Faithful in another sense: dependable, familiar, and
 exactly the UI we have all seen before.
 :::
 
-## Old Faithful, live {.code-slide}
+## Old Faithful, live {.demo-slide}
 
 ```{shinylive-r}
 #| standalone: true
 #| components: [viewer]
-#| viewerHeight: 660
+#| viewerHeight: 1080
 {{< include apps/00-old-faithful-trim/app.R >}}
 ```
 
@@ -241,7 +233,9 @@ You need to be able to describe your UI and review the result.
 
 ## The server we started with {.code-slide auto-animate="true"}
 
-```{.r filename="app.R" code-line-numbers="|5|6"}
+<!-- The trailing `|` is an extra step that clears the highlight, so the
+     auto-animate into the next slide only has to move the changed lines. -->
+```{.r filename="app.R" code-line-numbers="|5|6|"}
 x <- faithful$waiting
 
 server <- function(input, output) {
@@ -266,7 +260,7 @@ of the data.
 
 ## The same server, with `shinyreact` {.code-slide auto-animate="true"}
 
-```{.r filename="app.R" code-line-numbers="|4|6-7"}
+```{.r filename="app.R" code-line-numbers="|6|7|4,8|"}
 x <- faithful$waiting
 
 server <- function(input, output) {
@@ -278,7 +272,9 @@ server <- function(input, output) {
 }
 ```
 
-::: {.fragment}
+<!-- .after-code, not .fragment: this appears on the same click as the code
+     block's trailing `|` step, which clears the highlight. See the theme. -->
+::: {.after-code}
 The reactive computation is unchanged. **What changed is the value sent by the server.**
 :::
 
@@ -394,12 +390,12 @@ Get output values as data.
 :::
 :::
 
-## Live: Old Faithful w/ `shinyreact` {.code-slide}
+## Live: Old Faithful w/ `shinyreact` {.demo-slide}
 
 ```{shinylive-r}
 #| standalone: true
 #| components: [viewer]
-#| viewerHeight: 660
+#| viewerHeight: 1080
 
 ## file: app.R
 # `shinyreact` isn't on repo.r-wasm.org, so install it from the wasm-repo/ that

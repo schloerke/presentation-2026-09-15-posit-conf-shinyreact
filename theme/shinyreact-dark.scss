@@ -241,12 +241,45 @@ $presentation-block-margin: 44px !default;
   }
   h1, h2 {
     font-size: 96px;
-    &::after { @include swoosh(640px); margin-top: 44px; }
+    &::after {
+      @include swoosh(640px);
+      margin-top: 44px;
+      transition: opacity .4s ease; // matches reveal's fragment fade
+    }
+    // A heading whose text is a fragment keeps its swoosh hidden until the
+    // click too, otherwise the rule floats under nothing.
+    &:has(> .fragment:not(.visible))::after { opacity: 0; }
   }
 }
 // Master 2 has no footer, and master 1 carries its own lockup instead.
 .reveal:has(section.divider.present) .footer,
 .reveal:has(#title-slide.present) .footer { display: none !important; }
+
+// -- live demo: the app gets the whole canvas --------------------------------
+// The `##` heading still exists (quarto splits slides on it, and it carries the
+// slide id and speaker notes) but is not drawn - the running app is the slide.
+.reveal section.demo-slide {
+  padding: 0 !important;
+  > h2 { display: none; }
+  // The app fills 1920x1080. The wrapper inherits reveal's block margin, which
+  // would push the whole thing 52px down the canvas.
+  // !important because reveal's own `.slides section > *` margin rule loads
+  // after the theme.
+  .shinylive-wrapper { margin: 0 !important; }
+  .shinylive-container, iframe { width: 100%; border: 0; }
+}
+.reveal:has(section.demo-slide.present) .footer { display: none !important; }
+
+// Text that lands on the same click as a code block's trailing `|` step (the
+// one that clears the highlight). It cannot be a `.fragment` with an explicit
+// index: reveal's sortFragments puts every explicitly-indexed fragment ahead of
+// the unindexed ones, and quarto's line-highlight clones are unindexed, so the
+// text would jump to the front of the slide. Key off the last clone instead -
+// the plugin appends one `code` per step, so the last one is the clear step.
+.reveal .after-code { opacity: 0; transition: opacity .4s ease; }
+.reveal section:has(pre > code.fragment:last-of-type.visible) .after-code {
+  opacity: 1;
+}
 
 // -- master 4: code ----------------------------------------------------------
 .reveal section.code-slide {
