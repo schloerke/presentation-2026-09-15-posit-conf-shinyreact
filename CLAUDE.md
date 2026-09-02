@@ -18,7 +18,7 @@ theme/fonts.scss           the DESIGN.md faces, inlined as data URIs (generated)
 theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
 theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
-apps/                      runnable Shiny apps demoed live in the talk
+apps/                      the apps demoed live in the talk (02 is React-only)
 _extensions/drop/          quarto-drop (webR console in a drawer)
 _extensions/EmilHvitfeldt/ quarto-revealjs-editable (live slide editing)
 ```
@@ -257,8 +257,30 @@ slide. If a demo looks like it is loading when you arrive, it is because you got
 there inside that window, not because it waited for you.
 
 The `shinyreact` demo runs in shinylive too, with its `www/` files passed as
-extra `## file:` entries in the same block. There are no iframes in the deck any
-more; nothing has to be running for the slides to work.
+extra `## file:` entries in the same block.
+
+`apps/02-react-only` ("Old Faithful, React only") is the odd one out: **no
+Shiny at all**, so shinylive has nothing to run. It is a static page the slide
+loads in an `<iframe>` — the one iframe in the deck. That still keeps the rule
+that nothing has to be *running* for the slides to work: the src is a relative
+path under `apps/`, served by whatever already serves `slides.html`, and React
+18's UMD build is vendored into `www/vendor/` so the page makes no off-origin
+request. (React 18 because 19 dropped the UMD build, and UMD is what lets the
+demo skip a bundler.)
+
+- `www/app.js` is `React.createElement`, not JSX, for the same reason — no
+  build step. The slide shows the JSX form of the same component; that is the
+  same split `apps/01-shinyreact` already has between `app.js` and `app.tsx`.
+- `www/data.js` holds `faithful$waiting` and `bin_data()`, the JS twin of what
+  the R server computes in `01-shinyreact`. `node apps/02-react-only/check.mjs`
+  asserts its counts match `hist()`'s for several bin counts — run it if you
+  touch the binning.
+- `www/app.css` is a copy of `01-shinyreact`'s, so the two demos look
+  identical. That is the whole point of the pair: the same app, with
+  `useState`/`useMemo` swapped for `useShinyInput`/`useShinyOutputValue`.
+- Quarto's revealjs theme caps `.reveal iframe` at `max-width/height: 95%`,
+  which letterboxes a full-bleed demo. `.demo-slide > iframe` in the SCSS
+  undoes it — don't fix that with inline styles on the slide.
 
 `shinyreact` is a monorepo, and the R package is **not at the root** — plain
 `pak::pak("posit-dev/shinyreact")` fails with "Can't find R package in GitHub
