@@ -299,7 +299,14 @@ $presentation-block-margin: 44px !default;
   // The footer sits in its own layer, so a code panel can run closer to the
   // bottom than a content slide's 140px.
   padding-bottom: 72px;
-  h2 { font-size: 76px; margin-bottom: 44px; }
+  // The lead-in bullet takes the air the heading would have had: it reads as
+  // part of the code block's caption, so the gap that matters is the one below
+  // it, not the one above.
+  h2 { font-size: 76px; margin-bottom: 16px; }
+  // A lead-in bullet above the panel is one line of text, not a bullet list
+  // with a list's rhythm - the content master's 60px above and 26px below cost
+  // the panel ~100px it does not have. Bullet keeps its rule and size.
+  ul { margin-top: 0; margin-bottom: 32px; }
 }
 
 // Extra air above a block that starts a new idea, where reveal's block margin
@@ -364,7 +371,8 @@ $presentation-block-margin: 44px !default;
   code { font-family: $font-family-monospace; }
   p code, li code { color: $cyan-text; }
 
-  // 6.4: filename as an uppercase letter-spaced label above the block. Quarto
+  // 6.4: filename as a letter-spaced label above the block, in the casing the
+  // slide wrote it - no text-transform, so `app.R` stays `app.R`. Quarto
   // ships its own chrome for this (grey bar, mono, border) at equal specificity,
   // so these have to be !important to land.
   .code-with-filename .code-with-filename-file {
@@ -373,10 +381,9 @@ $presentation-block-margin: 44px !default;
     border-radius: 0 !important;
     padding: 0 0 16px 4px !important;
     font-family: $font-family-sans-serif !important;
-    font-size: 28px !important;
+    font-size: 36px !important;
     font-weight: 700 !important;
     letter-spacing: .14em;
-    text-transform: uppercase;
     color: $cyan-text !important;
     // quarto wraps the name in <pre><strong>, which .reveal pre would otherwise
     // re-style as a code panel.

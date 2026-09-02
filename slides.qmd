@@ -67,11 +67,15 @@ exactly the UI we have all seen before.
 {{< include apps/00-old-faithful-trim/app.R >}}
 ```
 
-## Traditionally, you own both halves {.code-slide}
+## Ownership {.code-slide}
 
-::: {.columns}
-::: {.column width="50%"}
-```{.r filename="app.R — ui"}
+::: {.incremental}
+- R owns both the UI definition **and** the reactive computation.
+:::
+
+::: {.columns .spaced}
+::: {.column .fragment width="50%"}
+```{.r filename="UI"}
 ui <- bslib::page_sidebar(
   sidebar = bslib::sidebar(
     sliderInput(
@@ -85,8 +89,8 @@ ui <- bslib::page_sidebar(
 )
 ```
 :::
-::: {.column width="50%"}
-```{.r filename="app.R — server"}
+::: {.column .fragment width="50%"}
+```{.r filename="Server"}
 server <- function(input, output) {
   output$distPlot <- renderPlot({
     x <- faithful$waiting
@@ -97,9 +101,6 @@ server <- function(input, output) {
 :::
 :::
 
-::: {.fragment}
-R owns both the UI definition **and** the reactive computation.
-:::
 
 ::: {.notes}
 Let's dig into the code.
@@ -372,7 +373,7 @@ ui <- shinyreact::page_react_html()
 ```
 
 ::: {.fragment}
-All UI inputs and outputs now live in TypeScript.
+UI inputs and outputs now live in TypeScript.
 :::
 :::
 :::
@@ -383,9 +384,14 @@ Now let's look at the UI definitions.
 Note that you're signing up for all UI inputs and outputs living in TypeScript!
 :::
 
-## `ui.tsx` — index.html, upgraded for React {.code-slide}
+## `ui.tsx` {.code-slide}
 
-```{.javascriptreact filename="www/ui.tsx" code-line-numbers="|2|3|8-9|11"}
+::: {.incremental}
+- Built upon `index.html`, but upgraded for React
+:::
+
+::: {.fragment}
+```{.javascriptreact filename="www/ui.tsx" code-line-numbers="|2|3|8-9|10"}
 export default function App() {
   const [bins, setBins] = useShinyInput<number>("bins", 30);
   const data = useShinyOutputValue<HistData | null>("distPlot", null);
@@ -400,6 +406,7 @@ export default function App() {
   );
 }
 ```
+:::
 
 ::: {.notes}
 `ui.tsx` is Shiny's `index.html` escape hatch, but upgraded for React.
@@ -414,7 +421,7 @@ const [bins, setBins] = useShinyInput<number>("bins", 30);
 :::
 
 ::: {.fragment}
-Just like `useState` — except the state lives in R.
+Just like `useState` — except the state comes from R / python.
 :::
 
 ::: {.fragment .spaced}
