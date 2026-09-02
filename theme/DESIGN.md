@@ -285,11 +285,16 @@ Dark only — no light counterparts.
 
 ## 10. Deferred / open
 
-- **`.kth` production — resolved.** The `.potx`/`.pptx` route won. The AppleScript
-  route is impossible: Keynote's scripting dictionary cannot create or edit master
-  slides, only slides using existing masters. `build_theme.py`
-  generates the deck; the final `.kth` step is a manual Save Theme in Keynote (see
-  that directory's README).
+- **`.kth` production — resolved.** The `.pptx` route won: PowerPoint slide
+  layouts import as Keynote master slides, and `<p:ph>` placeholders import as
+  editable Keynote placeholders. `build_theme.py` generates the deck; the final
+  step is Save Theme in Keynote (see the README).
+- **Masters are the product, not slides.** Save Theme captures master slides and
+  discards content slides. The first build drew the design on slides, so the
+  resulting theme carried only the background colour. Every design element must
+  live on a layout, and every editable region must be a real placeholder whose
+  **list style** (`a:lvl1pPr`) carries the styling — run-level styling alone is
+  lost as soon as the user retypes the text.
 - **Light variant.** Dropped 2026-08-18. §4.2 holds the measured values if revived.
 - **Licensed faces.** If the conf(2026) pixel display face is ever wanted, CoFo
   Sans Pixel is commercial and would need a license. Currently unused.

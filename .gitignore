@@ -1,2 +1,4 @@
 _dev
 _zzz_old_dev
+__pycache__/
+*.pyc
