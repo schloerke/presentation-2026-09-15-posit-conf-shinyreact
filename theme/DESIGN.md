@@ -91,6 +91,7 @@ Code tokens, all on `--ink-deep`:
 | string | `#9FE88D` | 12.51:1 | AAA |
 | number | `#FFB86C` | 10.71:1 | AAA |
 | comment | `#9AA3B2` | **7.17:1** | AAA |
+| JSX prop | `#F0A6C8` | 9.55:1 | AAA |
 
 The comment color is the one value that had to change from a conventional
 syntax theme. The inherited `#6B7280` measured **3.77:1** — legal for large text,

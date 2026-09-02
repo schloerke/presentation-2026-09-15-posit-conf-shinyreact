@@ -31,6 +31,18 @@ quarto preview slides.qmd     # live reload while writing
 quarto render slides.qmd
 ```
 
+### Looking at a slide
+
+Checking a layout or a colour means rendering and *looking*, not reading the
+SCSS. Serve the render and drive it with a browser tool; every slide has an id
+from its heading, so `slides.html#/two-hooks-are-the-whole-api` lands on one
+directly. The browser caches `slides.html` hard between renders — add a
+`?v=N` that changes, or a re-render appears to have done nothing.
+
+**Screenshots go in `.context/`, which is gitignored.** Never leave a debug
+image in the repo root; if one is already there, delete it rather than adding
+it to a commit or `.gitignore`.
+
 The canvas is **1920x1080** (set in the qmd), which is why the SCSS uses the
 same px values DESIGN.md and `build_theme.py` do. Do not rescale them; reveal
 fits the canvas to the viewport.
@@ -80,6 +92,22 @@ Do not "clean these up" — each one silently breaks the layout:
 - Quarto's code filename div is `.code-with-filename-file` (not `-title`), and
   it wraps the name in `<pre><strong>`, so `.reveal pre` re-styles it as a code
   panel unless overridden.
+- Quarto caps highlighted blocks with `.reveal div.sourceCode pre code
+  { max-height: 500px }`, which out-specifies `.reveal pre code`. Past ~11 lines
+  the block silently becomes a scroll container and loses its tail — on a
+  projector that just looks like the code ends mid-line. The theme resets it
+  with the same selector.
+- `.tsx` is not a skylighting language, so a `{.tsx}` block renders unhighlighted.
+  Use `{.javascriptreact}`: it tokenises JSX (DOM tag → keyword, component →
+  function, props → `ot`, coloured by the theme). `{.typescript}` highlights the
+  type annotations instead but leaves all the markup grey.
+- That grammar emits the bracket *and* the name as one token (`<main` is a
+  single `span.kw`), so CSS cannot colour them apart.
+  `theme/jsx-tokens.html` (a second `include-after-body`) re-splits those spans
+  into `.jsx-b` / `.jsx-tag` at parse time — before quarto initialises Reveal,
+  so the `code-line-numbers` clones copy the already-split markup. Its second
+  pass re-tags what the grammar drops around a type parameter
+  (`useShinyInput`, `number`, `HistData` come out as bare text) as `.jsx-id`.
 - SVG data-URI motifs (orbit, swoosh) are scaled by `background-size`, so
   strokes need `vector-effect="non-scaling-stroke"` or they thicken with the
   motif.

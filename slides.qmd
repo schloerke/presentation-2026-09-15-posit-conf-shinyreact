@@ -24,7 +24,9 @@ format:
     drop:
       engine: webr
       button: true
-    include-after-body: theme/fit-width.html
+    include-after-body:
+      - theme/fit-width.html
+      - theme/jsx-tokens.html
 revealjs-plugins:
   - drop
   # - editable   # quarto-revealjs-editable; needs both lists. See CLAUDE.md.
@@ -334,27 +336,17 @@ Note that you're signing up for all UI inputs and outputs living in TypeScript!
 
 ## `ui.tsx` — index.html, upgraded for React {.code-slide}
 
-```{.tsx filename="www/ui.tsx" code-line-numbers="|2|3|9-14|18"}
+```{.javascriptreact filename="www/ui.tsx" code-line-numbers="|2|3|8-9|11"}
 export default function App() {
   const [bins, setBins] = useShinyInput<number>("bins", 30);
   const data = useShinyOutputValue<HistData | null>("distPlot", null);
 
   return (
     <main className="layout">
-      <aside className="sidebar">
-        <label htmlFor="bins">Number of bins:</label>
-        <input
-          id="bins"
-          type="range"
-          value={bins}
-          onChange={(e) => setBins(Number(e.target.value))}
-        />
-      </aside>
-      <section className="panel">
-        <div className="chart">
-          <Histogram data={data} />
-        </div>
-      </section>
+      <label htmlFor="bins">Number of bins:</label>
+      <input id="bins" type="range" value={bins}
+             onChange={(e) => setBins(Number(e.target.value))} />
+      <Histogram data={data} />
     </main>
   );
 }
@@ -367,7 +359,7 @@ export default function App() {
 ## Two hooks are the whole API {.code-slide}
 
 ::: {.fragment .spaced}
-```{.tsx filename="read and write an input"}
+```{.javascriptreact filename="read and write an input"}
 const [bins, setBins] = useShinyInput<number>("bins", 30);
 ```
 :::
@@ -377,7 +369,7 @@ Just like `useState` — except the state lives in R.
 :::
 
 ::: {.fragment .spaced}
-```{.tsx filename="read an output"}
+```{.javascriptreact filename="read an output"}
 const data = useShinyOutputValue<HistData>("distPlot", null);
 ```
 :::
