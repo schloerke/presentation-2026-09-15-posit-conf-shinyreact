@@ -1,0 +1,10 @@
+"$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
+
+[scripts]
+run_mode = "concurrent"
+
+[scripts.run.slides]
+available_in = [ "local" ]
+command = "quarto preview slides.qmd --port $CONDUCTOR_PORT --no-browser"
+default = true
+icon = "presentation"
