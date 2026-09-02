@@ -4,8 +4,6 @@ Built from [`DESIGN.md`](DESIGN.md). Dark mode only.
 
 ```
 build_theme.py        generator (the source of truth - edit this, not the .pptx)
-format_r/python/tsx_clipboard  highlight code to the clipboard as RTF
-shinyreact-dark.theme  token colours for `highlight`
 shinyreact-dark.pptx  5 masters + 5 example slides
 preview/slide-N.png       the example slides
 preview/master-N-blank.png a fresh slide from each master - what you actually get
@@ -69,36 +67,6 @@ file-save panel resists scripting; *Add to Theme Chooser* is one click and works
 
 Bullets are a cyan `▍` bullet character, not a drawn rectangle, so they stay
 aligned when a bullet wraps to two lines.
-
-## Styling code chunks
-
-Keynote has no syntax highlighting, and a theme cannot add any — but Keynote
-*does* keep colour on a rich-text paste. These follow the same shape as
-`~/Documents/bin/misc/format_r_clipboard`: clipboard in, RTF out.
-
-```bash
-./format_r_clipboard              # highlight whatever is on the clipboard
-./format_python_clipboard
-./format_tsx_clipboard ui.tsx     # ...or pass a file
-```
-
-Then click into a code placeholder and press **Cmd-V**. Use plain paste —
-*Paste and Match Style* (Cmd-Shift-Option-V) strips the colours, which defeats
-the point.
-
-They shell out to `highlight` (brew-installed on first run, same guard as the
-original) with `shinyreact-dark.theme`. Colours come from DESIGN.md §4.1, so
-pasted code matches the rest of the theme and clears 7:1 — including the comment
-colour, where the conventional mid-grey measures 3.77:1 and vanishes at the back
-of a room.
-
-Two things to know if you edit the theme file:
-
-- `--font-size` is in **points**, not the spec's pixels. 17pt is the spec's 34px
-  on the 1920x1080 canvas; passing 34 gives you double-size code.
-- The theme paints a `#141519` canvas behind the text, which is exactly the code
-  panel's colour, so it is invisible there. Paste onto a different background and
-  you will see the block.
 
 ## Fonts
 
