@@ -366,28 +366,24 @@ export default function App() {
 
 ## Two hooks are the whole API {.code-slide}
 
-::: {.columns}
-::: {.column width="50%"}
-```{.tsx filename="inputs"}
-const [bins, setBins] =
-  useShinyInput<number>("bins", 30);
+::: {.fragment .spaced}
+```{.tsx filename="read and write an input"}
+const [bins, setBins] = useShinyInput<number>("bins", 30);
 ```
+:::
 
 ::: {.fragment}
-Get **and set** input values.
+Just like `useState` — except the state lives in R.
 :::
-:::
-::: {.column width="50%"}
-```{.tsx filename="outputs"}
-const data =
-  useShinyOutputValue<HistData>(
-    "distPlot", null);
+
+::: {.fragment .spaced}
+```{.tsx filename="read an output"}
+const data = useShinyOutputValue<HistData>("distPlot", null);
 ```
+:::
 
 ::: {.fragment}
-Get output values as data.
-:::
-:::
+R computes the value; React decides how it looks.
 :::
 
 ## Live: Old Faithful w/ `shinyreact` {.demo-slide}
