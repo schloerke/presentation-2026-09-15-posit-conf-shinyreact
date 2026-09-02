@@ -1,0 +1,81 @@
+<script>
+  // Split JSX angle brackets off the tag name.
+  //
+  // Skylighting's `javascriptreact` grammar emits the bracket and the name as
+  // one token - `<main` is a single <span class="kw">, `</main>` a single one
+  // too - so CSS alone cannot colour them apart. This re-splits those spans
+  // into `.jsx-b` (the brackets) and `.jsx-tag` (the element name); the theme
+  // does the colouring.
+  //
+  // Runs at parse time, before quarto initialises Reveal, so the
+  // code-line-numbers clones the highlight plugin makes are copies of the
+  // already-split markup.
+  (function () {
+    // `<main`, `</main>`, `>` and `/>`, but not a comparison or a type
+    // parameter - those tokenise as `op`, and this only walks kw/fu spans.
+    var TAG = /^(?:<\/?[A-Za-z][\w.$-]*>?|\/?>)$/;
+    var PARTS = /(<\/|\/>|[<>])/;
+
+    var spans = document.querySelectorAll(
+      'code.sourceCode.javascriptreact span.kw, code.sourceCode.javascriptreact span.fu'
+    );
+
+    Array.prototype.forEach.call(spans, function (span) {
+      if (!TAG.test(span.textContent)) return;
+      var frag = document.createDocumentFragment();
+      span.textContent.split(PARTS).forEach(function (part) {
+        if (!part) return;
+        var el = document.createElement('span');
+        el.className = PARTS.test(part) ? 'jsx-b' : 'jsx-tag';
+        el.textContent = part;
+        frag.appendChild(el);
+      });
+      span.parentNode.replaceChild(frag, span);
+    });
+
+    // The same grammar drops a call or a type that carries a type parameter:
+    // `useShinyInput<number>` leaves the name, `number` and `HistData` as bare
+    // text. Pick them back up - a name before `(` or `<`, a PascalCase name, or
+    // a primitive type - and give them the one blue DESIGN.md 4.1 assigns to
+    // functions, built-ins and data types alike.
+    // The lookbehinds keep the PascalCase and primitive arms off the tail of a
+    // longer name (`setBins` is not `set` + `Bins`).
+    var REST = '|(?<![\\w$])([A-Z][\\w$]*)|(?<![\\w$])(number|string|boolean|void|any|unknown)(?![\\w$])';
+    var IDENT = new RegExp('([A-Za-z_$][\\w$]*)(?=[(<])' + REST, 'g');
+    // The `<` of `useShinyInput<number>` tokenises as `op`, so it lands in the
+    // next span and the name ends its own text node, out of the lookahead's
+    // reach. Only then does end-of-node stand in for the bracket - matching `$`
+    // unconditionally would also catch `bins` in `const [bins, setBins]`.
+    var IDENT_TAIL = new RegExp('([A-Za-z_$][\\w$]*)(?=[(<]|$)' + REST, 'g');
+
+    var codes = document.querySelectorAll('code.sourceCode.javascriptreact');
+    Array.prototype.forEach.call(codes, function (code) {
+      var walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
+      var texts = [];
+      // Only text the highlighter left unclassified: anything it did tokenise
+      // sits inside a span that already carries a class.
+      while (walker.nextNode()) {
+        if (walker.currentNode.parentElement.className === '') texts.push(walker.currentNode);
+      }
+      texts.forEach(function (node) {
+        var next = node.nextSibling ? node.nextSibling.textContent : '';
+        var re = /^[(<]/.test(next) ? IDENT_TAIL : IDENT;
+        if (!re.test(node.textContent)) return;
+        re.lastIndex = 0;
+        var frag = document.createDocumentFragment();
+        var at = 0;
+        node.textContent.replace(re, function (m, a, b, c, i) {
+          frag.appendChild(document.createTextNode(node.textContent.slice(at, i)));
+          var el = document.createElement('span');
+          el.className = 'jsx-id';
+          el.textContent = m;
+          frag.appendChild(el);
+          at = i + m.length;
+          return m;
+        });
+        frag.appendChild(document.createTextNode(node.textContent.slice(at)));
+        node.parentNode.replaceChild(frag, node);
+      });
+    });
+  })();
+</script>

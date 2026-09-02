@@ -8,6 +8,9 @@ author:
 format:
   revealjs:
     theme: [dark, theme/shinyreact-dark.scss]
+    # No math in the deck, and the default MathJax comes off a CDN - which the
+    # venue may not have. `plain` keeps the render fully self-contained.
+    html-math-method: plain
     highlight-style: theme/shinyreact-dark.highlight.theme
     # 1920x1080 so every px in DESIGN.md and shinyreact-dark.scss is literal.
     width: 1920
@@ -21,16 +24,17 @@ format:
     code-line-numbers: false
     code-copy: false
     incremental: true
-    drop:
-      engine: webr
-      button: true
-    include-after-body: theme/fit-width.html
-    # Pre-render mermaid to svg: rendered in-browser, reveal's font-size rules
-    # reflow the labels after mermaid has already measured them, and the boxes
-    # no longer fit their text.
+    # drop:                      # quarto-drop; off - it loads webR from a CDN.
+    #   engine: webr             # See CLAUDE.md.
+    #   button: true
+    include-after-body:
+      - theme/fit-width.html
+      - theme/jsx-tokens.html
+    # Pre-render mermaid to svg: left to the browser, mermaid measures its
+    # labels while reveal has the slide display:none'd and draws empty boxes.
     mermaid-format: svg
 revealjs-plugins:
-  - drop
+  # - drop       # quarto-drop (webR console on backtick). See CLAUDE.md.
   # - editable   # quarto-revealjs-editable; needs both lists. See CLAUDE.md.
 filters:
   - shinylive
@@ -338,27 +342,17 @@ Note that you're signing up for all UI inputs and outputs living in TypeScript!
 
 ## `ui.tsx` — index.html, upgraded for React {.code-slide}
 
-```{.tsx filename="www/ui.tsx" code-line-numbers="|2|3|9-14|18"}
+```{.javascriptreact filename="www/ui.tsx" code-line-numbers="|2|3|8-9|11"}
 export default function App() {
   const [bins, setBins] = useShinyInput<number>("bins", 30);
   const data = useShinyOutputValue<HistData | null>("distPlot", null);
 
   return (
     <main className="layout">
-      <aside className="sidebar">
-        <label htmlFor="bins">Number of bins:</label>
-        <input
-          id="bins"
-          type="range"
-          value={bins}
-          onChange={(e) => setBins(Number(e.target.value))}
-        />
-      </aside>
-      <section className="panel">
-        <div className="chart">
-          <Histogram data={data} />
-        </div>
-      </section>
+      <label htmlFor="bins">Number of bins:</label>
+      <input id="bins" type="range" value={bins}
+             onChange={(e) => setBins(Number(e.target.value))} />
+      <Histogram data={data} />
     </main>
   );
 }
@@ -370,28 +364,24 @@ export default function App() {
 
 ## Two hooks are the whole API {.code-slide}
 
-::: {.columns}
-::: {.column width="50%"}
-```{.tsx filename="inputs"}
-const [bins, setBins] =
-  useShinyInput<number>("bins", 30);
+::: {.fragment .spaced}
+```{.javascriptreact filename="read and write an input"}
+const [bins, setBins] = useShinyInput<number>("bins", 30);
 ```
+:::
 
 ::: {.fragment}
-Get **and set** input values.
+Just like `useState` — except the state lives in R.
 :::
-:::
-::: {.column width="50%"}
-```{.tsx filename="outputs"}
-const data =
-  useShinyOutputValue<HistData>(
-    "distPlot", null);
+
+::: {.fragment .spaced}
+```{.javascriptreact filename="read an output"}
+const data = useShinyOutputValue<HistData>("distPlot", null);
 ```
+:::
 
 ::: {.fragment}
-Get output values as data.
-:::
-:::
+R computes the value; React decides how it looks.
 :::
 
 ## Live: Old Faithful w/ `shinyreact` {.demo-slide}
@@ -402,17 +392,8 @@ Get output values as data.
 #| viewerHeight: 1080
 
 ## file: app.R
-# `shinyreact` isn't on repo.r-wasm.org, so install it from the wasm-repo/ that
-# ships next to slides.html. The relative URL resolves against webR's asset
-# directory (slides_files/libs/quarto-contrib/shinylive-*/shinylive/webr/), so
-# six levels up is always the folder holding slides.html - wherever the deck is
-# served from. See CLAUDE.md for how wasm-repo/ is rebuilt.
-# repo.r-wasm.org stays in the list or the Imports (brio, cli, rlang, ...)
-# resolve against wasm-repo/ alone and fail.
-webr::install(
-  "shinyreact",
-  repos = c("../../../../../../wasm-repo", "https://repo.r-wasm.org")
-)
+# `shinyreact` (and `brio`) are mounted from the deck's own assets by
+# bundle-wasm.R, so nothing is installed at runtime. See CLAUDE.md.
 {{< include apps/01-shinyreact/app.R >}}
 
 ## file: www/index.html

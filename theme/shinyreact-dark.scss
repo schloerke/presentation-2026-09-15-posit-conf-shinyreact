@@ -14,6 +14,7 @@ $text:       #f2f4f8;
 $muted:      #a3acbb;
 $cyan:       #00d8ff; // graphic only - fringes on letterforms, see DESIGN.md 4.1
 $cyan-text:  #6fd4e8;
+$jsx-attr:   #f0a6c8; // JSX props, 9.55:1 on --ink-deep (DESIGN.md 4.1)
 
 // -- 4.3 chart series (fixed order, never cycled) ----------------------------
 $series-1: #0e9dba;
@@ -27,7 +28,9 @@ $margin:    96px;
 $footer-y:  60px;
 
 // -- 5.1 faces ---------------------------------------------------------------
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Code+Pro:wght@400;600&display=swap');
+// Inlined faces, not a Google Fonts @import: the deck must render with no
+// network at the venue. Regenerate with `python3 theme/build_fonts.py`.
+@import "fonts";
 
 $font-family-sans-serif: Inter, "Helvetica Neue", Arial, sans-serif !default;
 $font-family-monospace: "Source Code Pro", Menlo, "Courier New", monospace !default;
@@ -284,8 +287,15 @@ $presentation-block-margin: 44px !default;
 // -- master 4: code ----------------------------------------------------------
 .reveal section.code-slide {
   padding-top: 96px;
+  // The footer sits in its own layer, so a code panel can run closer to the
+  // bottom than a content slide's 140px.
+  padding-bottom: 72px;
   h2 { font-size: 76px; margin-bottom: 44px; }
 }
+
+// Extra air above a block that starts a new idea, where reveal's block margin
+// reads as "same idea, next line".
+.reveal .spaced { margin-top: 100px; }
 
 .reveal {
   // 6.4: the panel. Radius 20, 40/44 padding, cyan hairline at 18%. Only `pre`
@@ -301,7 +311,29 @@ $presentation-block-margin: 44px !default;
     padding: 40px 44px;
     font-size: $code-block-font-size;
     line-height: 1.35;
-    code { background: none; padding: 0; max-height: none; }
+    code { background: none; padding: 0; }
+  }
+  // Quarto caps a highlighted block at `max-height: 500px` from
+  // `.reveal div.sourceCode pre code`, which out-specifies anything set on
+  // `.reveal pre code` - a long block silently loses its last lines to a
+  // scroll container nobody can scroll on a projector. Match the selector.
+  div.sourceCode pre code { max-height: none; }
+
+  // JSX reads as markup, not as one grey blob: the tag brackets and element
+  // name come from the `javascriptreact` grammar (`kw` for a DOM tag, `fu` for
+  // a component), and props are the one token the shared theme leaves plain -
+  // `ot` is R's `<-` everywhere else, so colour it inside JSX only.
+  // `.jsx-b` / `.jsx-tag` are split out of skylighting's single tag token by
+  // theme/jsx-tokens.html - the grammar emits `<main` as one span.
+  .sourceCode.javascriptreact {
+    .ot { color: $jsx-attr; }
+    .jsx-b { color: $muted; font-weight: 400; }
+    // Element names sit in the same blue as `App` / `setBins` / `<Histogram`:
+    // a tag is a call, and the brackets are what mark it as markup.
+    .jsx-tag { color: $cyan-text; font-weight: 400; }
+    // Hook calls and type names the grammar left untokenised - DESIGN.md 4.1
+    // gives function, built-in and data type the same blue.
+    .jsx-id { color: $cyan-text; }
   }
   div.sourceCode, .code-with-filename {
     border: none;
