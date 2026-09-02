@@ -20,6 +20,7 @@ format:
     footer: "posit::conf(2026) · @schloerke"
     code-line-numbers: false
     code-copy: false
+    incremental: true
     drop:
       engine: webr
       button: true
@@ -34,29 +35,37 @@ revealjs-plugins:
 
 ## Old Faithful {.divider data-number="01"}
 
-## Historically, you own both halves
+## Everyone remembers their first app
 
-- Shiny defines the **UI** and the **server**
-- One language, one mental model
-- The UI vocabulary is *whatever Shiny ships*
+- Building Shiny apps since **2016**, on the Shiny team since **2018**
+- One input, one plot — a complete interactive app in a few lines of R
+- Old Faithful in both senses: *dependable, familiar, the UI we've all seen*
 
-## The app {.code-slide}
+## Old Faithful, live {.code-slide}
+
+<!-- Run it first: R -e 'shiny::runApp("apps/00-old-faithful", port = 8080)' -->
+<iframe class="app" src="http://127.0.0.1:8080"></iframe>
+
+## Traditionally, you own both halves {.code-slide}
 
 ::: {.columns}
 ::: {.column width="50%"}
-```{.r filename="app.R"}
-ui <- page_sidebar(
-  sidebar = sidebar(
-    sliderInput("bins", "Bins:",
-                min = 1, max = 50,
-                value = 30)
+```{.r filename="app.R — ui"}
+ui <- bslib::page_sidebar(
+  sidebar = bslib::sidebar(
+    sliderInput(
+      inputId = "bins",
+      label = "Number of bins:",
+      min = 1, max = 50,
+      value = 30
+    )
   ),
-  plotOutput("distPlot")
+  plotOutput(outputId = "distPlot")
 )
 ```
 :::
 ::: {.column width="50%"}
-```{.r filename="server"}
+```{.r filename="app.R — server"}
 server <- function(input, output) {
   output$distPlot <- renderPlot({
     x <- faithful$waiting
@@ -67,58 +76,274 @@ server <- function(input, output) {
 :::
 :::
 
-## Shiny React {.divider data-number="02"}
-
-## Same server, your frontend {.code-slide}
-
-::: {.columns}
-::: {.column width="50%"}
-```{.tsx filename="app.tsx"}
-const [n, setN] = useShinyInput(
-  "bins", 30
-);
-const plot = useShinyOutputValue(
-  "hist"
-);
-
-return <Slider value={n}
-  onChange={setN} />;
-```
+::: {.fragment}
+R owns both the UI definition **and** the reactive computation.
 :::
-::: {.column width="50%"}
-```{.r filename="app.R"}
-ui <- page_react_html("www/index.html")
+
+## The R UI is wonderful… until it isn't
+
+- For an app like this, `bslib` gets you from nothing to something to be *proud of*
+- Then a request comes in:
+  - a distinctive interface
+  - richer interaction
+  - a component from a modern design system
+- Suddenly you're authoring an uphill battle of markup, styling, and interaction details
+
+## But the reactive data model is your domain expertise
+
+::: {.nonincremental}
+- I do **not** want to replace Shiny
+:::
+
+::: {.fragment}
+Keep Shiny for **reactive computation**.
+
+Use a modern UI ecosystem — **React.js** — for the interface.
+:::
+
+## React.js {.divider data-number="02"}
+
+## What is React?
+
+- "The library for web and native user interfaces"
+- "…build user interfaces out of individual pieces called **components**"
+
+## Why React?
+
+- A **massive** ecosystem of proven, production-ready components
+- It dwarfs what R / Python has readily available
+- Component libraries, design systems, charts, tables, maps — off the shelf
+
+## UI is assembled from your data's state
+
+- React is *really* good at taking JSON and mapping data to UI
+- You describe what the UI looks like **for a given state**
+- Don't worry about managing transitions from one data state to another
+
+## Why Shiny **+** React?
+
+- If you've found yourself writing custom HTML and JavaScript, React is the framework that scales those projects
+- "We picked it up off the shelf to not write JS… happy with the tradeoffs"
+- AI does better building on top of existing frameworks
+
+## `shinyreact` {.divider data-number="03"}
+
+## `shinyreact`
+
+*Shiny UI infrastructure for React-based component rendering*
+
+- The Shiny server contains **only reactive data computation**
+- The UI is a React client **you own**
+- `shinyreact` is the bridge between the two — it ships **zero UI components**
+
+## Two frameworks, one reactive model
+
+- Pure functional programming keeps logic easy to reason about as apps grow
+- That's what makes *both* frameworks a joy to work in
+- Build the whole UI from the ground up in React / TypeScript
+- *Experimental package, for the brave few*
+
+## "You want me to write JavaScript?!?"
+
+- Joe: "Shiny authors shouldn't need to write JavaScript"
+- Barret: **I believe this still holds true!**
+- Agents have far more examples of mainstream React patterns than custom Shiny UI apps
+  - I trust any frontier model to write React code better than I can
+- Your job: **describe your UI, review the result**
+
+## Old Faithful, remixed {.divider data-number="04"}
+
+## The server we started with {.code-slide auto-animate="true"}
+
+```{.r filename="app.R" code-line-numbers="|5|6"}
+x <- faithful$waiting
 
 server <- function(input, output) {
-  output$hist <- reactive_output({
-    req(input$bins)
-    hist_data(x, input$bins)
+  output$distPlot <- renderPlot({
+    breaks <- seq(min(x), max(x), length.out = input$bins + 1)
+    hist(x, breaks = breaks)
   })
 }
 ```
-:::
-:::
 
-## Live {.code-slide}
-
-<!-- Run it first: R -e 'shiny::runApp("apps/01-shinyreact", port = 8080)' -->
-<iframe class="app" src="http://127.0.0.1:8080"></iframe>
-
-## Numbers {.data-slide}
-
-Bundle size, measured on the trimmed apps
-
-::: {.stats}
-::: {}
-[42 kB]{.stat-value}<br>[gzipped]{.stat-label}
-:::
-::: {}
-[1]{.stat-value}<br>[websocket]{.stat-label}
-:::
+::: {.fragment}
+`input$bins` → `breaks` → `hist()`
 :::
 
-::: {.lede}
-Press `` ` `` for a live R console — it keeps its state across slides.
+## The same server, with `shinyreact` {.code-slide auto-animate="true"}
+
+```{.r filename="app.R" code-line-numbers="|4|6-7"}
+x <- faithful$waiting
+
+server <- function(input, output) {
+  output$distPlot <- shinyreact::reactive_output({
+    breaks <- seq(min(x), max(x), length.out = input$bins + 1)
+    info <- hist(x, breaks = breaks, plot = FALSE)
+    info[c("breaks", "counts")]
+  })
+}
+```
+
+::: {.fragment}
+The reactive computation is unchanged. **What changed is the value sent by the server.**
 :::
 
-## Thanks {.divider data-number="03"}
+## `reactive_output()` — a new concept
+
+- No corresponding UI component on the server side
+- Convert your data and send it to the client **as JSON**
+- `hist(x, plot = FALSE)` returns `breaks` and `counts` — send exactly what's needed
+- That shape is **the contract** the browser receives
+- Let React display your data's state in the UI
+
+## The UI moves to TypeScript {.code-slide}
+
+::: {.columns}
+::: {.column width="50%"}
+```{.r filename="app.R (classic)"}
+ui <- bslib::page_sidebar(
+  sidebar = bslib::sidebar(
+    sliderInput(inputId = "bins", ...)
+  ),
+  plotOutput(outputId = "distPlot")
+)
+```
+:::
+::: {.column width="50%"}
+```{.r filename="app.R (shinyreact)"}
+ui <- shinyreact::page_react_html()
+```
+
+::: {.fragment}
+All UI inputs and outputs now live in TypeScript.
+:::
+:::
+:::
+
+## `ui.tsx` — index.html, upgraded for React {.code-slide}
+
+```{.tsx filename="www/ui.tsx" code-line-numbers="|2|3|9-14|18"}
+export default function App() {
+  const [bins, setBins] = useShinyInput<number>("bins", 30);
+  const data = useShinyOutputValue<HistData | null>("distPlot", null);
+
+  return (
+    <main className="layout">
+      <aside className="sidebar">
+        <label htmlFor="bins">Number of bins:</label>
+        <input
+          id="bins"
+          type="range"
+          value={bins}
+          onChange={(e) => setBins(Number(e.target.value))}
+        />
+      </aside>
+      <section className="panel">
+        <div className="chart">
+          <Histogram data={data} />
+        </div>
+      </section>
+    </main>
+  );
+}
+```
+
+## Two hooks are the whole API {.code-slide}
+
+::: {.columns}
+::: {.column width="50%"}
+```{.tsx filename="inputs"}
+const [bins, setBins] =
+  useShinyInput<number>("bins", 30);
+```
+
+::: {.fragment}
+Get **and set** input values.
+:::
+:::
+::: {.column width="50%"}
+```{.tsx filename="outputs"}
+const data =
+  useShinyOutputValue<HistData>(
+    "distPlot", null);
+```
+
+::: {.fragment}
+Get output values as data.
+:::
+:::
+:::
+
+## Live: Old Faithful w/ `shinyreact` {.code-slide}
+
+<!-- Run it first: R -e 'shiny::runApp("apps/01-shinyreact", port = 8081)' -->
+<iframe class="app" src="http://127.0.0.1:8081"></iframe>
+
+## The data cycle
+
+- **Shiny (classic):** `input$value` → `reactive()` → `renderFn()`
+- **shinyreact server:** `input$value` → `reactive()` → `reactive_output()`
+- **shinyreact browser:** `useShinyInput()` in, `useShinyOutputValue()` out
+- Inputs still travel to the Shiny server; outputs travel back **as data**
+- Keep R / Python for data work and reactivity
+- **IDs and JSON are the contract**
+
+## Testing {.divider data-number="05"}
+
+## Test coverage at every hop
+
+- **Within the server** — `test_server()`
+  - set inputs, confirm output values
+- **Server → client** — `wire_tap`
+  - assert `shinyreact` messages on the websocket
+- **Within the client** — JS unit tests
+  - *agent's choice*
+- **Confirm the client** — `features.md`
+  - a nested list of features you can read and other agents can confirm
+
+## Why that contract matters
+
+- The narrow **IDs + JSON** boundary is practical to review and maintain
+- Server logic stays in R: review it, defend it, test it independently
+- Delegate the busy-work UI details to the agent — then verify
+
+## What's next {.divider data-number="06"}
+
+## Future work: incremental adoption
+
+- Embed React components into **existing** apps
+  - no need to port your whole application to React
+- Opens the door for helper packages down the road
+- Today, writing `shinyreact` apps will feel ad-hoc — that's the tradeoff of experimental
+
+## Recap
+
+- Keep **R / Python** for reactive data processing
+- Let an **agent** build the React.js client
+- **IDs and JSON structures** are the communication contract
+
+## Q & A {.divider data-number="07"}
+
+## Is node.js needed?
+
+- **No** — but highly recommended
+- TSX is much more readable than vanilla JavaScript
+- A build system can lint and strongly type your code
+
+## How do I review generated code?
+
+- Unit tests help with drift — but they confirm *existing* behavior
+- The logic you care about lives server-side: review it, defend it, write independent tests
+- I'm comfortable delegating busy-work UI details to the LLM
+
+## What about my existing apps?
+
+- Agent Skills are available to convert Shiny apps to `shinyreact`
+
+## Can I keep my existing outputs?
+
+- **Yup.** Use regular render methods, just like normal
+- Pair them with `<ShinyOutput id="distPlot" />` in your React code
+- Don't reinvent the wheel — your UI app becomes more about **layout** than outputs
+
+## Thanks {.divider data-number="08"}
