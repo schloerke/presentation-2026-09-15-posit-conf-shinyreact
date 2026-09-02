@@ -17,6 +17,7 @@ theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 apps/                      runnable Shiny apps demoed live in the talk
 _extensions/drop/          quarto-drop (webR console in a drawer)
+_extensions/EmilHvitfeldt/ quarto-revealjs-editable (live slide editing)
 ```
 
 **`theme/DESIGN.md` outranks both renderers.** The SCSS and `build_theme.py` are
@@ -83,6 +84,29 @@ Do not "clean these up" — each one silently breaks the layout:
   padding. The theme fixes it by making such a `pre` a grid and pinning every
   `> code` to cell `1 / 1`; an abspos grid item's containing block is its grid
   area, which sits inside the padding. Don't "fix" it with a hardcoded `top`.
+
+### Editing slides during the talk (installed, off)
+
+`_extensions/EmilHvitfeldt` (quarto-revealjs-editable) allows dragging,
+resizing and retyping content on the rendered slide. It is installed but
+**commented out in both yaml lists**, and it needs both to do anything:
+
+```yaml
+revealjs-plugins: [drop, editable]
+filters: [shinylive, editable]
+```
+
+Uncomment only while actually adjusting something, then comment it back out:
+it pins a 100px Save/Add/Modify bar to the top of the window and sets
+`html.has-editable-toolbar`, which offsets `.reveal` by the same 100px, so
+every slide gets a toolbar and loses 100px of height. The plugin has no option
+to hide it.
+
+Click **Modify** to edit the current slide; `.editable` on a div or image
+pre-marks it. Save Edits writes back absolute geometry
+(`{.absolute width=… left=…}`), which is at odds with every master in
+DESIGN.md — treat anything it writes into `slides.qmd` as something to fold
+back into the theme, not to keep.
 
 ### Live code and apps
 

@@ -27,8 +27,10 @@ format:
     include-after-body: theme/fit-width.html
 revealjs-plugins:
   - drop
+  # - editable   # quarto-revealjs-editable; needs both lists. See CLAUDE.md.
 filters:
   - shinylive
+  # - editable
 ---
 
 ## Old Faithful {.divider data-number="01"}
