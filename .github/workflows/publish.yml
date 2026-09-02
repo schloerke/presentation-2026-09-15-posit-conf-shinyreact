@@ -41,37 +41,16 @@ jobs:
             any::shinylive
             posit-dev/shinyreact/pkg-r
 
-      # The shinylive R package unpacks ~700 MB of web assets outside the R
-      # library, on first use rather than at install time - so the package
-      # cache above does not cover it.
-      - name: Locate the shinylive assets
-        id: shinylive
-        shell: Rscript {0}
-        run: |
-          cat(
-            "dir=", tools::R_user_dir("shinylive", "cache"), "\n",
-            "version=", as.character(shinylive::assets_version()), "\n",
-            sep = "", file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE
-          )
-      - uses: actions/cache/restore@v4
-        id: shinylive-cache
-        with:
-          path: ${{ steps.shinylive.outputs.dir }}
-          key: shinylive-${{ runner.os }}-${{ steps.shinylive.outputs.version }}
-
+      # shinylive's web assets are deliberately *not* cached. They live outside
+      # the R library (`~/.cache/shinylive`), so the package cache above misses
+      # them - but measured in this job the download is 2s and the unzip 2s,
+      # against ~740 MB unpacked. Caching that is slower than fetching it, and
+      # it would crowd the R package cache out of the repo's 10 GB.
       - run: quarto render
 
-      # Saved even if the render failed, and skipped on a hit: restore/save
-      # rather than `actions/cache` so a red PR still leaves the assets behind.
-      - uses: actions/cache/save@v4
-        if: always() && steps.shinylive-cache.outputs.cache-hit != 'true'
-        with:
-          path: ${{ steps.shinylive.outputs.dir }}
-          key: shinylive-${{ runner.os }}-${{ steps.shinylive.outputs.version }}
-
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
         if: github.event_name != 'pull_request'
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         if: github.event_name != 'pull_request'
         with:
           path: _site
@@ -84,5 +63,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
         id: deploy
