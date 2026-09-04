@@ -14,5 +14,17 @@
     <div id="root"></div>
     <script src="data.js"></script>
     <script src="app.js"></script>
+    <!-- The deck loads this page in an iframe, so reveal never sees these keys.
+         Hand them back via reveal's postMessage API: triggerKey runs whatever
+         reveal itself has bound to the code, so no keymap is duplicated here. -->
+    <script>
+      const deckKeys = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, " ": 32, Escape: 27 };
+      addEventListener("keydown", (e) => {
+        const keyCode = deckKeys[e.key];
+        if (keyCode && parent !== window) {
+          parent.postMessage(JSON.stringify({ method: "triggerKey", args: [keyCode] }), "*");
+        }
+      });
+    </script>
   </body>
 </html>
