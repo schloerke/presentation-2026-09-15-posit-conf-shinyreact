@@ -1,5 +1,4 @@
-# Original Title - Beyond Bootstrap: Building Custom Shiny UI Packages with AI
-# Proposed Title - Beyond Bootstrap: Building Custom Shiny UI with React
+# Beyond Bootstrap: Building Custom Shiny UI with React
 
 Slides: https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/
 
