@@ -9,7 +9,6 @@
 // -- 4.1 dark tokens ---------------------------------------------------------
 $ink:        #1c1d22;
 $ink-deep:   #141519;
-$hex-plate:  #23252c;
 $text:       #f2f4f8;
 $muted:      #a3acbb;
 $cyan:       #00d8ff; // graphic only - fringes on letterforms, see DESIGN.md 4.1
@@ -158,6 +157,8 @@ $presentation-block-margin: 44px !default;
 
   // Hex ring + logo, right (DESIGN.md 6.1). A stroke, not a fill: the logo PNG
   // bakes in its own #1C1D22 hex, so a fill behind it would show as a patch.
+  // Cyan, not the old #23252C: grey it read as a smudge the logo's atom
+  // happened to cross.
   // The logo is a second background layer here rather than
   // `title-slide-attributes: data-background-image`, because reveal's
   // background element is the *viewport*, not the 1920x1080 canvas - so the
@@ -172,7 +173,7 @@ $presentation-block-margin: 44px !default;
     background:
       no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
       no-repeat center / 100% 100%
-        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2323252C" stroke-width="4"/></svg>');
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2300D8FF" stroke-width="4"/></svg>');
   }
 
   h1.title {
@@ -466,6 +467,18 @@ $presentation-block-margin: 44px !default;
   font-size: 30px;
   color: $muted;
   text-align: right;
+}
+
+// Conf logo, bottom-left (DESIGN.md 6). A background layer rather than a
+// pseudo-element: both of the title slide's own pseudos are taken (orbit,
+// hex ring), and `background-image` in its own rule leaves the divider's
+// `background: $ink-deep` shorthand alone. Same url() walk as shiny-react.png.
+#title-slide,
+.reveal section.divider.end {
+  background-image: url('../../../../../theme/posit-conf-2026.svg');
+  background-repeat: no-repeat;
+  background-position: $margin calc(100% - #{$footer-y});
+  background-size: 130px 76px;
 }
 
 // -- chrome ------------------------------------------------------------------

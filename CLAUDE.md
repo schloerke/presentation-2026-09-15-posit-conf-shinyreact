@@ -38,6 +38,12 @@ The deck is `index.qmd`, not `slides.qmd`, so the published site's root *is*
 the deck. Render output goes to `_site/`, with `apps/` copied in as a project
 resource (slide 02 loads it in an iframe by relative path).
 
+`theme/*.png` and `theme/*.svg` are project resources too. The compiled theme's
+`url()`s (the title hex logo, the conf logo) walk out of
+`index_files/libs/revealjs/dist/theme/` to `_site/theme/`; without the resource
+entries they only resolve under `quarto preview`, which serves the project root
+— a served render 404s them, silently, as a missing logo.
+
 ### Looking at a slide
 
 Checking a layout or a colour means rendering and *looking*, not reading the

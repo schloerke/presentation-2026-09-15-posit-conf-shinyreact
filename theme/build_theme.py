@@ -45,7 +45,6 @@ OUT = HERE / "shinyreact-dark.pptx"
 
 INK = RGBColor(0x1C, 0x1D, 0x22)
 INK_DEEP = RGBColor(0x14, 0x15, 0x19)
-HEX_PLATE = RGBColor(0x23, 0x25, 0x2C)
 TEXT = RGBColor(0xF2, 0xF4, 0xF8)  # 15.28:1 on INK
 MUTED = RGBColor(0xA3, 0xAC, 0xBB)  # 7.35:1 on INK
 CYAN = RGBColor(0x00, 0xD8, 0xFF)  # GRAPHIC ONLY
@@ -324,7 +323,7 @@ def master_title(lay):
     lay.background.fill.solid()
     lay.background.fill.fore_color.rgb = INK
     orbit(sh, 1770, 370, 550, 7)
-    hex_ring(sh, 1920 - 130 - 560, 247, 560, 647, HEX_PLATE, width=4)
+    hex_ring(sh, 1920 - 130 - 560, 247, 560, 647, CYAN, width=4)
     sh.add_picture(str(LOGO), PX(1920 - 150 - 520), PX(270), width=PX(520))
 
     _, tf = textbox(sh, MARGIN, 250, 1100, 60)

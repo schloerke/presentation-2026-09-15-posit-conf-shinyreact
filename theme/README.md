@@ -10,6 +10,7 @@ shinyreact-dark.pptx  5 masters + 5 example slides
 preview/slide-N.png       the example slides
 preview/master-N-blank.png a fresh slide from each master - what you actually get
 shiny-react.png       logo, vendored from posit-dev/shinyreact
+posit-conf-2026.svg   conf logo, from conf.posit.co, recoloured to --muted
 DESIGN.md             the spec: tokens, type scale, masters, measured contrast
 ```
 

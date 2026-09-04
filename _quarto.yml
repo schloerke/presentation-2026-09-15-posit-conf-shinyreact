@@ -11,6 +11,11 @@ project:
   output-dir: _site
   resources:
     - apps/**
+    # The compiled theme's url()s (title logo, conf logo) walk out of
+    # index_files/libs/revealjs/dist/theme/ to _site/theme/. Without this they
+    # only resolve under `quarto preview`, which serves the project root.
+    - theme/*.png
+    - theme/*.svg
   # Bundles wasm-repo/ into the render so the deck runs with no network.
   post-render:
     - bundle-wasm.R
