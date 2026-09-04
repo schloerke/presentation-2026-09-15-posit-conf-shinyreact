@@ -308,6 +308,34 @@ $presentation-block-margin: 44px !default;
     max-height: none;
   }
 }
+
+// -- app showcase: one screenshot per bullet, swapped on the bullet's click ---
+// Reveal's `.r-stack` already puts every image in one grid cell, so this only
+// has to give that cell a size the screenshots can share - they do not share an
+// aspect ratio, hence `object-fit: contain` and a panel-coloured backdrop, so
+// the letterbox bars read as part of the frame. Quarto wraps each image in its
+// own `<p>`, which is what `.r-stack` actually stacks; pair with `.nostretch`
+// or auto-stretch takes the images over.
+.reveal .app-stack {
+  height: 560px;
+  > p { margin: 0; height: 100%; }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: $ink-deep;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 16px;
+    box-shadow: none;
+  }
+}
+// Five one-item lists, not one list: each bullet is its own fragment, so it can
+// share a `fragment-index` with its screenshot. That costs the list's own
+// rhythm, so set the gap between the bullets here.
+.reveal .app-slide {
+  padding-top: 96px;
+  ul { margin: 0 0 40px; }
+}
 .reveal:has(section.demo-slide.present) .footer { display: none !important; }
 
 // Text that lands on the same click as a code block's trailing `|` step (the

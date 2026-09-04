@@ -528,7 +528,116 @@ review and maintain.
 You need to be able to describe your UI and review the result.
 :::
 
-## What's next {.divider data-number="06"}
+## In the wild {.divider data-number="06"}
+
+::: {.notes}
+None of this is theory any more. Over the summer one intern built a shelf of it.
+:::
+
+## Samuel Bharti
+
+::: {.columns}
+::: {.column width="32%"}
+![](images/samuel-bharti.png){width="440"}
+:::
+::: {.column width="68%"}
+::: {.nonincremental}
+- Posit engineering intern, summer 2026
+- Computational biologist
+- Ph.D. candidate, UAB · ex-Genentech
+- Nine Shiny apps, four supporting packages
+- `posit-dev/shiny-showcase-bioinformatics`
+:::
+:::
+:::
+
+::: {.notes}
+Samuel was our software engineering intern this summer — a computational
+biologist and a PhD candidate at UAB, previously at Genentech and Roche.
+
+He spent the summer building bioinformatics Shiny apps, and the gallery is all
+of them in one place.
+:::
+
+## A summer of Shiny for bioinformatics {.app-slide .nostretch}
+
+<!-- One screenshot per app, swapped on the same click as its bullet. Both
+     halves carry matching `fragment-index`, which is the only way to land two
+     fragments on one click; the images are `.fade-in-then-out` so exactly one
+     is up at a time. Screenshots, not iframes: these are deployments, and the
+     deck makes no off-origin request. -->
+::: {.columns}
+::: {.column width="46%"}
+::: {.fragment .nonincremental fragment-index=1}
+- **tahoe-explorer** · 100.6M rows
+:::
+::: {.fragment .nonincremental fragment-index=2}
+- **genescout** · evidence review
+:::
+::: {.fragment .nonincremental fragment-index=3}
+- **variant-reviewer** · 18 cards
+:::
+::: {.fragment .nonincremental fragment-index=4}
+- **gene-list-builder** · 7 sources
+:::
+::: {.fragment .nonincremental fragment-index=5}
+- **Plotomics Live** · `shinyreact`
+:::
+:::
+::: {.column width="54%"}
+::: {.r-stack .app-stack}
+![](images/app-tahoe-explorer.png){.fragment .fade-in-then-out fragment-index=1}
+
+![](images/app-genescout.png){.fragment .fade-in-then-out fragment-index=2}
+
+![](images/app-variant-reviewer.png){.fragment .fade-in-then-out fragment-index=3}
+
+![](images/app-gene-list-builder.png){.fragment .fade-in-then-out fragment-index=4}
+
+![](images/app-plotomics-live.png){.fragment fragment-index=5}
+:::
+:::
+:::
+
+::: {.notes}
+Nine apps in the gallery; these are the five with public source. Each one is
+archived on Zenodo, so there is a DOI to cite rather than a deployment address.
+
+The last one is the one I care about today: Plotomics Live. Twenty-six
+biological visualizations, each rendered *two ways* — an interactive GPU
+component in React, and the classic server-rendered ggplot2 image, both off the
+same server-side computation. On screen is spatial transcriptomics: 3,798
+capture spots at their real coordinates on a breast cancer section, over the
+H&E they came from.
+:::
+
+## What `shinyreact` bought him {.code-slide}
+
+::: {.incremental}
+- `app.R` is **compute-only** — one `reactive_output()` per visualization
+- The entire UI, in R, is **one line**
+:::
+
+::: {.fragment}
+```{.r filename="app.R"}
+ui <- shinyreact::page_react_html("www/index.html")
+```
+:::
+
+::: {.fragment .spaced}
+584,207 cells on the GPU; **ggplot2 has to subsample**
+:::
+
+::: {.notes}
+The server does data work and nothing else: one `reactive_output()` per
+visualization, and in R the whole UI is a single line.
+
+The headline is the single-cell UMAP: 584,207 real cells, streamed as binary
+column blobs and drawn on the GPU. The ggplot2 engine can only show a static
+subsample. That contrast is the whole demo.
+:::
+
+## What's next {.divider data-number="07"}
 
 ## Future work: incremental adoption
 
@@ -550,7 +659,7 @@ Today, everything will feel ad-hoc when writing `shinyreact` apps.
 - Let an **agent** build the React.js client
 - **IDs and JSON structures** are the communication contract
 
-## Q & A {.divider data-number="07"}
+## Q & A {.divider data-number="08"}
 
 ## Is node.js needed?
 
@@ -574,7 +683,7 @@ Today, everything will feel ad-hoc when writing `shinyreact` apps.
 - Pair them with `<ShinyOutput id="distPlot" />` in your React code
 - Don't reinvent the wheel — your UI app becomes more about **layout** than outputs
 
-## Thanks {.divider .end data-number="08"}
+## Thanks {.divider .end data-number="09"}
 
 ::: {.handle}
 @schloerke
