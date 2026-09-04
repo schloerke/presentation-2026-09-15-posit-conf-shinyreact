@@ -53,6 +53,13 @@ from its heading, so `index.html#/two-hooks-are-the-whole-api` lands on one
 directly. The browser caches `index.html` hard between renders — add a
 `?v=N` that changes, or a re-render appears to have done nothing.
 
+`quarto render` **deletes and recreates `_site/`**, so a server started *inside*
+it keeps serving the old, unlinked directory: every later check silently reads a
+stale deck (the tell is reveal bouncing a known slide id back to
+`#/title-slide`). Restart the server after each render. Serving the project root
+instead is not a fix — the deck's assets resolve from `index.html`'s own
+directory, so `/_site/index.html` loads unstyled.
+
 **Screenshots go in `.context/`, which is gitignored.** Never leave a debug
 image in the repo root; if one is already there, delete it rather than adding
 it to a commit or `.gitignore`.
@@ -82,6 +89,7 @@ Master equivalents, applied as classes on a `##` heading:
 | Code two-up | `## Name {.code-slide}` + `.columns` with two fenced blocks |
 | Data | `## Name {.data-slide}` + caption, `.stats`, one chart |
 | (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
+| (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 
 `.demo-slide` is for live apps: the heading is kept in the source (quarto splits
@@ -89,13 +97,32 @@ slides on `##`, and it carries the slide id and speaker notes) but hidden, and
 padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
 Pair it with `#| viewerHeight: 1080`.
 
-It also takes a **1920x1080 screenshot** in place of an app that cannot run
-offline (`## Plotomics Live {.demo-slide .nostretch}` + a bare `![](…)`).
-`.nostretch` is load-bearing: quarto's auto-stretch otherwise lifts the image
-out of its `<p>`, tags it `.r-stretch`, and reveal writes an aspect-preserving
-width/height inline that beats the theme's rule — the image then letterboxes
-inside the slide. Capture the shot at exactly 1920x1080 (playwright/CDP at
-`scale: device`) so nothing is scaled.
+`.app-slide` (deck-local, on "A summer of Shiny for bioinformatics") is bullets
+on the left and **one screenshot per bullet** on the right, swapped on the same
+click as its bullet. Screenshots rather than iframes: those apps are Connect
+Cloud deployments, and a served render makes no off-origin request. Three things
+make the swap work, and it breaks if any one goes:
+
+- **Matching `fragment-index` on both halves.** Two fragments only land on one
+  click if they carry the same index; the bullet is `{.fragment fragment-index=3}`
+  and its image `{.fragment .fade-in-then-out fragment-index=3}`. This is the
+  one place explicit indices are right — every fragment on the slide has one, so
+  reveal's `sortFragments` has nothing unindexed to hoist (contrast the
+  `.after-code` case below).
+- **`.nonincremental` on each bullet's div.** `incremental: true` in the yaml
+  also fragments the `li` *inside* the div, at an index after all of the
+  images — so the div appears on cue and the text stays invisible until the end
+  of the slide.
+- **`.nostretch` on the heading**, or quarto's auto-stretch lifts each image out
+  of its `<p>`, tags it `.r-stretch`, and reveal writes an aspect-preserving
+  width/height inline that beats the theme.
+
+The images sit in a reveal `.r-stack` (one grid cell, everything centred in it)
+with `.app-stack` for the size. They do not share an aspect ratio, so the rule
+is `object-fit: contain` over a panel-coloured backdrop; a shot much wider than
+the box shrinks to unreadable, so crop it closer to the box's ratio
+(`magick in.png -crop WxH+0+0 +repage -resize 1600x out.png`) rather than
+growing the box.
 
 Code fences take `filename="app.R"`, which renders as the cyan label from
 DESIGN.md 6.4, in whatever casing you wrote — nothing upper-cases it.
