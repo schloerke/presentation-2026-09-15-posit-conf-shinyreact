@@ -53,6 +53,10 @@ $presentation-heading-font-weight: 800 !default;
 $code-block-font-size: 34px !default;
 
 $presentation-slide-text-align: left !default;
+// Quarto centres the title slide by default, which leaves the kicker and the
+// swoosh (both left-anchored backgrounds) under a centred title. Master 1 in
+// DESIGN.md is left-aligned like every other master.
+$presentation-title-slide-text-align: left !default;
 $presentation-block-margin: 44px !default;
 
 /*-- scss:mixins --*/
@@ -181,17 +185,7 @@ $presentation-block-margin: 44px !default;
     font-size: $presentation-h1-font-size;
     line-height: .98;
 
-    // kicker (master 1). ::before because ::after is the swoosh and ::before on
-    // the section itself is the orbit.
-    &::before {
-      content: "POSIT::CONF(2026)";
-      display: block;
-      margin-bottom: 22px;
-      font-size: 34px;
-      font-weight: 700;
-      letter-spacing: .22em;
-      color: $cyan-text;
-    }
+    // No kicker: the conference logo sits at the bottom of the slide instead.
     &::after { @include swoosh(520px); margin-top: 42px; }
   }
   .subtitle {
