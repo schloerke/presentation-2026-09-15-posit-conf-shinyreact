@@ -18,6 +18,7 @@ theme/fonts.scss           the DESIGN.md faces, inlined as data URIs (generated)
 theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
 theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
+theme/qr-repo.svg          QR to this repo, bottom-centre of the title/end slides
 apps/                      the apps demoed live in the talk (02 is React-only)
 images/                    slide images (headshot, app screenshots) - 1920x1080
 _extensions/drop/          quarto-drop (webR console in a drawer)
@@ -79,6 +80,12 @@ no-op. (Same lever as
 <https://github.com/orgs/quarto-dev/discussions/11318>, which sets `height:`
 statically; this just does it per window.)
 
+`theme/qr-repo.svg` is generated; regenerate it if the repo URL changes:
+
+```bash
+uv run --with segno python -c "import segno; segno.make('https://github.com/schloerke/presentation-2026-09-15-posit-conf-shinyreact', error='m').save('theme/qr-repo.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
+```
+
 Master equivalents, applied as classes on a `##` heading:
 
 | DESIGN.md master | markdown |
@@ -91,6 +98,16 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
 | (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
+| (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
+
+`.recap` is the slide that stays up through Q&A, so it carries the talk title,
+the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
+shared with `#title-slide` in one rule; the lockup is written out as a
+`::: {.handle}` div (three lines) because only a real title slide has `author:`
+to build one from. Its footer is hidden — the lockup takes that corner — and
+`.recap ul` is capped at 1080px so bullets clear the logo's column.
+`[text](url){.gh}` prefixes a link with the octocat, as a mask so the mark takes
+the link's colour.
 
 `.demo-slide` is for live apps: the heading is kept in the source (quarto splits
 slides on `##`, and it carries the slide id and speaker notes) but hidden, and
