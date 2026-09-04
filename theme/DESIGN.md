@@ -65,7 +65,6 @@ because projector gamma and ambient light erode measured contrast in the room.
 |---|---|---|---|---|
 | `--ink` (ground) | `#1C1D22` | — | — | slide background |
 | `--ink-deep` (panel/divider) | `#141519` | — | — | code panels, divider slides |
-| `--hex-plate` | `#23252C` | — | — | ring behind the title logo |
 | `--text` | `#F2F4F8` | `--ink` | **15.28:1** | AAA |
 | `--text` on panel | `#F2F4F8` | `--ink-deep` | **16.57:1** | AAA |
 | `--muted` | `#A3ACBB` | `--ink` | **7.35:1** | AAA |
@@ -226,8 +225,10 @@ two feet. Anything you cannot read is what the back row cannot read.
 ### The five masters
 
 1. **Title** — headline left over ~1100px, swoosh, lede. Logo right on a
-   `#23252C` hex plate sized 40px larger than the logo's own hex and concentric
-   with it, so it reads as a ring. Orbit watermark bleeding off the top-right at
+   `--cyan` hex ring sized 40px larger than the logo's own hex and concentric
+   with it. The ring was `#23252C` at first, which read as a grey smudge the
+   logo's atom happened to cross; in the logo's own cyan the atom overlapping it
+   reads as intentional. Orbit watermark bleeding off the top-right at
    7% opacity. Full footer.
 2. **Section divider** — ground drops to `--ink-deep`. Ghost section number at
    240px/900 in `rgba(0,216,255,.22)` (decorative; the section name carries the
