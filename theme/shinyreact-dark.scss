@@ -307,6 +307,19 @@ $presentation-block-margin: 44px !default;
     max-width: none;
     max-height: none;
   }
+  // A 1920x1080 screenshot standing in for an app we cannot run offline. Same
+  // treatment as the iframe: it *is* the slide. Quarto wraps the image in a
+  // `<p>`, which carries reveal's block margin.
+  > p:has(> img) { margin: 0 !important; }
+  > p > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: 0;
+    box-shadow: none;
+  }
 }
 .reveal:has(section.demo-slide.present) .footer { display: none !important; }
 

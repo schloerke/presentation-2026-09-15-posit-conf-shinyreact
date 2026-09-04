@@ -528,7 +528,96 @@ review and maintain.
 You need to be able to describe your UI and review the result.
 :::
 
-## What's next {.divider data-number="06"}
+## In the wild {.divider data-number="06"}
+
+::: {.notes}
+None of this is theory any more. Over the summer one intern built a shelf of it.
+:::
+
+## Samuel Bharti
+
+::: {.columns}
+::: {.column width="32%"}
+![](images/samuel-bharti.png){width="440"}
+:::
+::: {.column width="68%"}
+::: {.nonincremental}
+- Posit engineering intern, summer 2026
+- Computational biologist
+- Ph.D. candidate, UAB · ex-Genentech
+- Nine Shiny apps, four supporting packages
+- `posit-dev/shiny-showcase-bioinformatics`
+:::
+:::
+:::
+
+::: {.notes}
+Samuel was our software engineering intern this summer — a computational
+biologist and a PhD candidate at UAB, previously at Genentech and Roche.
+
+He spent the summer building bioinformatics Shiny apps, and the gallery is all
+of them in one place.
+:::
+
+## A summer of Shiny for bioinformatics
+
+- **tahoe-explorer** — 100.6M perturbation rows, pushed to DuckDB
+- **genescout** — agentic, cited gene-evidence review
+- **variant-reviewer** — eighteen cards across public APIs
+- **gene-list-builder** — seven sources, re-ranked live
+- **Plotomics Live** — twenty-six GPU visualizations on `shinyreact`
+
+::: {.notes}
+Nine apps in the gallery; these are the five with public source. Each one is
+archived on Zenodo, so there is a DOI to cite rather than a deployment address.
+
+The last one is the one I care about today.
+:::
+
+## Plotomics Live {.demo-slide .nostretch}
+
+<!-- A 1920x1080 screenshot, not an iframe: the app is a deployment, and the
+     deck makes no off-origin request. `.demo-slide > p > img` sizes it, so
+     `.nostretch` is required - quarto's auto-stretch otherwise lifts the image
+     out of its `<p>` and reveal writes an aspect-preserving size inline. -->
+![](images/plotomics-live-visium.png)
+
+::: {.notes}
+Twenty-six biological visualizations, each rendered *two ways*: an interactive
+GPU component in React, and the classic server-rendered ggplot2 image. Flip the
+engine toggle and compare — both come off the same server-side computation.
+
+This is spatial transcriptomics: 3,798 capture spots at their real coordinates
+on a breast cancer section, over the H&E they came from.
+:::
+
+## What `shinyreact` bought him {.code-slide}
+
+::: {.incremental}
+- `app.R` is **compute-only** — one `reactive_output()` per visualization
+- The entire UI, in R, is **one line**
+:::
+
+::: {.fragment}
+```{.r filename="app.R"}
+ui <- shinyreact::page_react_html("www/index.html")
+```
+:::
+
+::: {.fragment .spaced}
+584,207 cells on the GPU; **ggplot2 has to subsample**
+:::
+
+::: {.notes}
+The server does data work and nothing else: one `reactive_output()` per
+visualization, and in R the whole UI is a single line.
+
+The headline is the single-cell UMAP: 584,207 real cells, streamed as binary
+column blobs and drawn on the GPU. The ggplot2 engine can only show a static
+subsample. That contrast is the whole demo.
+:::
+
+## What's next {.divider data-number="07"}
 
 ## Future work: incremental adoption
 
@@ -550,7 +639,7 @@ Today, everything will feel ad-hoc when writing `shinyreact` apps.
 - Let an **agent** build the React.js client
 - **IDs and JSON structures** are the communication contract
 
-## Q & A {.divider data-number="07"}
+## Q & A {.divider data-number="08"}
 
 ## Is node.js needed?
 
@@ -574,7 +663,7 @@ Today, everything will feel ad-hoc when writing `shinyreact` apps.
 - Pair them with `<ShinyOutput id="distPlot" />` in your React code
 - Don't reinvent the wheel — your UI app becomes more about **layout** than outputs
 
-## Thanks {.divider .end data-number="08"}
+## Thanks {.divider .end data-number="09"}
 
 ::: {.handle}
 @schloerke

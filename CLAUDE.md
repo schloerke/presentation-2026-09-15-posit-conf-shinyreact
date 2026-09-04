@@ -19,6 +19,7 @@ theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
 theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 apps/                      the apps demoed live in the talk (02 is React-only)
+images/                    slide images (headshot, app screenshots) - 1920x1080
 _extensions/drop/          quarto-drop (webR console in a drawer)
 _extensions/EmilHvitfeldt/ quarto-revealjs-editable (live slide editing)
 ```
@@ -87,6 +88,14 @@ Master equivalents, applied as classes on a `##` heading:
 slides on `##`, and it carries the slide id and speaker notes) but hidden, and
 padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
 Pair it with `#| viewerHeight: 1080`.
+
+It also takes a **1920x1080 screenshot** in place of an app that cannot run
+offline (`## Plotomics Live {.demo-slide .nostretch}` + a bare `![](…)`).
+`.nostretch` is load-bearing: quarto's auto-stretch otherwise lifts the image
+out of its `<p>`, tags it `.r-stretch`, and reveal writes an aspect-preserving
+width/height inline that beats the theme's rule — the image then letterboxes
+inside the slide. Capture the shot at exactly 1920x1080 (playwright/CDP at
+`scale: device`) so nothing is scaled.
 
 Code fences take `filename="app.R"`, which renders as the cyan label from
 DESIGN.md 6.4, in whatever casing you wrote — nothing upper-cases it.
