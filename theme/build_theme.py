@@ -327,19 +327,16 @@ def master_title(lay):
     hex_ring(sh, 1920 - 130 - 560, 247, 560, 647, HEX_PLATE, width=4)
     sh.add_picture(str(LOGO), PX(1920 - 150 - 520), PX(270), width=PX(520))
 
-    _, tf = textbox(sh, MARGIN, 250, 1100, 60)
-    style(tf.paragraphs[0], "POSIT::CONF(2026)", size=34, color=CYAN_TEXT,
-          font=BOLD, spacing=7.5)
-
-    t, tf = textbox(sh, MARGIN, 306, 1100, 280)
+    # No kicker: the conference logo carries the conference name.
+    t, tf = textbox(sh, MARGIN, 250, 1100, 280)
     style(tf.paragraphs[0], "Title", size=128, color=TEXT, font=DISPLAY, line=0.98)
     no_bullet(tf.paragraphs[0])
     ph_defaults(t, size=128, color="F2F4F8", font=DISPLAY, line=0.98)
     as_placeholder(t, "title")
 
-    swoosh(sh, MARGIN, 596, 520)
+    swoosh(sh, MARGIN, 540, 520)
 
-    b, tf = textbox(sh, MARGIN, 686, 1100, 160)
+    b, tf = textbox(sh, MARGIN, 630, 1100, 160)
     style(tf.paragraphs[0], "Subtitle", size=46, color=MUTED, line=1.35)
     no_bullet(tf.paragraphs[0])
     ph_defaults(b, size=46, color="A3ACBB", font=BODY, line=1.35)
