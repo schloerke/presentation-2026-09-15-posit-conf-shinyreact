@@ -218,6 +218,14 @@ two feet. Anything you cannot read is what the back row cannot read.
 - **Footer** (all masters except the section divider): conf logo + QR
   bottom-left, speaker lockup bottom-right, both in `--muted`. Carried over from
   the 2025 deck, where it worked.
+- **Social marks:** the speaker lockup's handle line is preceded by the octocat
+  and the bluesky butterfly, 38px tall, in `--muted` at 85% fill opacity, one
+  mark-width gap apart (they were overlapped first, which read as one blob) and
+  6px from the handle. The handle is the same on both services, so one mark
+  pair stands for both — the marks have to sit closer to the handle than to
+  each other, or they read as a separate thought. The closing divider
+  carries the handle line (and these marks) on its own, since master 2 has no
+  footer. Ported to the SCSS only — the Keynote theme does not carry them.
 - **Title underline:** the logo's swoosh, 8px stroke, round caps, as a static
   block below the headline — never absolutely positioned. Absolute positioning is
   what collided it with the lede during mockup.
