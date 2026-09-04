@@ -575,3 +575,7 @@ Today, everything will feel ad-hoc when writing `shinyreact` apps.
 - Don't reinvent the wheel — your UI app becomes more about **layout** than outputs
 
 ## Thanks {.divider .end data-number="08"}
+
+::: {.handle}
+@schloerke
+:::
