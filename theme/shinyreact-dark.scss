@@ -182,29 +182,6 @@ $presentation-block-margin: 44px !default;
   // pushes the whole slide down the canvas.
   padding: 250px $margin 0 !important;
 
-  &::before { @include orbit(550px, .07); top: -180px; right: -420px; }
-
-  // Hex ring + logo, right (DESIGN.md 6.1). A stroke, not a fill: the logo PNG
-  // bakes in its own #1C1D22 hex, so a fill behind it would show as a patch.
-  // Cyan, not the old #23252C: grey it read as a smudge the logo's atom
-  // happened to cross.
-  // The logo is a second background layer here rather than
-  // `title-slide-attributes: data-background-image`, because reveal's
-  // background element is the *viewport*, not the 1920x1080 canvas - so the
-  // background version drifted out of the ring at every window size but one.
-  // The url() walks back out of the compiled theme
-  // (slides_files/libs/revealjs/dist/theme/) to the folder holding slides.html.
-  &::after {
-    content: "";
-    position: absolute;
-    top: 247px; right: 130px;
-    width: 560px; height: 647px;
-    background:
-      no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
-      no-repeat center / 100% 100%
-        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2300D8FF" stroke-width="4"/></svg>');
-  }
-
   h1.title {
     max-width: 1100px;
     font-size: $presentation-h1-font-size;
@@ -247,9 +224,58 @@ $presentation-block-margin: 44px !default;
   }
   .date { display: none; }
 
-  // ponytail: no QR block - it needs a real QR image, not a white square. Add
-  // it as a second data-background-image in the qmd when the URL is known.
+  // The conf logo and the repo QR come from the shared background rule below.
 }
+
+// The title slide's two motifs: the orbit, and the hex ring + logo on the right
+// (DESIGN.md 6.1). Shared with `.recap`, which is dressed as a second title
+// slide. A stroke, not a fill: the logo PNG bakes in its own #1C1D22 hex, so a
+// fill behind it would show as a patch. Cyan, not the old #23252C: grey it read
+// as a smudge the logo's atom happened to cross.
+//
+// The logo is a background layer here rather than
+// `title-slide-attributes: data-background-image`, because reveal's background
+// element is the *viewport*, not the 1920x1080 canvas - so the background
+// version drifted out of the ring at every window size but one. The url() walks
+// back out of the compiled theme (index_files/libs/revealjs/dist/theme/) to the
+// folder holding index.html.
+#title-slide,
+.reveal section.recap {
+  &::before { @include orbit(550px, .07); top: -180px; right: -420px; }
+  &::after {
+    content: "";
+    position: absolute;
+    // Raised until the "Shiny" wordmark inside the png reads level with the
+    // title - measured against the rendered slide, not the box's own centre.
+    top: 109px; right: 130px;
+    width: 560px; height: 647px;
+    background:
+      no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
+      no-repeat center / 100% 100%
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2300D8FF" stroke-width="4"/></svg>');
+  }
+}
+
+// The recap wears the title slide's furniture - it is the slide that stays up
+// through Q&A, so it carries the talk's name, the speaker and the repo QR. The
+// content master otherwise applies; only the hex logo's column is off limits.
+.reveal section.recap {
+  ul { max-width: 1080px; }
+}
+// `[text](url){.gh}` - the octocat, in front of a repo link. A mask rather than
+// a fill so the mark takes the link's own colour instead of hardcoding it.
+.reveal a.gh::before {
+  content: "";
+  display: inline-block;
+  width: .82em; height: .82em;
+  margin-right: .28em;
+  vertical-align: -.08em;
+  background: currentColor;
+  mask: no-repeat center / contain
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>');
+}
+// The lockup takes the footer's corner.
+.reveal:has(section.recap.present) .footer { display: none !important; }
 
 // -- master 2: section divider -----------------------------------------------
 .reveal section.divider {
@@ -500,31 +526,46 @@ $presentation-block-margin: 44px !default;
 // pseudo-element: both of the title slide's own pseudos are taken (orbit,
 // hex ring), and `background-image` in its own rule leaves the divider's
 // `background: $ink-deep` shorthand alone. Same url() walk as shiny-react.png.
+// Second layer: the repo QR, just right of the conf logo. `theme/qr-repo.svg` is generated
+// (see theme/README.md); regenerate it if the repo moves. Light modules on the
+// deck's own ink so it reads as part of the slide, with the two-module quiet
+// zone the format needs. background-position percentages resolve against
+// (area - image), so `calc(100% - 30px)` puts each bottom edge 30px off the
+// canvas - the speaker lockup's `bottom`, so all three sit on one line.
 #title-slide,
+.reveal section.recap,
 .reveal section.divider.end {
-  background-image: url('../../../../../theme/posit-conf-2026.svg');
+  background-image:
+    url('../../../../../theme/posit-conf-2026.svg'),
+    url('../../../../../theme/qr-repo.svg');
   background-repeat: no-repeat;
-  background-position: $margin calc(100% - #{$footer-y});
-  background-size: 130px 76px;
+  background-position:
+    $margin calc(100% - 30px),
+    #{$margin + 170px} calc(100% - 30px);
+  background-size: 130px 76px, 110px 110px;
 }
 
-// The closing slide's handle, where the title slide has its speaker lockup.
-// Master 2 hides the footer, so without this the deck ends with no handle at
-// all. Absolute against the section, which reveal has already positioned.
+// The speaker lockup where a slide has no `author:` to build one from: the
+// recap (three lines, as on the title slide) and the closing divider (the
+// handle alone - master 2 hides the footer, so without this the deck ends with
+// no handle at all). Absolute against the section, which reveal has positioned.
+.reveal section.recap .handle,
 .reveal section.divider.end .handle {
   position: absolute;
   right: $margin;
-  bottom: $footer-y;
+  bottom: 30px; // as the title lockup
+  text-align: right;
   font-size: 30px;
   font-weight: 400; // .reveal sets 500; the title lockup is 400
+  line-height: 1.45;
   color: $muted;
-  // Pandoc wraps the div's text in a <p>: the marks go there, or they land on
-  // their own line above the handle.
+  // Pandoc wraps each line in a <p>: the marks go on the handle's own <p>, or
+  // they land on a line of their own.
   > p {
     margin: 0;
     white-space: nowrap;
-    &::before { @include social-marks(38px); }
   }
+  > p:last-child::before { @include social-marks(38px); }
 }
 
 // -- chrome ------------------------------------------------------------------

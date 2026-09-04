@@ -544,11 +544,22 @@ into React.js. It also opens the door for helper packages down the road.
 Today, everything will feel ad-hoc when writing `shinyreact` apps.
 :::
 
-## Recap
+## Beyond Bootstrap {.recap}
 
 - Keep **R / Python** for reactive data processing
 - Let an **agent** build the React.js client
 - **IDs and JSON structures** are the communication contract
+- [posit-dev/shinyreact](https://github.com/posit-dev/shinyreact){.gh}
+
+<!-- The lockup the title slide builds from `author:`, written out - this is not
+     a quarto title slide, so there is nothing to reuse. -->
+::: {.handle}
+Barret Schloerke
+
+posit / Shiny Team
+
+@schloerke
+:::
 
 ## Q & A {.divider data-number="07"}
 
