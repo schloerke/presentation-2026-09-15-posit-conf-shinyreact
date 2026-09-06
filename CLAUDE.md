@@ -99,6 +99,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
+| (none — deck-local) | `## Name {.logo-slide}` + `.hexlogo` / `.hexreact` divs |
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
@@ -140,6 +141,116 @@ is `object-fit: contain` over a panel-coloured backdrop; a shot much wider than
 the box shrinks to unreadable, so crop it closer to the box's ratio
 (`magick in.png -crop WxH+0+0 +repage -resize 1600x out.png`) rather than
 growing the box.
+
+### The logo build (`.logo-slide`, three slides)
+
+"Why Shiny + React?" → `.logo-slide` → the `shinyreact` bullets slide are one
+auto-animate run that assembles the logo, after slides 30–31 of the
+[shinytest2 talk](https://schloerke.com/presentation-2022-07-28-rstudioconf22-shinytest2/#30),
+where the Shiny and testthat hexes merge into the shinytest2 hex.
+
+The beats:
+
+1. **"Why Shiny + React?"** carries a small **corner lockup** of the two
+   projects *in their own clothes* — Shiny's actual hex sticker, a `+`, and a
+   bare React atom. No deck styling on either: this slide is about the two
+   projects, not about the combined mark.
+2. **`.logo-slide`** auto-animates that lockup to full size at the quarter
+   points — still Shiny's blue sticker and a bare atom, unchanged. Everything
+   then happens on **one click**: the mark slides to the centre and the sticker
+   cross-dissolves into the deck's outlined shinyreact "Shiny" while the atom
+   flies its loop round and lands in the tail of the swoosh.
+3. **The bullets slide** parks the finished mark in the top-right corner.
+
+**Section 03 has no divider.** The build slide is the divider — the marks
+meeting *is* the section opener, and a `## shinyreact {.divider}` in between
+would break the auto-animate chain, since reveal only auto-animates between
+consecutive slides. If a divider is ever wanted back, it has to go *before* the
+"Why" slide, not between it and the build.
+
+There are **two images**, and no more should be needed. `theme/shiny-react.png`
+is the finished shinyreact hex; the deck's "Shiny mark" is that same PNG with
+`.lb-hole` — a disc in the hexagon's own ground colour ($ink; the PNG bakes in
+`#1C1D22`) over its React atom. `theme/shiny-hex.svg` is Shiny's own sticker
+from [rstudio/hex-stickers](https://github.com/rstudio/hex-stickers), drawn on
+the **same 2521x2911 viewBox** the PNG uses — so the two are in register and the
+cross-dissolve reads as one mark changing rather than two images crossing. It
+sits in `.lb-shiny`, a layer over the PNG, hidden except where a slide asks for
+it. The flying atom (`.hexreact`) is drawn from the orbit motif's ellipses plus
+a nucleus, and is cross-faded out at the exact moment the hole goes, so it never
+has to match the logo pixel for pixel. It is **an atom and nothing else** — no
+hexagon of its own, on any slide; its box is invisible scaffolding for
+auto-animate and `offset-path` to move, with the atom sized off it. Don't cut the wordmark or the atom out
+into further files: that is more things to keep in register for no gain.
+
+- **Both images are project resources in `_quarto.yml`.** Quarto does not trace
+  `url()`s out of an scss file, so without those entries they are absent from
+  `_site/` and the title slide and this build render as empty boxes.
+  `quarto preview` serves the project root, so it only breaks once published —
+  which is how the missing PNG went unnoticed until this build needed it.
+- **The atom is 60% of its box everywhere**, because that is what lands it at
+  the logo's own atom size after the flight. So the corner lockup sizes the
+  *box* around the atom (250px box for a 150px atom) rather than re-scaling the
+  atom inside it. Keeping the ratio fixed is what stops the atom jumping when
+  auto-animate carries the pair to full size; the box is invisible there anyway.
+- **The sticker converts on the click, not on arrival** — the slide is Shiny's
+  logo until React comes for it. So the cross-dissolve is keyed off
+  `.hexreact.visible`, the same trigger as the flight, and runs alongside the
+  mark's slide to the centre. `animation-fill-mode: both` plus keyframes that
+  spell out their own `from` value is what holds the sticker up (and the ring
+  down) through the animation's delay instead of falling back to the base
+  declaration.
+- The ring belongs to the *shinyreact* mark, so `:has(.lb-shiny)` turns it off
+  wherever Shiny's own sticker is laid over the top. That is the whole of the
+  per-slide styling: carrying the `.lb-shiny` div is what makes a slide show
+  Shiny's mark, and the corner slide simply has no such div.
+- **Both hexagons carry a `$cyan-text` ring** (`::after`, a stroked hex svg).
+  The logo bakes in its own `#1C1D22` ground, which *is* `$ink` — the background
+  of every master except the divider — so without the ring the hexagons have no
+  visible shape at all, most obviously the corner mark on the bullets slide. The
+  stroke is `vector-effect="non-scaling-stroke"` because the box runs 150px →
+  780px across and a viewBox-relative stroke would go from a hairline to a band.
+- **`offset-path: path()` coordinates are relative to the element's own static
+  top-left**, not to its containing block, whatever the spec reads like. So the
+  path's first point must be the element's own half-size — that is what makes
+  `offset-distance: 0%` a no-op — and every later point is an offset from where
+  the box already sits. Two consequences that both cost a revision:
+  - the declaration is **scoped to `.logo-slide`**, because the same path on the
+    150x173 corner lockup would shift it by the difference in half-sizes; and
+  - **`offset-anchor` is spelled out as `50% 50%`**. Left at `auto` it follows
+    `transform-origin`, and reveal's auto-animate stylesheet sets
+    `transform-origin: 0 0` on every `[data-id]` element — so adding a
+    `data-id` silently moved the anchor to the box's top-left and parked the
+    mark half a box off. Measure the rect before trusting a number here.
+- The flight is a **clockwise loop**: down to the bottom right, left along the
+  bottom, up the left side, across the top, down to the right by the "y", then
+  tracing the swoosh's own tail into the atom's slot. The bottom leg is
+  deliberately shy of the canvas edge — the box is still ~450px across there and
+  its lower half would run off 1080.
+- **Only the containers may be auto-animate-matched.** Reveal animates each
+  matched element with its own transform, so a matched child inside a matched
+  parent compounds both. `data-id` is on `.hexlogo` / `.hexreact` alone, and the
+  slides carry `auto-animate-unmatched="false"` so reveal doesn't cross-fade the
+  parts on every transition either.
+- `.hexreact` is a **`.fragment.fade-out`**: present on arrival, "shown" on the
+  click. Its animation therefore keys off `.visible`, and re-runs cleanly if the
+  fragment is stepped back. `opacity`/`visibility` are in its keyframes because
+  reveal's own `.fade-out.visible` rule hides the element outright, and a
+  running animation outranks a normal declaration.
+- The Shiny mark's move to centre is a plain **transition** (`:has()` on the
+  same fragment state), timed well short of the flight so the atom lands in a
+  mark that has stopped moving. That is also what lets the flight path be
+  authored against a fixed frame.
+- Every `.hexlogo` / `.hexreact` box keeps the hexagon's **0.866 ratio**, and
+  the parts inside are sized in `%`, so they ride each move for free. That is
+  where the paired numbers in the scss come from: a length that is n% of the
+  width is n × 0.866 % of the height.
+
+When checking this by hand: `python3 -m http.server` keeps an open handle on the
+directory it was launched in, and `quarto render` **replaces** `_site/` rather
+than writing into it — so a server started before a re-render serves the old
+inode for ever. Restart it after each render, or you will debug a slide that is
+not the one on disk.
 
 Code fences take `filename="app.R"`, which renders as the cyan label from
 DESIGN.md 6.4, in whatever casing you wrote — nothing upper-cases it.
