@@ -225,7 +225,16 @@ Hold on to those two lines. In a few minutes the only thing that changes is
 *where they get their values from*.
 :::
 
-## Why Shiny **+** React?
+## Why Shiny **+** React? {auto-animate="true" auto-animate-unmatched="false"}
+
+<!-- The two marks as a corner lockup. They are the same `[data-id]` elements on
+     the next two slides, so auto-animate carries them into the build and then
+     into the finished logo. `.lb-shiny` is Shiny's own hex sticker, laid over
+     the shinyreact logo; `.lb-hole` covers that logo's React atom, so what is
+     underneath is the *Shiny* mark either way. See CLAUDE.md. -->
+<div class="hexlogo lockup" data-id="hexlogo"><div class="lb-hole"></div><div class="lb-shiny"></div></div>
+<div class="hexplus">+</div>
+<div class="hexreact lockup" data-id="hexreact"><div class="hr-atom"></div></div>
 
 - If you've found yourself writing custom HTML and JavaScript, React is the framework that scales those projects
 - "We picked it up off the shelf to not write JS… happy with the tradeoffs"
@@ -236,9 +245,26 @@ If you've found yourself writing custom HTML and JavaScript, React.js is a
 perfect framework to help scale your larger projects.
 :::
 
-## `shinyreact` {.divider data-number="03"}
+## The mark {.logo-slide auto-animate="true" auto-animate-unmatched="false"}
 
-## `shinyreact`
+<!-- The lockup, at full size. The Shiny sticker arrives with the move and then
+     dissolves into the deck's own outlined mark; `.hexreact` is a
+     `.fragment.fade-out`, so it is there on arrival and flies on the click.
+     Both are in the theme, keyed off `.present` and `.visible`. -->
+<div class="hexlogo" data-id="hexlogo"><div class="lb-hole"></div><div class="lb-shiny"></div></div>
+<div class="hexreact fragment fade-out" data-id="hexreact"><div class="hr-atom"></div></div>
+
+::: {.notes}
+Two logos. One click, and they meet: the Shiny mark takes the middle, and React
+comes round into the tail of the swoosh.
+
+That *is* the logo. Nothing about Shiny changed — React is just what the swoosh
+now ends in.
+:::
+
+## `shinyreact` {auto-animate="true" auto-animate-unmatched="false"}
+
+<div class="hexlogo corner" data-id="hexlogo"></div>
 
 *Shiny UI infrastructure for React-based component rendering*
 
