@@ -534,7 +534,7 @@ You need to be able to describe your UI and review the result.
 None of this is theory any more. Over the summer one intern built a shelf of it.
 :::
 
-## Samuel Bharti
+## Samuel Bharti[.com]{.dotcom} {#samuel-bharti .nostretch}
 
 ::: {.columns}
 ::: {.column width="32%"}
@@ -542,13 +542,16 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 :::
 ::: {.column width="68%"}
 ::: {.nonincremental}
-- Posit engineering intern, summer 2026
+- Shiny summer '26 intern
 - Computational biologist
-- Ph.D. candidate, UAB · ex-Genentech
-- Nine Shiny apps, four supporting packages
-- [samuelbharti.com](https://www.samuelbharti.com/)
+- Ph.D. candidate, UAB
+- 10x Shiny apps. 4x supporting packages
 - [posit-dev/shiny-showcase-bioinformatics](https://github.com/posit-dev/shiny-showcase-bioinformatics){.gh}
 :::
+
+<!-- The QR sits under the gallery bullet, not under the headshot: it is the
+     gallery's address, and next to the photo it would read as Samuel's. -->
+![](theme/qr-showcase.svg){.qr-inline}
 :::
 :::
 
@@ -557,7 +560,8 @@ Samuel was our software engineering intern this summer — a computational
 biologist and a PhD candidate at UAB, previously at Genentech and Roche.
 
 He spent the summer building bioinformatics Shiny apps, and the gallery is all
-of them in one place.
+of them in one place — that is the QR, and the heading finishes his address on
+its own if you wait a beat.
 :::
 
 ## A summer of Shiny for bioinformatics {.app-slide .nostretch}

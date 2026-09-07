@@ -54,6 +54,18 @@ from its heading, so `index.html#/two-hooks-are-the-whole-api` lands on one
 directly. The browser caches `index.html` hard between renders — add a
 `?v=N` that changes, or a re-render appears to have done nothing.
 
+A render can come out **incomplete**: exit 0 and "Output created", but
+`_site/index_files/libs/` has no `revealjs/` in it, so the served deck is
+unstyled markdown with ~19 console errors. The tell is quarto's own line
+`Error adding css vars block SCSSParsingError` plus a
+`_quarto_internal_scss_error.scss` dropped in the project root — quarto parses
+the theme a second time for that pass, with a stricter parser than sass. A
+one-lined `@keyframes x { from { … } to { … } }` is enough to trip it. So:
+never commit `_quarto_internal_scss_error.scss`, treat it as "the SCSS you just
+wrote broke a build pass", and check `ls _site/index_files/libs` before
+concluding anything about a change — otherwise you debug the CSS of a deck that
+never loaded the theme.
+
 `quarto render` **deletes and recreates `_site/`**, so a server started *inside*
 it keeps serving the old, unlinked directory: every later check silently reads a
 stale deck (the tell is reveal bouncing a known slide id back to
@@ -80,10 +92,23 @@ no-op. (Same lever as
 <https://github.com/orgs/quarto-dev/discussions/11318>, which sets `height:`
 statically; this just does it per window.)
 
-`theme/qr-repo.svg` is generated; regenerate it if the repo URL changes:
+The "Samuel Bharti" slide has two deck-local pieces. `[.com]{.dotcom}` in the
+heading fades in 2.2s after the slide lands, in `$muted`, so the heading turns
+into his address on its own; the animation is keyed off `section.present`, not
+a bare `animation-delay`, because reveal keeps the coming slides in the DOM and
+a plain delay would have run out before you ever arrived. `.qr-inline` is a QR
+in a slide's *content* (the gallery's, under its bullet) rather than the
+furniture QR the title and recap slides carry as a background layer; it also
+zeroes the margin on the `<p>` quarto wraps the image in, which otherwise puts
+the code through the bottom of the canvas. 140px on the 1920 canvas decodes
+fine — verified by decoding it back out of a screenshot of the rendered slide.
+
+`theme/qr-repo.svg` and `theme/qr-showcase.svg` are generated; regenerate one
+if its URL changes:
 
 ```bash
 uv run --with segno python -c "import segno; segno.make('https://github.com/schloerke/presentation-2026-09-15-posit-conf-shinyreact', error='m').save('theme/qr-repo.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
+uv run --with segno python -c "import segno; segno.make('https://github.com/posit-dev/shiny-showcase-bioinformatics', error='m').save('theme/qr-showcase.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
 ```
 
 Master equivalents, applied as classes on a `##` heading:
