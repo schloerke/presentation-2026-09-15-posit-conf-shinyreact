@@ -343,7 +343,7 @@ $presentation-block-margin: 44px !default;
 // own `<p>`, which is what `.r-stack` actually stacks; pair with `.nostretch`
 // or auto-stretch takes the images over.
 .reveal .app-stack {
-  height: 560px;
+  height: 690px;
   > p { margin: 0; height: 100%; }
   img {
     width: 100%;
@@ -358,11 +358,104 @@ $presentation-block-margin: 44px !default;
 // Five one-item lists, not one list: each bullet is its own fragment, so it can
 // share a `fragment-index` with its screenshot. That costs the list's own
 // rhythm, so set the gap between the bullets here.
-.reveal .app-slide {
-  padding-top: 96px;
-  ul { margin: 0 0 40px; }
+// `section.app-slide`, not `.app-slide`: two rules from later stylesheets have
+// the same specificity as a plain `.reveal .app-slide …` and therefore win.
+// `.reveal .slides section` sets the master's padding, and quarto's
+// `.reveal .slide ul` sets `margin-bottom: .5em` (26px here, which is what the
+// gap between the apps really was). Adding the element name outranks both.
+.reveal .slides section.app-slide {
+  // Ten lines of text on the left, so this master buys every pixel it can:
+  // less top pad and a tighter swoosh than the content master, and the gap
+  // between apps as small as still reads as a gap. Two lines per app is the
+  // ceiling - a third, or a sub-bullet that wraps, and the fifth app's caption
+  // goes off the bottom of the canvas.
+  padding-top: 72px;
+  > h2::after { margin-top: 20px; }
+  // Five apps, each two lines: the content master's body size and block margin
+  // put the fifth one off the bottom of the canvas. The gap between apps is the
+  // list's margin alone, so the item's own margin goes to zero.
+  ul { margin: 0 0 18px; }
+  ul > li { font-size: 44px; margin-bottom: 0; }
+  // Each app's sub-bullet is a caption for the name above it, not a second
+  // bullet: it drops the cyan rule (the parent's rule already brackets the
+  // group) and aligns with the parent's text, not its rule. Reveal's
+  // `.reveal ul ul` out-specifies the theme's `list-style: none`, so a nested
+  // list needs it said again or it draws a square as well. 32px is the floor
+  // from DESIGN.md 9; it has to stay on one line, so keep the text short.
+  li > ul { margin: 8px 0 0; list-style: none; }
+  ul ul > li {
+    font-size: 32px;
+    padding-left: 0;
+    &::before { content: none; }
+  }
 }
 .reveal:has(section.demo-slide.present) .footer { display: none !important; }
+
+// One app, full slide, as a recording (deck-local, "Plotomics Live"). The GIF
+// is the slide, so everything above it is one heading and one caption line and
+// the rest of the canvas is the app. `section.gif-slide` for the same
+// specificity reason as `.app-slide` above.
+.reveal .slides section.gif-slide {
+  padding-top: 72px;
+  h2 { font-size: 76px; }
+  > h2::after { margin-top: 20px; }
+  .gif-caption {
+    display: block;
+    font-size: 36px;
+    color: $muted;
+    margin: 8px 0 20px;
+  }
+  // Height-driven, not width: the canvas has height to spare only after the
+  // heading and the caption, and the GIF's own 1200px width is the ceiling on
+  // how far it can be scaled before it goes soft.
+  // Centred rather than flush left like the rest of the master: at 1.62:1 the
+  // recording can only be ~1100px wide at this height, and left-aligned that
+  // leaves 630px of empty canvas down one side.
+  .app-gif {
+    display: block;
+    height: 680px;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 16px;
+    box-shadow: none;
+  }
+}
+
+// The `.com` on the "Samuel Bharti" heading: his site is his name, so the
+// heading finishes the address itself a beat after the slide lands. The
+// animation is keyed off `.present`, not just a delay - reveal keeps the next
+// slides in the DOM, so a bare `animation-delay` would have already run by the
+// time you arrived. Hidden by default, so it also resets on the way back.
+.reveal h2 .dotcom { color: $muted; opacity: 0; }
+.reveal section.present h2 .dotcom {
+  animation: dotcom-in .8s ease 2.2s forwards;
+}
+// Keep the semicolon after the last declaration in each keyframe. Sass does
+// not need it, but quarto's css-vars pass parses this file with a stricter
+// parser, and without it that pass dies (SCSSParsingError) and takes the
+// revealjs libs out of the render with it. See CLAUDE.md.
+@keyframes dotcom-in { from { opacity: 0; } to { opacity: 1; } }
+
+// A QR inside the content of a slide (the gallery, on "Samuel Bharti"), as
+// opposed to the furniture QR the title and recap slides carry as a background
+// layer. Indented past the bullet rule so it lines up with the bullet text.
+// Quarto wraps the image in its own `<p>`; that margin plus the list's block
+// margin leaves 80px of air this slide does not have, so zero it and let the
+// list's own bottom margin be the whole gap.
+.reveal .slides section:has(> .columns .qr-inline) p:has(> .qr-inline) {
+  margin: 0;
+}
+.reveal .qr-inline {
+  display: block;
+  width: 140px;
+  height: 140px;
+  margin: 0 0 0 42px;
+  border: none;
+  box-shadow: none;
+  background: none;
+}
 
 // -- deck-local: state -> UI, on "UI is assembled from your data's state" -----
 // The point is that the picture is *derived*, so the whole chain sits on one

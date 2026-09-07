@@ -19,6 +19,11 @@ theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
 theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 theme/qr-repo.svg          QR to this repo, bottom-centre of the title/end slides
+theme/qr-showcase.svg      QR to the app gallery, on the "Samuel Bharti" slide
+theme/fit-width.html       scales the deck to the window's width, not its box
+theme/jsx-tokens.html      re-splits the JSX spans the grammar merges
+theme/gif-restart.html     replays a slide's GIF from frame 1 on arrival
+record-plotomics-gif.py    drives the live app to record images/plotomics-live.gif
 apps/                      the apps demoed live in the talk (02 is React-only)
 images/                    slide images (headshot, app screenshots) - 1920x1080
 _extensions/drop/          quarto-drop (webR console in a drawer)
@@ -54,6 +59,21 @@ from its heading, so `index.html#/two-hooks-are-the-whole-api` lands on one
 directly. The browser caches `index.html` hard between renders — add a
 `?v=N` that changes, or a re-render appears to have done nothing.
 
+A render can come out **incomplete**: exit 0 and "Output created", but
+`_site/index_files/libs/` has no `revealjs/` in it, so the served deck is
+unstyled markdown with ~19 console errors. The tell is quarto's own line
+`Error adding css vars block SCSSParsingError` plus a
+`_quarto_internal_scss_error.scss` dropped in the project root — quarto parses
+the theme a second time for that pass, with a stricter parser than sass. The
+one trigger found so far is a **missing semicolon after the last declaration in
+a block**: `@keyframes x { from { opacity: 0 } to { opacity: 1 } }` kills the
+pass, and the same line with both semicolons is fine (bisected by rendering
+each). Sass itself accepts either, so nothing else warns you. So:
+never commit `_quarto_internal_scss_error.scss`, treat it as "the SCSS you just
+wrote broke a build pass", and check `ls _site/index_files/libs` before
+concluding anything about a change — otherwise you debug the CSS of a deck that
+never loaded the theme.
+
 `quarto render` **deletes and recreates `_site/`**, so a server started *inside*
 it keeps serving the old, unlinked directory: every later check silently reads a
 stale deck (the tell is reveal bouncing a known slide id back to
@@ -80,10 +100,23 @@ no-op. (Same lever as
 <https://github.com/orgs/quarto-dev/discussions/11318>, which sets `height:`
 statically; this just does it per window.)
 
-`theme/qr-repo.svg` is generated; regenerate it if the repo URL changes:
+The "Samuel Bharti" slide has two deck-local pieces. `[.com]{.dotcom}` in the
+heading fades in 2.2s after the slide lands, in `$muted`, so the heading turns
+into his address on its own; the animation is keyed off `section.present`, not
+a bare `animation-delay`, because reveal keeps the coming slides in the DOM and
+a plain delay would have run out before you ever arrived. `.qr-inline` is a QR
+in a slide's *content* (the gallery's, under its bullet) rather than the
+furniture QR the title and recap slides carry as a background layer; it also
+zeroes the margin on the `<p>` quarto wraps the image in, which otherwise puts
+the code through the bottom of the canvas. 140px on the 1920 canvas decodes
+fine — verified by decoding it back out of a screenshot of the rendered slide.
+
+`theme/qr-repo.svg` and `theme/qr-showcase.svg` are generated; regenerate one
+if its URL changes:
 
 ```bash
 uv run --with segno python -c "import segno; segno.make('https://github.com/schloerke/presentation-2026-09-15-posit-conf-shinyreact', error='m').save('theme/qr-repo.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
+uv run --with segno python -c "import segno; segno.make('https://github.com/posit-dev/shiny-showcase-bioinformatics', error='m').save('theme/qr-showcase.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
 ```
 
 Master equivalents, applied as classes on a `##` heading:
@@ -97,6 +130,7 @@ Master equivalents, applied as classes on a `##` heading:
 | Data | `## Name {.data-slide}` + caption, `.stats`, one chart |
 | (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
 | (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
+| (none — deck-local) | `## Name {.gif-slide .nostretch}` + a `.gif-caption` span and one `.app-gif` |
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
 | (none — deck-local) | `## Name {.logo-slide}` + `.hexlogo` / `.hexreact` divs |
@@ -118,7 +152,18 @@ Pair it with `#| viewerHeight: 1080`.
 
 `.app-slide` (deck-local, on "A summer of Shiny for bioinformatics") is bullets
 on the left and **one screenshot per bullet** on the right, swapped on the same
-click as its bullet. Screenshots rather than iframes: those apps are Connect
+click as its bullet. Each bullet is the app's name linked to its Connect Cloud
+deployment, over a sub-bullet linked to the source: the deck is published, so
+on a projector those read as plain text and afterwards they are how a viewer
+reaches the app. `apps.yml` in `posit-dev/shiny-showcase-bioinformatics` is the
+source of truth for all three addresses (deployment, source, Zenodo DOI) — the
+deployment URL is *derived* there, as
+`https://<pcc-account>-<app>.share.connect.posit.cloud/`, so read it from that
+file rather than guessing. The README carries the full table.
+
+Two lines per app is the ceiling: five apps at two lines each already reach
+966px of the 1080 canvas, so a wrapped sub-bullet pushes the fifth caption off
+the bottom. Keep them short and re-check the last fragment after any edit. Screenshots rather than iframes: those apps are Connect
 Cloud deployments, and a served render makes no off-origin request. Three things
 make the swap work, and it breaks if any one goes:
 
@@ -143,6 +188,58 @@ the box shrinks to unreadable, so crop it closer to the box's ratio
 (`magick in.png -crop WxH+0+0 +repage -resize 1600x out.png`) rather than
 growing the box.
 
+The five shots are **zoomed crops, not full pages**. A whole 1600px browser
+window in a ~930px box renders its 14px UI text at 8px — on a projector that is
+a screenshot of nothing. Crop to the one region the bullet is about, sized
+~900x630 so it lands at roughly 1:1 in the box, and cut on an element boundary
+(a card gap, a panel edge) so nothing is sliced mid-word. Check by looking at
+the rendered slide, not at the crop.
+
+### `.gif-slide` — Plotomics Live, as a recording
+
+**Only one of the five apps uses `shinyreact`.** Verified against each repo's
+`renv.lock`, UI sources and code search: `plotomics-live` has
+`library(shinyreact)` and `ui <- page_react_html("www/index.html")`; the other
+four are `shiny` + `bslib` with the UI written in R. Two of them pull
+`reactable`/`reactR`, so React runs in the page, but as an htmlwidget's
+internals — not as UI anyone authored in React. Do not describe those four as
+`shinyreact` apps; the slide's own claim is that the fifth reached for it
+*because the visualization demanded it*, and that only works if the other four
+are honestly plain Shiny.
+
+So the app slide is followed by a full slide for that one app: heading, one
+`.gif-caption` stat line, and a recording of the deployment filling the rest.
+The measured numbers behind the caption (re-measure, do not trust these):
+26 visualizations, and 69 `reactive_output()` calls in `app.R` — 22 `*_data`
+feeds React reads through `useShinyOutputValue`, 28 `*_png` ggplot2 images, 14
+`*_stats`, 5 other (`nd_meta`, `igv_genes`, `igv_config`, `lollipop_genes`,
+`chat_response`). `app.R` is 546 lines, 432 of them code — the "476 lines" in
+upstream's `apps.yml` no longer matches anything measurable, so the deck says
+"one line of UI" instead, which the next slide proves.
+
+A **GIF, not an iframe**: it is a Connect Cloud deployment, and a served render
+makes no off-origin request. `record-plotomics-gif.py` drives the live app with
+playwright and writes frames to `.context/frames/`; four beats, in the order
+the talk needs (React render → fade the spots to the H&E → recolour by ERBB2, a
+real server round trip → the same numbers as a ggplot2 PNG). Assemble with:
+
+```bash
+python3 record-plotomics-gif.py
+magick -delay 10 -loop 0 .context/frames/f*.png -resize 1200x -colors 96 \
+  -layers Optimize images/plotomics-live.gif    # ~3.2 MB, 59 frames
+```
+
+96 colours holds up on the H&E photography; 1200px wide is the native width, so
+`.app-gif`'s 680px height (all the canvas has spare under the heading and the
+caption) scales it *down*. Recording headless is fine for this page, but **not**
+for the UMAP page — 584k WebGL points come out sparse and wrong under
+SwiftShader.
+
+`theme/gif-restart.html` (a third `include-after-body`) blanks and re-sets the
+`src` of any `.gif` on `slidechanged`. A GIF starts decoding at page load and
+loops forever with no way to seek it, so without this you arrive mid-loop and
+the four beats play out of order. Assigning the same URL back is a no-op, hence
+the blank-for-a-tick.
 ### The logo build (`.logo-slide`, three slides)
 
 "Why Shiny + React?" → `.logo-slide` → the `shinyreact` bullets slide are one
@@ -277,6 +374,15 @@ Do not "clean these up" — each one silently breaks the layout:
 - Never set `position: relative` on a section. Reveal positions sections
   absolutely; making one relative puts it back in flow and pushes it off-canvas.
   Pseudo-elements can already position against the section as-is.
+- A master's own rules need an element name to beat quarto's, not just its
+  class. `.reveal .app-slide { padding-top }` and `.reveal .app-slide ul
+  { margin }` are both *the same specificity* as rules that come later in the
+  cascade — `.reveal .slides section` (the master padding) and quarto's
+  `.reveal .slide ul { margin-bottom: .5em }` — so they silently lose. The tell
+  is a value you can see in the compiled CSS, matching the element, and not in
+  `getComputedStyle`. Write `.reveal .slides section.app-slide` instead. (Check
+  a spacing change actually moved something before tuning the number again;
+  two rounds of "tighten the gap" here did nothing at all.)
 - Quarto's code filename div is `.code-with-filename-file` (not `-title`), and
   it wraps the name in `<pre><strong>`, so `.reveal pre` re-styles it as a code
   panel unless overridden.

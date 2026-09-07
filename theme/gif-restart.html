@@ -1,0 +1,28 @@
+<script>
+  // Restart the GIF on a slide every time that slide becomes the current one.
+  //
+  // An animated GIF starts when the browser decodes it, i.e. at page load, and
+  // loops forever - there is no DOM API to seek or replay one. So by the time
+  // you walk to the Plotomics Live slide you are dropped into the middle of the
+  // loop, which for a recording with an order to it (render, fade, recolour,
+  // switch engine) shows the wrong beat first. Re-assigning `src` forces a
+  // fresh decode, which starts the animation over.
+  //
+  // The blank in between matters: assigning the same URL back is a no-op, and
+  // the cached-image path can also skip the restart, so drop the src for a tick
+  // first. Cheap - the file is already in cache, so nothing goes over the wire.
+  window.addEventListener("load", function () {
+    if (!window.Reveal) return;
+    var replay = function () {
+      var slide = Reveal.getCurrentSlide();
+      if (!slide) return;
+      slide.querySelectorAll('img[src$=".gif"]').forEach(function (img) {
+        var src = img.src;
+        img.src = "";
+        setTimeout(function () { img.src = src; }, 0);
+      });
+    };
+    Reveal.on("slidechanged", replay);
+    replay();
+  });
+</script>
