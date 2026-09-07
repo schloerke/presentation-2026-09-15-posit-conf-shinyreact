@@ -343,7 +343,7 @@ $presentation-block-margin: 44px !default;
 // own `<p>`, which is what `.r-stack` actually stacks; pair with `.nostretch`
 // or auto-stretch takes the images over.
 .reveal .app-stack {
-  height: 560px;
+  height: 650px;
   > p { margin: 0; height: 100%; }
   img {
     width: 100%;

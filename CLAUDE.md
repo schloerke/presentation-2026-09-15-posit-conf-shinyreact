@@ -141,6 +141,13 @@ the box shrinks to unreadable, so crop it closer to the box's ratio
 (`magick in.png -crop WxH+0+0 +repage -resize 1600x out.png`) rather than
 growing the box.
 
+The five shots are **zoomed crops, not full pages**. A whole 1600px browser
+window in a ~930px box renders its 14px UI text at 8px — on a projector that is
+a screenshot of nothing. Crop to the one region the bullet is about, sized
+~900x630 so it lands at roughly 1:1 in the box, and cut on an element boundary
+(a card gap, a panel edge) so nothing is sliced mid-word. Check by looking at
+the rendered slide, not at the crop.
+
 Code fences take `filename="app.R"`, which renders as the cyan label from
 DESIGN.md 6.4, in whatever casing you wrote — nothing upper-cases it.
 
