@@ -184,29 +184,99 @@ Use a modern UI ecosystem — **React.js** — for the interface.
 
 ## React.js {.divider data-number="02"}
 
-## What is React?
+## What is React? {.code-slide}
+
+<!-- The atom marks every slide in section 02 as a React slide. `.hexreact` is
+     atom-only by design (see the theme) and `.corner` parks it where
+     `.hexlogo.corner` parks the finished mark. Never with a `data-id`: that is
+     what enlists an element in the logo build's auto-animate chain. -->
+<div class="hexreact corner"><div class="hr-atom"></div></div>
 
 - > The library for web and native user interfaces
 - > "…build user interfaces out of individual pieces called **components**"
 
-## Why React?
+<!-- One component, defined once and used twice - the smallest honest picture of
+     "user interfaces out of individual pieces". The right-hand panel is not a
+     screenshot: it is the deck's own `.stats` markup, the same class names the
+     JSX writes, so what you read on the left is literally what draws on the
+     right. 272 is `nrow(faithful)` and 30 is the app's default bin count. -->
+::: {.columns}
+::: {.column .fragment width="64%"}
+```{.javascriptreact filename="Stat.jsx"}
+function Stat({ label, value }) {
+  return (
+    <div className="stat">
+      <span className="stat-label">{label}</span>
+      <span className="stat-value">{value}</span>
+    </div>
+  );
+}
+<Stat label="Eruptions" value={272} />
+<Stat label="Bins" value={30} />
+```
+:::
+::: {.column .fragment width="36%"}
+[Rendered]{.render-label}
 
-- A **massive** ecosystem of proven, production-ready components
-- It dwarfs what R / Python has readily available
-- Component libraries, design systems, charts, tables, maps — off the shelf
+::: {.render-out}
+::: {.stats}
+::: {.stat}
+[Eruptions]{.stat-label}
+[272]{.stat-value}
+:::
+::: {.stat}
+[Bins]{.stat-label}
+[30]{.stat-value}
+:::
+:::
+:::
+:::
+:::
+
+::: {.notes}
+React calls itself "the library for web and native user interfaces", and you
+build those interfaces out of individual pieces called components.
+
+A component is a function that returns markup. Define `Stat` once, and you use
+it as `<Stat>` — twice here, and it draws twice. That is the whole idea: you
+name a piece of UI, and then you reuse it.
+:::
+
+## Why React? {.nostretch}
+
+<div class="hexreact corner"><div class="hr-atom"></div></div>
+
+<!-- The two sub-bullets are the evidence for "massive", so they are screenshot
+     and number rather than more prose. The badge is github.com/facebook/react's
+     own "Used by", screenshotted at 4x on 2026-09-06 (the raw count that day was
+     30,088,518; the avatar row and that number are cropped off). Shot over an
+     $ink ground, so only `.used-by`'s border marks it as a screenshot.
+     The download numbers, also measured 2026-09-06: npm's `react` did
+     171,637,376 in the week to 2026-08-29 (api.npmjs.org/downloads/point/
+     last-week/react) against shiny's 50,465,284 since cranlogs began on
+     2012-10-01 (cranlogs.r-pkg.org). Re-measure before the talk; the ratio
+     only grows. -->
+- **Massive** adoption in the JS community
+  - GitHub: ![](images/react-used-by.png){.used-by fig-alt="GitHub's sidebar badge: Used by 30M"}
+  - `react` alone pulled **170M downloads last week**\
+    3x Shiny's 14-year CRAN total of 50M
+- Proven component libraries, design systems, charts, tables, maps, ...
 
 ::: {.notes}
 A MASSIVE ecosystem of proven components, ready for production environments. It
 dwarfs what R and Python readily have available.
 
+Thirty million repositories on GitHub depend on React.
+
+And react alone pulled 170 million downloads *last week* — more than three times
+Shiny's entire 14-year total on CRAN, which is about 50 million.
+
 *Show off existing libraries.*
 :::
 
-## UI is assembled from your data's state
+## UI is assembled from data's state
 
-- React is *really* good at taking JSON and mapping data to UI
-- You describe what the UI looks like **for a given state**
-- Don't worry about managing transitions from one data state to another
+<div class="hexreact corner"><div class="hr-atom"></div></div>
 
 <!-- Old Faithful, twice: the raw waiting times plus a bin count, the `data`
      they reduce to, and the bars that data draws. Every number is real -
@@ -228,7 +298,8 @@ dwarfs what R and Python readily have available.
 ::: {.notes}
 React is *REALLY* good at just taking JSON and mapping data to UI.
 
-Don't worry about managing the transitions from one data state to another!
+You describe what the UI looks like *for a given state* — and don't worry about
+managing the transitions from one data state to another!
 
 Old Faithful is the whole idea in one picture: the same 272 waiting times go in,
 `bin_count` reduces them to a `bins` array, and that array *is* the chart. The
@@ -236,11 +307,14 @@ only thing that changed between these two is the number. Nobody added, removed,
 or resized a bar.
 :::
 
-## Old Faithful, React only {.demo-slide}
+## Old Faithful {.demo-slide}
 
 <!-- A static page, not shinylive: no server, no webR. `.demo-slide > iframe`
      in the theme sizes it to the full 1920x1080. -->
 <iframe src="apps/02-react-only/www/index.html" title="Old Faithful, React only"></iframe>
+<!-- After the iframe, not before: neither carries a z-index, so DOM order is
+     what puts the atom over the app rather than under it. -->
+<div class="hexreact corner"><div class="hr-atom"></div></div>
 
 ::: {.notes}
 Same app, no Shiny at all — this is 100% React, and the data is baked into the
@@ -250,7 +324,15 @@ Drag the slider. Every bar moves. I did not write a single line that adds,
 removes, or resizes a bar.
 :::
 
-## The UI is a function of `bin_count` {.code-slide}
+<!-- The atom in the corner is what says "React" now that the heading doesn't.
+     `.hexreact` is atom-only by design (see the theme), and `.corner` puts it
+     where `.hexlogo.corner` parks the finished mark. No `data-id`: this slide is
+     not part of the logo build's auto-animate chain, and adding one would enlist
+     it. The id is explicit because "Old Faithful" alone collides with the
+     divider slide's generated `#old-faithful`. -->
+## Old Faithful {#react-code .code-slide}
+
+<div class="hexreact corner"><div class="hr-atom"></div></div>
 
 ```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,4,6|3,4,5,6|11-12|13"}
 function App() {

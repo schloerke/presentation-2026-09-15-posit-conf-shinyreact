@@ -491,15 +491,37 @@ $presentation-block-margin: 44px !default;
   background: none;
 }
 
-// -- deck-local: state -> UI, on "UI is assembled from your data's state" -----
+// GitHub's "Used by 30M" badge, inline in a sub-bullet on "Why React?". Its
+// ground is $ink, matching the slide, so the border is the only thing saying
+// "this is a screenshot" - without it the badge reads as deck typography.
+// 88px of raster at 64px tall keeps its 15px UI text at ~44px, over the 36px
+// floor; `vertical-align` sits it on the text's baseline rather than below it.
+.reveal img.used-by {
+  height: 64px;
+  width: auto;
+  margin: 0 0 0 8px;
+  vertical-align: -14px;
+  border: 2px solid rgba($muted, .55);
+  border-radius: 8px;
+  box-shadow: none;
+  background: none;
+}
+
+// -- deck-local: state -> UI, on "UI is assembled from data's state" ---------
 // The point is that the picture is *derived*, so the whole chain sits on one
 // row: the raw waiting times and a bin count, the `data` they reduce to, and
 // the bars that data draws. Two of these stack in an `.r-stack`, so stepping
 // from 12 to 30 bins only changes the numbers. The svg is authored at 900x300
 // and scaled by the box.
+// The slide is a heading and this row, nothing else, so the row is centred in
+// the canvas under the heading (which ends at 334) by margin: 334 + (676-190)/2.
+// The height is what *sizes the chart* - the svg takes 100% of the row's height
+// and `preserveAspectRatio` widens it to match, so a taller box does not centre
+// the row, it runs the bars off the right of the canvas. Move this row with the
+// margin; leave the 190 alone.
 .reveal .state-stack {
   height: 190px;
-  margin-top: 24px;
+  margin-top: 243px;
 }
 // Quarto puts the labels and the svg in one `<p>`, so that is the flex row -
 // styling the fragment div itself only lays out the paragraph.
@@ -535,6 +557,16 @@ $presentation-block-margin: 44px !default;
   // The arrows are the whole claim - the data on one side, the UI it implies
   // on the other - so they sit between the panels, not inside them.
   .state-arrow { flex: none; font-size: 48px; color: rgba($cyan, .5); }
+  // The `bins` panel is `flex: none`, so it was as wide as its own string -
+  // and `[1, 8, 7, 10, …]` is seven characters shorter than
+  // `[13, 19, 31, 20, …]`. Stepping from 12 bins to 30 therefore shrank the
+  // panel and slid the second arrow and the whole histogram left, which reads
+  // as the chart being redrawn rather than the numbers changing. Pin it to the
+  // longer of the two strings: 26 monospace characters (`bins = ` + 19), on
+  // the `code` because `ch` has to resolve in the mono font, not the slide's
+  // sans. `.state-arrow + .state-json` and not `:nth-of-type(2)` - the arrows
+  // are spans too, so they count.
+  .state-arrow + .state-json code { min-width: 26ch; }
   svg { flex: 1; height: 100%; min-width: 0; }
   rect { fill: $cyan-text; }
 }
@@ -666,8 +698,16 @@ $presentation-block-margin: 44px !default;
 //    box is invisible, and keeping the ratio fixed is what lets auto-animate
 //    carry the pair to full size without the atom jumping.
 //    150 + 80 + 150 lands the visible pair's right edge on the 96px margin.
+//
+//    `.corner` shares that geometry: every slide in section 02 carries a bare
+//    atom to mark it as a React slide, and the lockup's box already puts a
+//    150px atom's right edge on the margin. One rule rather than
+//    two that can drift - but the class names stay distinct, since the lockup is
+//    auto-animate scaffolding and the corner is decoration.
 .reveal .hexlogo.lockup  { top: 110px; left: 1444px; width: 150px; height: 173px; }
-.reveal .hexreact.lockup { top: 52px;  left: 1624px; width: 250px; height: 289px; }
+.reveal .hexreact:is(.lockup, .corner) {
+  top: 52px; left: 1624px; width: 250px; height: 289px;
+}
 .reveal .hexplus {
   position: absolute;
   top: 110px; left: 1594px;
@@ -724,6 +764,14 @@ $presentation-block-margin: 44px !default;
 //    the text, or a bullet runs under it.
 .reveal .hexlogo.corner { top: 100px; left: 1594px; width: 230px; height: 266px; }
 .reveal section:has(.hexlogo.corner) > :is(p, ul, ol) { max-width: 1380px; }
+
+// The corner atom sits at the heading's own height, and its ink starts at 1674
+// (1624 + the atom's 20% inset), so a heading on one of these slides has 1578px
+// before it runs into the mark. No current heading is near that - the longest,
+// "UI is assembled from data's state", ends at 1463 - but an earlier draft of
+// that one came within 8px of the atom, which reads as a rendering bug. The cap
+// turns the next such heading into a visible wrap instead.
+.reveal section:has(.hexreact.corner) > h2 { max-width: 1578px; }
 
 // -- the flight --------------------------------------------------------------
 // `.hexreact` is a `.fragment.fade-out` - visible on arrival, "shown" on the
@@ -892,7 +940,9 @@ $presentation-block-margin: 44px !default;
   // 6.4: the panel. Radius 20, 40/44 padding, cyan hairline at 18%. Only `pre`
   // draws it - quarto nests pre inside div.sourceCode inside .code-with-filename,
   // and styling more than one of those gives you concentric boxes.
-  pre {
+  // `.render-out` (the rendered half of "What is React?") joins the selector
+  // rather than restating the six values, so the two panels can't drift apart.
+  pre, .render-out {
     background: $ink-deep;
     border: 2px solid rgba($cyan, .18);
     border-radius: 20px;
@@ -994,6 +1044,36 @@ $presentation-block-margin: 44px !default;
   margin: 48px 0;
   .stat-value { font-size: 132px; font-weight: 800; line-height: 1; color: $cyan-text; }
   .stat-label { font-size: 30px; color: $muted; }
+}
+
+// -- deck-local: the rendered half of "What is React?" -----------------------
+// The right column shows what the left column's JSX draws, in the deck's own
+// `.stats` markup - the same class names the JSX writes, so the two halves are
+// the same component rather than a screenshot of one. The panel itself is the
+// 6.4 code panel (`.render-out` is in that selector); only the label and the
+// stacking are local. `.stats` is a row on the data master, and two 132px
+// numbers do not fit side by side in a 36% column.
+.reveal .render-label {
+  display: block;
+  padding: 0 0 16px 4px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: $cyan-text;
+}
+// Quarto wraps the span in a `<p>`, whose block margin would double the 16px.
+.reveal p:has(> .render-label) { margin: 0; }
+
+.reveal .render-out {
+  // Every span here is on its own markdown line, so quarto gives each one a
+  // `<p>` - whose block margins are what pushed the panel off the canvas.
+  p { margin: 0; }
+  .stats {
+    flex-direction: column;
+    gap: 56px;
+    margin: 0;
+    .stat-label, .stat-value { display: block; }
+  }
 }
 
 // -- deck-local: mermaid cycle diagram ---------------------------------------

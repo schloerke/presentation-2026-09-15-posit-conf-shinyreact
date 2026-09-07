@@ -135,6 +135,9 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
 | (none — deck-local) | `## Name {.logo-slide}` + `.hexlogo` / `.hexreact` divs |
 | (none — deck-local) | bullets + an `.r-stack.state-stack` of `.state-viz` rows |
+| (none — deck-local) | `.hexreact.corner` — a bare React atom, top right |
+| (none — deck-local) | `img.used-by` — a screenshot inline in a bullet |
+| (none — deck-local) | `.render-out` — a code panel holding rendered UI, not code |
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
@@ -366,6 +369,47 @@ below, and the heading's margin shrinks to 16px. That rhythm is what makes a
 13-line block fit — the list defaults put it 80px off the bottom of the slide,
 which reads on a projector as the code simply ending early. Check the tail of
 the longest block after any change here.
+
+When you do that check, **measure the rendered block; do not compute it from
+`$code-block-font-size`.** That variable is 34px, but the effective size on a
+slide is **36px** — quarto's own revealjs css beats `.reveal pre`'s declaration.
+A budget worked out from 34 is wrong by ~2px a line, which is a whole line over
+ten of them; one shrink-the-font "fix" was made on that arithmetic and then
+reverted, because at 36px the block fit all along.
+
+`.render-out` is the other half of a `.code-slide`: a panel that holds *rendered
+UI* rather than code (used on "What is React?", where the right column shows what
+the left column's JSX draws). It is not a screenshot — it is the deck's own
+`.stats` markup, carrying the same class names the JSX writes, so the two halves
+cannot drift. It joins `pre` in the 6.4 panel selector rather than restating the
+panel's six values. Every span in it sits on its own markdown line, so quarto
+wraps each in a `<p>`; those block margins are zeroed, and forgetting that is
+what pushed the panel 120px off the canvas first time round.
+
+`img.used-by` is a screenshot **inline in a bullet** (GitHub's "Used by 30M"
+badge, on "Why React?"). It was shot over an `$ink` ground so it needs no frame
+— which means the 2px `$muted` border is the only thing telling the audience it
+is a screenshot and not deck typography. Keep it. `theme/`'s numbers assume a
+4x raster: 88px of image at 64px tall puts 15px browser UI text at ~44px, over
+DESIGN.md's 36px floor. Re-shoot at 4x if the badge is refreshed.
+
+`.hexreact.corner` is a bare React atom in the top-right corner, on every
+section-02 slide. It shares `.hexreact.lockup`'s geometry (one rule, so they
+cannot drift), and it must **never** carry a `data-id` — that is what enlists an
+element in the logo build's auto-animate chain. The atom's ink starts at x=1674,
+so a heading on one of these slides has 1578px; `section:has(.hexreact.corner) >
+h2` caps it there so a long one wraps visibly instead of colliding with the mark.
+The divider has no atom: its own centred watermark is already the orbit motif.
+
+On the state row ("UI is assembled from data's state"), `.state-stack`'s
+**`height` is what sizes the chart** — the svg takes 100% of the row's height and
+`preserveAspectRatio` widens it to match. Growing the box to centre the row runs
+the bars off the right of the canvas; move the row with `margin-top` and leave
+the 190 alone. The `bins` panel also carries `min-width: 26ch` on its `code`,
+because `flex: none` sized it to its own string and `[1, 8, 7, 10, …]` is seven
+characters shorter than `[13, 19, 31, 20, …]` — so stepping 12 → 30 bins shrank
+the panel and slid the arrow and histogram left, which reads as the chart being
+redrawn rather than the numbers changing.
 
 ### Reveal quirks this theme already works around
 
