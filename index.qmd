@@ -544,8 +544,8 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 ::: {.column width="68%"}
 ::: {.nonincremental}
 - Shiny summer '26 intern
-- Computational biologist
 - Ph.D. candidate, UAB
+- Computational biologist
 - 10x Shiny apps. 4x supporting packages
 - [posit-dev/shiny-showcase-bioinformatics](https://github.com/posit-dev/shiny-showcase-bioinformatics){.gh}
 :::
@@ -626,7 +626,7 @@ That is the point — the last one is the only one that reaches for
 
 ## Plotomics Live {.gif-slide .nostretch}
 
-[26 visualizations · 22 data feeds + 28 ggplot2 PNGs · 69 `reactive_output()`]{.gif-caption}
+[26 visualizations · 22 data feeds + 28 ggplot2 PNGs · 65+ `reactive_output()`]{.gif-caption}
 
 <!-- A GIF of the deployment, not an iframe: it is a Connect Cloud app, and a
      served render makes no off-origin request. Recorded with
@@ -646,21 +646,23 @@ ggplot2 as a PNG on the server. That is the whole argument in one control.
 Twenty-six visualizations, and the server publishes sixty-nine
 `reactive_output()` feeds to serve them: twenty-two data feeds React reads
 through `useShinyOutputValue`, twenty-eight ggplot2 PNGs for the classic side,
-and the rest stats and config. None of it is UI code.
+and the rest stats and config.
+
+Two things to say out loud about that, because the next slide is the proof:
+
+- `app.R` is **compute-only** — one `reactive_output()` per visualization, and
+  not one line of it is UI
+- the entire UI, in R, is **one line**
 :::
 
 ## What `shinyreact` bought him {.code-slide}
 
-::: {.incremental}
-- `app.R` is **compute-only** — one `reactive_output()` per visualization
-- The entire UI, in R, is **one line**
-:::
-
-::: {.fragment}
+<!-- No lead-in bullet on this one: those two points are spoken over the
+     Plotomics Live slide before it, so the panel is the whole slide and lands
+     with it rather than on a click. -->
 ```{.r filename="app.R"}
 ui <- shinyreact::page_react_html("www/index.html")
 ```
-:::
 
 ::: {.fragment .spaced}
 584,207 cells on the GPU; **ggplot2 has to subsample**
