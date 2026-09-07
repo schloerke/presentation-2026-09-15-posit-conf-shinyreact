@@ -8,21 +8,22 @@ x <- faithful$waiting
 ui <- page_react_html("www/index.html")
 
 server <- function(input, output, session) {
-  # input$bins is NULL until the client's first useShinyInput("bins", 30)
+  # input$bin_count is NULL until the client's first
+  # useShinyInput("bin_count", 30)
   # message arrives. Returning NULL leaves the React side on its "Loading…"
   # placeholder; req() would work too, but its silent error still reaches the
-  # client. (Python's input.bins() raises a silent exception instead.)
-  bins <- reactive(input$bins)
+  # client. (Python's input.bin_count() raises a silent exception instead.)
+  bin_count <- reactive(input$bin_count)
 
   output$dist_data <- reactive_output({
-    n <- bins()
+    n <- bin_count()
     if (is.null(n)) {
       return(NULL)
     }
     breaks <- seq(min(x), max(x), length.out = n + 1)
-    info <- hist(x, breaks = breaks, plot = FALSE)
+    bins <- hist(x, breaks = breaks, plot = FALSE)
     # I() keeps length-1 vectors as JSON arrays (n = 1) instead of scalars.
-    list(breaks = I(info$breaks), counts = I(info$counts))
+    list(breaks = I(bins$breaks), counts = I(bins$counts))
   })
 }
 

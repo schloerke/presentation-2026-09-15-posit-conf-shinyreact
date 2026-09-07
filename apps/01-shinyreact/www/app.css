@@ -33,7 +33,7 @@ body {
   width: 100%;
 }
 
-.bins-value {
+.bin-count-value {
   display: block;
   margin-top: 0.25rem;
   font-variant-numeric: tabular-nums;

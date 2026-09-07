@@ -364,6 +364,75 @@ $presentation-block-margin: 44px !default;
 }
 .reveal:has(section.demo-slide.present) .footer { display: none !important; }
 
+// -- deck-local: state -> UI, on "UI is assembled from your data's state" -----
+// The point is that the picture is *derived*, so the whole chain sits on one
+// row: the raw waiting times and a bin count, the `data` they reduce to, and
+// the bars that data draws. Two of these stack in an `.r-stack`, so stepping
+// from 12 to 30 bins only changes the numbers. The svg is authored at 900x300
+// and scaled by the box.
+.reveal .state-stack {
+  height: 190px;
+  margin-top: 24px;
+}
+// Quarto puts the labels and the svg in one `<p>`, so that is the flex row -
+// styling the fragment div itself only lays out the paragraph.
+.reveal .state-viz {
+  width: 100%;
+  height: 100%;
+  > p {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin: 0;
+    height: 100%;
+  }
+  .state-json {
+    flex: none;
+    color: $muted;
+    padding: 16px 24px;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 20px;
+    background: $ink-deep;
+  }
+  // The panels hold code spans, one per line: `waiting` and `bins` stack into
+  // the input panel, `data` stands alone as what the bins reduced them to.
+  code {
+    display: block;
+    font-size: 30px;
+    line-height: 1.45;
+    color: inherit;
+    background: none;
+    padding: 0;
+  }
+  .state-count code { color: $cyan-text; font-weight: 700; }
+  // The arrows are the whole claim - the data on one side, the UI it implies
+  // on the other - so they sit between the panels, not inside them.
+  .state-arrow { flex: none; font-size: 48px; color: rgba($cyan, .5); }
+  svg { flex: 1; height: 100%; min-width: 0; }
+  rect { fill: $cyan-text; }
+}
+
+// -- deck-local: the chain under a stepped code block ------------------------
+// `input$bin_count` -> `breaks` -> ... , one link per code-line-numbers step.
+// Quarto's line-highlight plugin clones the <code> once per step (see
+// CLAUDE.md), so which clone is `.visible` *is* the step counter: the original
+// block is `code:nth-of-type(1)` and step n is `code:nth-of-type(n + 1)`. That
+// is also why this is CSS rather than fragments - a `.fragment` here would be
+// sorted after every clone and could not interleave with them.
+.reveal .chain {
+  margin-top: 16px;
+  color: $muted;
+  span { opacity: 0; transition: opacity .3s ease; }
+}
+// A slide carrying both a chain and an `.after-code` line puts two blocks under
+// the panel, which is more than the code master's bottom padding budgets for.
+.reveal section:has(.chain) .after-code { margin-top: 16px; }
+.reveal section:has(pre > code.fragment:nth-of-type(2).visible) .chain .chain-1,
+.reveal section:has(pre > code.fragment:nth-of-type(3).visible) .chain .chain-2,
+.reveal section:has(pre > code.fragment:nth-of-type(4).visible) .chain .chain-3 {
+  opacity: 1;
+}
+
 // -- deck-local: two marks becoming one --------------------------------------
 // A three-slide run, after slides 30-31 of the shinytest2 talk, where the Shiny
 // and testthat hexes merge into the shinytest2 hex: Shiny's own sticker and a

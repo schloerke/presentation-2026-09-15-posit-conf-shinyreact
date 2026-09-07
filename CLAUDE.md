@@ -100,6 +100,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
 | (none — deck-local) | `## Name {.logo-slide}` + `.hexlogo` / `.hexreact` divs |
+| (none — deck-local) | bullets + an `.r-stack.state-stack` of `.state-viz` rows |
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
@@ -317,6 +318,17 @@ Do not "clean these up" — each one silently breaks the layout:
   correctly too. Quarto's `data-fragment-index` escape hatch in that plugin is
   no help: it reads the attribute off the `<code>`, and a block attribute lands
   on the wrapping `div.sourceCode`.
+- `.chain` is the same trick, one step at a time: the two server slides carry
+  `input$bin_count → breaks → …` under the panel, and each link appears with the
+  code step that computes it. Since the plugin appends one `code` per step,
+  *which clone is `.visible` is the step counter* — `.chain-1` keys off
+  `code.fragment:nth-of-type(2)`, `.chain-2` off `(3)`, `.chain-3` off `(4)`.
+  Text left *outside* a `.chain-N` span is visible on arrival, which is how the
+  second slide keeps the first two links its auto-animate partner ended on.
+  Count the steps before writing those numbers: a trailing `|` is a step, so
+  `"|5|6|"` is four codes (original + three clones) and `"|6|7|4,8|"` is five,
+  which is why `.chain-3` and `.after-code` land on the same click on the first
+  slide and one apart on the second.
 
 ### Mermaid (the one diagram, on "The data cycle")
 
