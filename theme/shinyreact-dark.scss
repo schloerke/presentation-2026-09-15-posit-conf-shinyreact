@@ -14,6 +14,8 @@ $muted:      #a3acbb;
 $cyan:       #00d8ff; // graphic only - fringes on letterforms, see DESIGN.md 4.1
 $cyan-text:  #6fd4e8;
 $jsx-attr:   #f0a6c8; // JSX props, 9.55:1 on --ink-deep (DESIGN.md 4.1)
+$mark-red:   #ff7b72; // annotation X ("this goes"), 7.23:1 on --ink-deep
+$mark-amber: #ffc15e; // annotation circle ("this stays"), 11.35:1 on --ink-deep
 
 // -- 4.3 chart series (fixed order, never cycled) ----------------------------
 $series-1: #0e9dba;
@@ -769,6 +771,85 @@ $presentation-block-margin: 44px !default;
   // with a list's rhythm - the content master's 60px above and 26px below cost
   // the panel ~100px it does not have. Bullet keeps its rule and size.
   ul { margin-top: 0; margin-bottom: 32px; }
+}
+
+// One slide's panel runs long enough that 34px hangs into the footer. 32px is
+// DESIGN.md 9's floor for code, not a licence to shrink any block that is
+// awkward - shorten the code first, and only then reach for this.
+.reveal section.code-sm pre { font-size: 32px; }
+
+// Hand-drawn marks over parts of a code panel ("Ownership, moves to server":
+// an X through the renderUI, then a circle round the four `output$distPlot`
+// lines that survive it). Absolute against the section - reveal positions
+// sections absolutely, so they are already the containing block; do not add
+// `position: relative` (see the note above). Both boxes are measured off the
+// rendered slide (getBoundingClientRect over the section, divided by reveal's
+// scale), so re-measure if the block's length, font size or column split
+// changes.
+.reveal .circle-mark,
+.reveal .x-mark {
+  position: absolute;
+  pointer-events: none;
+  // The svg's viewBox is the box's own size, so the path is authored in canvas
+  // px and needs no aspect fitting. Do not stretch it with
+  // `preserveAspectRatio: none` instead: chrome then ignores the path's
+  // `pathLength` when dashing it, and the draw-on stops ~60% round the loop.
+  svg {
+    width: 100%;
+    height: 100%;
+    // The loop overshoots its own box, as a drawn one does.
+    overflow: visible;
+  }
+  // `pathLength="100"` normalises the dash units, so the offset is a
+  // percentage of the stroke and needs no measuring.
+  path {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+  }
+  // The swoop: the stroke draws on fast and eases out into the tail, and the
+  // whole mark settles from a slight over-rotation, the way a hand's does.
+  &.visible {
+    animation: circle-settle .7s cubic-bezier(.2, .9, .25, 1) forwards;
+    path { animation: circle-draw .7s cubic-bezier(.3, .8, .3, 1) forwards; }
+  }
+}
+
+// An ellipse does not cover the corners of the block it rings, so the box is a
+// good deal larger than the four lines' own rect (710x213 at 816,692). Amber,
+// not the X's red: the two marks say opposite things ("this goes" / "this
+// stays"), so they should not read as one annotation in two shapes. Amber over
+// red/green because the pair has to survive deuteranopia, and over cyan
+// because the circled lines are full of cyan function names.
+.reveal .circle-mark {
+  path { stroke: $mark-amber; }
+  left: 701px;
+  top: 614px;
+  width: 940px;
+  height: 370px;
+}
+
+// The X is two strokes, so the second waits for the first rather than both
+// appearing at once - one hand, two goes.
+.reveal .x-mark {
+  path { stroke: $mark-red; }
+  left: 796px;
+  top: 332px;
+  width: 1019px;
+  height: 329px;
+  &.visible path:last-child { animation-delay: .22s; }
+}
+
+@keyframes circle-draw {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes circle-settle {
+  from { transform: rotate(-2.5deg) scale(1.06); }
+  to { transform: rotate(0deg) scale(1); }
 }
 
 // Extra air above a block that starts a new idea, where reveal's block margin
