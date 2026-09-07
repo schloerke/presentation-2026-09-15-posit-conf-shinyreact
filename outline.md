@@ -17,7 +17,7 @@
       ```r
         ui <- bslib::page_sidebar(
           sidebar = bslib::sidebar(
-            sliderInput(inputId = "bins", ...)
+            sliderInput(inputId = "bin_count", ...)
           ),
           plotOutput(outputId = "distPlot")
         )
@@ -82,25 +82,26 @@
       server <- function(input, output) {
         output$distPlot <-
           renderPlot({
-            breaks <- seq(min(x), max(x), length.out = input$bins + 1)
+            breaks <- seq(min(x), max(x), length.out = input$bin_count + 1)
             hist(x, breaks = breaks)
           })
       }
       ```
-      * `input$bins` -> `breaks` -> `hist()`
-        * > We can see the single input value `bins` being used to calculate `breaks`
+      * `input$bin_count` -> `breaks` -> `hist()` -> `renderPlot()`
+        * > We can see the single input value `bin_count` being used to calculate `breaks`
         * > This value is then fed into `hist()` with the specified breaks to produce a histogram of the data
 
     * shinyreact
       * > The reactive computation is unchanged. What has changed is the value sent by the server.
+      * `input$bin_count` -> `breaks` -> `bins` -> `reactive_output()`
         ```r
         x <- faithful$waiting
         server <- function(input, output) {
           output$distPlot <-
             shinyreact::reactive_output({ # <<
-              breaks <- seq(min(x), max(x), length.out = input$bins + 1)
-              info <- hist(x, breaks = breaks, plot = FALSE) # <<
-              info[c("breaks", "counts")] # <<
+              breaks <- seq(min(x), max(x), length.out = input$bin_count + 1)
+              bins <- hist(x, breaks = breaks, plot = FALSE) # <<
+              bins[c("breaks", "counts")] # <<
             })
         }
         ```
@@ -125,7 +126,7 @@
       # app.R
       ui <- bslib::page_sidebar(
         sidebar = bslib::sidebar(
-          sliderInput(inputId = "bins", ...)
+          sliderInput(inputId = "bin_count", ...)
         ),
         plotOutput(outputId = "distPlot")
       )
@@ -139,24 +140,24 @@
         ```tsx
         // www/ui.tsx
         export default function App() {
-          const [bins, setBins] = useShinyInput<number>("bins", 30);
-          const data = useShinyOutputValue<HistData | null>("distPlot", null);
+          const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
+          const bins = useShinyOutputValue<HistData | null>("distPlot", null);
 
           return (
             <main className="layout">
               <aside className="sidebar">
-                <label htmlFor="bins">Number of bins:</label>
+                <label htmlFor="bin_count">Number of bins:</label>
                 <input  // # <<
-                  id="bins"
+                  id="bin_count"
                   type="range"
-                  value={bins}
-                  onChange={(e) => setBins(Number(e.target.value))}
+                  value={binCount}
+                  onChange={(e) => setBinCount(Number(e.target.value))}
                 />
               </aside>
 
               <section className="panel">
                 <div className="chart">
-                  <Histogram data={data} /> // # <<
+                  <Histogram bins={bins} /> // # <<
                 </div>
               </section>
             </main>

@@ -35,8 +35,8 @@ function xTicks(lo, hi) {
   return ticks;
 }
 
-function Histogram({ data }) {
-  const { breaks, counts } = data;
+function Histogram({ bins }) {
+  const { breaks, counts } = bins;
   const lo = breaks[0];
   const hi = breaks[breaks.length - 1];
   const { top, ticks } = yTicks(Math.max(...counts));
@@ -141,8 +141,8 @@ function Histogram({ data }) {
 
 function App() {
   const initialized = useShinyInitialized();
-  const [bins, setBins] = useShinyInput("bins", 30);
-  const data = useShinyOutputValue("dist_data", null);
+  const [binCount, setBinCount] = useShinyInput("bin_count", 30);
+  const bins = useShinyOutputValue("dist_data", null);
   const status = useShinyOutputStatus("dist_data");
 
   if (!initialized) return null;
@@ -153,16 +153,16 @@ function App() {
     h(
       "aside",
       { className: "sidebar" },
-      h("label", { htmlFor: "bins" }, "Number of bins:"),
+      h("label", { htmlFor: "bin_count" }, "Number of bins:"),
       h("input", {
-        id: "bins",
+        id: "bin_count",
         type: "range",
         min: 1,
         max: 50,
-        value: bins,
-        onChange: (e) => setBins(Number(e.target.value)),
+        value: binCount,
+        onChange: (e) => setBinCount(Number(e.target.value)),
       }),
-      h("output", { htmlFor: "bins", className: "bins-value" }, bins),
+      h("output", { htmlFor: "bin_count", className: "bin-count-value" }, binCount),
     ),
     h(
       "section",
@@ -170,11 +170,11 @@ function App() {
       h("h1", null, "Hello Shiny!"),
       // Keep the chart mounted while the server recomputes — only show the
       // placeholder before the first value has ever arrived.
-      data
+      bins
         ? h(
             "div",
             { className: status === "recalculating" ? "recalculating" : "" },
-            h(Histogram, { data }),
+            h(Histogram, { bins }),
           )
         : h("div", { className: "placeholder" }, "Loading…"),
     ),

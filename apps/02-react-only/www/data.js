@@ -18,20 +18,20 @@ const waiting = [
   46, 74,
 ];
 
-// R's `hist(x, breaks = seq(min(x), max(x), length.out = bins + 1))`, in JS:
+// R's `hist(x, breaks = seq(min(x), max(x), length.out = bin_count + 1))`, in JS:
 // equal-width bins, right-closed, with the lowest edge folded into bin 0.
 // The R server computes exactly this in the shinyreact version; here it is a
 // plain function called from the component.
-function bin_data(x, bins) {
+function bin_data(x, bin_count) {
   const lo = Math.min(...x);
   const hi = Math.max(...x);
   const breaks = Array.from(
-    { length: bins + 1 },
-    (_, i) => lo + (i * (hi - lo)) / bins,
+    { length: bin_count + 1 },
+    (_, i) => lo + (i * (hi - lo)) / bin_count,
   );
-  const counts = new Array(bins).fill(0);
+  const counts = new Array(bin_count).fill(0);
   for (const v of x) {
-    counts[v === lo ? 0 : Math.ceil(((v - lo) / (hi - lo)) * bins) - 1]++;
+    counts[v === lo ? 0 : Math.ceil(((v - lo) / (hi - lo)) * bin_count) - 1]++;
   }
   return { breaks, counts };
 }
