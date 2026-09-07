@@ -34,6 +34,7 @@ format:
     include-after-body:
       - theme/fit-width.html
       - theme/jsx-tokens.html
+      - theme/gif-restart.html
     # Pre-render mermaid to svg: left to the browser, mermaid measures its
     # labels while reveal has the slide display:none'd and draws empty boxes.
     mermaid-format: svg
@@ -593,7 +594,7 @@ its own if you wait a beat.
 :::
 ::: {.fragment .nonincremental fragment-index=5}
 - **[Plotomics Live](https://posit-plotomics-live.share.connect.posit.cloud/)** · `shinyreact`
-  - 476 lines of R, one of them UI · [source](https://github.com/samuelbharti/plotomics-live){.gh}
+  - 26 visualizations, one line of UI · [source](https://github.com/samuelbharti/plotomics-live){.gh}
 :::
 :::
 ::: {.column width="54%"}
@@ -618,12 +619,34 @@ sub-bullet to the source — and each one is archived on Zenodo too, so there is
 a DOI to cite as well as an address. The README of this repo has all three
 columns.
 
-The last one is the one I care about today: Plotomics Live. Twenty-six
-biological visualizations, each rendered *two ways* — an interactive GPU
-component in React, and the classic server-rendered ggplot2 image, both off the
-same server-side computation. On screen is spatial transcriptomics: 3,798
-capture spots at their real coordinates on a breast cancer section, over the
-H&E they came from.
+Four of these are ordinary Shiny: `shiny` plus `bslib`, the UI written in R.
+That is the point — the last one is the only one that reaches for
+`shinyreact`, and it does it because the visualization demanded it.
+:::
+
+## Plotomics Live {.gif-slide .nostretch}
+
+[26 visualizations · 22 data feeds + 28 ggplot2 PNGs · 69 `reactive_output()`]{.gif-caption}
+
+<!-- A GIF of the deployment, not an iframe: it is a Connect Cloud app, and a
+     served render makes no off-origin request. Recorded with
+     record-plotomics-gif.py, which is not part of the build. -->
+![](images/plotomics-live.gif){.app-gif}
+
+::: {.notes}
+One app, one page, both engines. Spatial transcriptomics: 3,798 capture spots
+at their real coordinates on a breast cancer section, over the H&E they came
+from.
+
+Watch the loop. The spots fade out and the histology underneath comes through.
+Then colour by a gene instead of a cluster — ERBB2 — and the server recomputes
+and the spots restyle. Then the engine toggle: *the same numbers*, drawn by
+ggplot2 as a PNG on the server. That is the whole argument in one control.
+
+Twenty-six visualizations, and the server publishes sixty-nine
+`reactive_output()` feeds to serve them: twenty-two data feeds React reads
+through `useShinyOutputValue`, twenty-eight ggplot2 PNGs for the classic side,
+and the rest stats and config. None of it is UI code.
 :::
 
 ## What `shinyreact` bought him {.code-slide}

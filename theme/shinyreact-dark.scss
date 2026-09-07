@@ -391,6 +391,38 @@ $presentation-block-margin: 44px !default;
 }
 .reveal:has(section.demo-slide.present) .footer { display: none !important; }
 
+// One app, full slide, as a recording (deck-local, "Plotomics Live"). The GIF
+// is the slide, so everything above it is one heading and one caption line and
+// the rest of the canvas is the app. `section.gif-slide` for the same
+// specificity reason as `.app-slide` above.
+.reveal .slides section.gif-slide {
+  padding-top: 72px;
+  h2 { font-size: 76px; }
+  > h2::after { margin-top: 20px; }
+  .gif-caption {
+    display: block;
+    font-size: 36px;
+    color: $muted;
+    margin: 8px 0 20px;
+  }
+  // Height-driven, not width: the canvas has height to spare only after the
+  // heading and the caption, and the GIF's own 1200px width is the ceiling on
+  // how far it can be scaled before it goes soft.
+  // Centred rather than flush left like the rest of the master: at 1.62:1 the
+  // recording can only be ~1100px wide at this height, and left-aligned that
+  // leaves 630px of empty canvas down one side.
+  .app-gif {
+    display: block;
+    height: 680px;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 16px;
+    box-shadow: none;
+  }
+}
+
 // The `.com` on the "Samuel Bharti" heading: his site is his name, so the
 // heading finishes the address itself a beat after the slide lands. The
 // animation is keyed off `.present`, not just a delay - reveal keeps the next

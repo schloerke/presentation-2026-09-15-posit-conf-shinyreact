@@ -19,6 +19,11 @@ theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
 theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
 theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 theme/qr-repo.svg          QR to this repo, bottom-centre of the title/end slides
+theme/qr-showcase.svg      QR to the app gallery, on the "Samuel Bharti" slide
+theme/fit-width.html       scales the deck to the window's width, not its box
+theme/jsx-tokens.html      re-splits the JSX spans the grammar merges
+theme/gif-restart.html     replays a slide's GIF from frame 1 on arrival
+record-plotomics-gif.py    drives the live app to record images/plotomics-live.gif
 apps/                      the apps demoed live in the talk (02 is React-only)
 images/                    slide images (headshot, app screenshots) - 1920x1080
 _extensions/drop/          quarto-drop (webR console in a drawer)
@@ -122,6 +127,7 @@ Master equivalents, applied as classes on a `##` heading:
 | Data | `## Name {.data-slide}` + caption, `.stats`, one chart |
 | (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
 | (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
+| (none — deck-local) | `## Name {.gif-slide .nostretch}` + a `.gif-caption` span and one `.app-gif` |
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
 
@@ -183,6 +189,52 @@ a screenshot of nothing. Crop to the one region the bullet is about, sized
 ~900x630 so it lands at roughly 1:1 in the box, and cut on an element boundary
 (a card gap, a panel edge) so nothing is sliced mid-word. Check by looking at
 the rendered slide, not at the crop.
+
+### `.gif-slide` — Plotomics Live, as a recording
+
+**Only one of the five apps uses `shinyreact`.** Verified against each repo's
+`renv.lock`, UI sources and code search: `plotomics-live` has
+`library(shinyreact)` and `ui <- page_react_html("www/index.html")`; the other
+four are `shiny` + `bslib` with the UI written in R. Two of them pull
+`reactable`/`reactR`, so React runs in the page, but as an htmlwidget's
+internals — not as UI anyone authored in React. Do not describe those four as
+`shinyreact` apps; the slide's own claim is that the fifth reached for it
+*because the visualization demanded it*, and that only works if the other four
+are honestly plain Shiny.
+
+So the app slide is followed by a full slide for that one app: heading, one
+`.gif-caption` stat line, and a recording of the deployment filling the rest.
+The measured numbers behind the caption (re-measure, do not trust these):
+26 visualizations, and 69 `reactive_output()` calls in `app.R` — 22 `*_data`
+feeds React reads through `useShinyOutputValue`, 28 `*_png` ggplot2 images, 14
+`*_stats`, 5 other (`nd_meta`, `igv_genes`, `igv_config`, `lollipop_genes`,
+`chat_response`). `app.R` is 546 lines, 432 of them code — the "476 lines" in
+upstream's `apps.yml` no longer matches anything measurable, so the deck says
+"one line of UI" instead, which the next slide proves.
+
+A **GIF, not an iframe**: it is a Connect Cloud deployment, and a served render
+makes no off-origin request. `record-plotomics-gif.py` drives the live app with
+playwright and writes frames to `.context/frames/`; four beats, in the order
+the talk needs (React render → fade the spots to the H&E → recolour by ERBB2, a
+real server round trip → the same numbers as a ggplot2 PNG). Assemble with:
+
+```bash
+python3 record-plotomics-gif.py
+magick -delay 10 -loop 0 .context/frames/f*.png -resize 1200x -colors 96 \
+  -layers Optimize images/plotomics-live.gif    # ~3.2 MB, 59 frames
+```
+
+96 colours holds up on the H&E photography; 1200px wide is the native width, so
+`.app-gif`'s 680px height (all the canvas has spare under the heading and the
+caption) scales it *down*. Recording headless is fine for this page, but **not**
+for the UMAP page — 584k WebGL points come out sparse and wrong under
+SwiftShader.
+
+`theme/gif-restart.html` (a third `include-after-body`) blanks and re-sets the
+`src` of any `.gif` on `slidechanged`. A GIF starts decoding at page load and
+loops forever with no way to seek it, so without this you arrive mid-loop and
+the four beats play out of order. Assigning the same URL back is a no-op, hence
+the blank-for-a-tick.
 
 Code fences take `filename="app.R"`, which renders as the cyan label from
 DESIGN.md 6.4, in whatever casing you wrote — nothing upper-cases it.
