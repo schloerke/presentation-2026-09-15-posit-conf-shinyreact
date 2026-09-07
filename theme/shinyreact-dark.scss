@@ -343,7 +343,7 @@ $presentation-block-margin: 44px !default;
 // own `<p>`, which is what `.r-stack` actually stacks; pair with `.nostretch`
 // or auto-stretch takes the images over.
 .reveal .app-stack {
-  height: 650px;
+  height: 690px;
   > p { margin: 0; height: 100%; }
   img {
     width: 100%;
@@ -358,9 +358,36 @@ $presentation-block-margin: 44px !default;
 // Five one-item lists, not one list: each bullet is its own fragment, so it can
 // share a `fragment-index` with its screenshot. That costs the list's own
 // rhythm, so set the gap between the bullets here.
-.reveal .app-slide {
-  padding-top: 96px;
-  ul { margin: 0 0 40px; }
+// `section.app-slide`, not `.app-slide`: two rules from later stylesheets have
+// the same specificity as a plain `.reveal .app-slide …` and therefore win.
+// `.reveal .slides section` sets the master's padding, and quarto's
+// `.reveal .slide ul` sets `margin-bottom: .5em` (26px here, which is what the
+// gap between the apps really was). Adding the element name outranks both.
+.reveal .slides section.app-slide {
+  // Ten lines of text on the left, so this master buys every pixel it can:
+  // less top pad and a tighter swoosh than the content master, and the gap
+  // between apps as small as still reads as a gap. Two lines per app is the
+  // ceiling - a third, or a sub-bullet that wraps, and the fifth app's caption
+  // goes off the bottom of the canvas.
+  padding-top: 72px;
+  > h2::after { margin-top: 20px; }
+  // Five apps, each two lines: the content master's body size and block margin
+  // put the fifth one off the bottom of the canvas. The gap between apps is the
+  // list's margin alone, so the item's own margin goes to zero.
+  ul { margin: 0 0 18px; }
+  ul > li { font-size: 44px; margin-bottom: 0; }
+  // Each app's sub-bullet is a caption for the name above it, not a second
+  // bullet: it drops the cyan rule (the parent's rule already brackets the
+  // group) and aligns with the parent's text, not its rule. Reveal's
+  // `.reveal ul ul` out-specifies the theme's `list-style: none`, so a nested
+  // list needs it said again or it draws a square as well. 32px is the floor
+  // from DESIGN.md 9; it has to stay on one line, so keep the text short.
+  li > ul { margin: 8px 0 0; list-style: none; }
+  ul ul > li {
+    font-size: 32px;
+    padding-left: 0;
+    &::before { content: none; }
+  }
 }
 .reveal:has(section.demo-slide.present) .footer { display: none !important; }
 

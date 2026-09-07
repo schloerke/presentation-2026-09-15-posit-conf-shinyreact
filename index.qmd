@@ -546,7 +546,8 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 - Computational biologist
 - Ph.D. candidate, UAB · ex-Genentech
 - Nine Shiny apps, four supporting packages
-- `posit-dev/shiny-showcase-bioinformatics`
+- [samuelbharti.com](https://www.samuelbharti.com/)
+- [posit-dev/shiny-showcase-bioinformatics](https://github.com/posit-dev/shiny-showcase-bioinformatics){.gh}
 :::
 :::
 :::
@@ -565,23 +566,30 @@ of them in one place.
      halves carry matching `fragment-index`, which is the only way to land two
      fragments on one click; the images are `.fade-in-then-out` so exactly one
      is up at a time. Screenshots, not iframes: these are deployments, and the
-     deck makes no off-origin request. -->
+     deck makes no off-origin request. The name links to the deployment and the
+     sub-bullet to the source: the deck is published, so on a projector these
+     read as plain text, and afterwards they are how a viewer gets to the app. -->
 ::: {.columns}
 ::: {.column width="46%"}
 ::: {.fragment .nonincremental fragment-index=1}
-- **tahoe-explorer** · 100.6M rows
+- **[tahoe-explorer](https://posit-tahoe-explorer.share.connect.posit.cloud/)** · 100.6M rows
+  - Summaries push into DuckDB · [source](https://github.com/samuelbharti/tahoe-explorer){.gh}
 :::
 ::: {.fragment .nonincremental fragment-index=2}
-- **genescout** · evidence review
+- **[genescout](https://posit-genescout.share.connect.posit.cloud/)** · evidence review
+  - A ranked, cited shortlist · [source](https://github.com/samuelbharti/genescout){.gh}
 :::
 ::: {.fragment .nonincremental fragment-index=3}
-- **variant-reviewer** · 18 cards
+- **[variant-reviewer](https://posit-variant-reviewer.share.connect.posit.cloud/)** · 18 cards
+  - Public APIs, fanned out async · [source](https://github.com/samuelbharti/variant-reviewer){.gh}
 :::
 ::: {.fragment .nonincremental fragment-index=4}
-- **gene-list-builder** · 7 sources
+- **[gene-list-builder](https://posit-gene-list-builder.share.connect.posit.cloud/)** · 7 sources
+  - Re-ranks as you tune the weights · [source](https://github.com/samuelbharti/gene-list-builder){.gh}
 :::
 ::: {.fragment .nonincremental fragment-index=5}
-- **Plotomics Live** · `shinyreact`
+- **[Plotomics Live](https://posit-plotomics-live.share.connect.posit.cloud/)** · `shinyreact`
+  - 476 lines of R, one of them UI · [source](https://github.com/samuelbharti/plotomics-live){.gh}
 :::
 :::
 ::: {.column width="54%"}
@@ -600,8 +608,11 @@ of them in one place.
 :::
 
 ::: {.notes}
-Nine apps in the gallery; these are the five with public source. Each one is
-archived on Zenodo, so there is a DOI to cite rather than a deployment address.
+Nine apps in the gallery; these are the five with public source. Every name
+here is a link — the app name goes to the deployment on Connect Cloud, the
+sub-bullet to the source — and each one is archived on Zenodo too, so there is
+a DOI to cite as well as an address. The README of this repo has all three
+columns.
 
 The last one is the one I care about today: Plotomics Live. Twenty-six
 biological visualizations, each rendered *two ways* — an interactive GPU

@@ -116,7 +116,18 @@ Pair it with `#| viewerHeight: 1080`.
 
 `.app-slide` (deck-local, on "A summer of Shiny for bioinformatics") is bullets
 on the left and **one screenshot per bullet** on the right, swapped on the same
-click as its bullet. Screenshots rather than iframes: those apps are Connect
+click as its bullet. Each bullet is the app's name linked to its Connect Cloud
+deployment, over a sub-bullet linked to the source: the deck is published, so
+on a projector those read as plain text and afterwards they are how a viewer
+reaches the app. `apps.yml` in `posit-dev/shiny-showcase-bioinformatics` is the
+source of truth for all three addresses (deployment, source, Zenodo DOI) — the
+deployment URL is *derived* there, as
+`https://<pcc-account>-<app>.share.connect.posit.cloud/`, so read it from that
+file rather than guessing. The README carries the full table.
+
+Two lines per app is the ceiling: five apps at two lines each already reach
+966px of the 1080 canvas, so a wrapped sub-bullet pushes the fifth caption off
+the bottom. Keep them short and re-check the last fragment after any edit. Screenshots rather than iframes: those apps are Connect
 Cloud deployments, and a served render makes no off-origin request. Three things
 make the swap work, and it breaks if any one goes:
 
@@ -172,6 +183,15 @@ Do not "clean these up" — each one silently breaks the layout:
 - Never set `position: relative` on a section. Reveal positions sections
   absolutely; making one relative puts it back in flow and pushes it off-canvas.
   Pseudo-elements can already position against the section as-is.
+- A master's own rules need an element name to beat quarto's, not just its
+  class. `.reveal .app-slide { padding-top }` and `.reveal .app-slide ul
+  { margin }` are both *the same specificity* as rules that come later in the
+  cascade — `.reveal .slides section` (the master padding) and quarto's
+  `.reveal .slide ul { margin-bottom: .5em }` — so they silently lose. The tell
+  is a value you can see in the compiled CSS, matching the element, and not in
+  `getComputedStyle`. Write `.reveal .slides section.app-slide` instead. (Check
+  a spacing change actually moved something before tuning the number again;
+  two rounds of "tighten the gap" here did nothing at all.)
 - Quarto's code filename div is `.code-with-filename-file` (not `-title`), and
   it wraps the name in `<pre><strong>`, so `.reveal pre` re-styles it as a code
   panel unless overridden.
