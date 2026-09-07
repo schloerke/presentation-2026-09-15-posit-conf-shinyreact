@@ -198,10 +198,13 @@ removes, or resizes a bar.
 
 ## The UI is a function of `bins` {.code-slide}
 
-```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3|10"}
+```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,4,6|3,4,5,6|11-12|13"}
 function App() {
   const [bins, setBins] = useState(30);
-  const data = useMemo(() => bin_data(waiting, bins), [bins]);
+  const data = useMemo(
+    () => bin_data(waiting, bins),
+    [bins]
+  );
 
   return (
     <main className="layout">
