@@ -10,7 +10,7 @@ ui <- page_sidebar(
   sidebar = sidebar(
     # Input: Slider for the number of bins ----
     sliderInput(
-      inputId = "bins",
+      inputId = "bin_count",
       label = "Number of bins:",
       min = 1,
       max = 50,
@@ -30,11 +30,11 @@ server <- function(input, output) {
   # to renderPlot to indicate that:
   #
   # 1. It is "reactive" and therefore should be automatically
-  #    re-executed when inputs (input$bins) change
+  #    re-executed when inputs (input$bin_count) change
   # 2. Its output type is a plot
   output$distPlot <- renderPlot({
     x <- faithful$waiting
-    breaks <- seq(min(x), max(x), length.out = input$bins + 1)
+    breaks <- seq(min(x), max(x), length.out = input$bin_count + 1)
 
     hist(
       x,

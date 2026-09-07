@@ -22,9 +22,9 @@ const expected = {
 };
 
 assert.equal(waiting.length, 272);
-for (const [bins, counts] of Object.entries(expected)) {
-  const got = bin_data(waiting, Number(bins));
-  assert.equal(got.breaks.length, Number(bins) + 1);
-  assert.equal(got.counts.join(" "), counts, `bins = ${bins}`);
+for (const [bin_count, counts] of Object.entries(expected)) {
+  const got = bin_data(waiting, Number(bin_count));
+  assert.equal(got.breaks.length, Number(bin_count) + 1);
+  assert.equal(got.counts.join(" "), counts, `bin_count = ${bin_count}`);
 }
 console.log("ok");

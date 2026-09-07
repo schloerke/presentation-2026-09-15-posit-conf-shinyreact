@@ -1,4 +1,4 @@
-// React only — no Shiny, no server. `bins` lives in useState, `data` is
+// React only — no Shiny, no server. `bin_count` lives in useState, `bins` is
 // derived from it. The shinyreact version (apps/01-shinyreact) is this file
 // with two lines changed: useState -> useShinyInput, and the useMemo call
 // -> useShinyOutputValue.
@@ -36,8 +36,8 @@ function xTicks(lo, hi) {
   return ticks;
 }
 
-function Histogram({ data }) {
-  const { breaks, counts } = data;
+function Histogram({ bins }) {
+  const { breaks, counts } = bins;
   const lo = breaks[0];
   const hi = breaks[breaks.length - 1];
   const { top, ticks } = yTicks(Math.max(...counts));
@@ -141,8 +141,8 @@ function Histogram({ data }) {
 // --- app -------------------------------------------------------------------
 
 function App() {
-  const [bins, setBins] = useState(30);
-  const data = useMemo(() => bin_data(waiting, bins), [bins]);
+  const [binCount, setBinCount] = useState(30);
+  const bins = useMemo(() => bin_data(waiting, binCount), [binCount]);
 
   return h(
     "main",
@@ -150,22 +150,22 @@ function App() {
     h(
       "aside",
       { className: "sidebar" },
-      h("label", { htmlFor: "bins" }, "Number of bins:"),
+      h("label", { htmlFor: "bin_count" }, "Number of bins:"),
       h("input", {
-        id: "bins",
+        id: "bin_count",
         type: "range",
         min: 1,
         max: 50,
-        value: bins,
-        onChange: (e) => setBins(Number(e.target.value)),
+        value: binCount,
+        onChange: (e) => setBinCount(Number(e.target.value)),
       }),
-      h("output", { htmlFor: "bins", className: "bins-value" }, bins),
+      h("output", { htmlFor: "bin_count", className: "bin-count-value" }, binCount),
     ),
     h(
       "section",
       { className: "panel" },
       h("h1", null, "Hello React!"),
-      h(Histogram, { data }),
+      h(Histogram, { bins }),
     ),
   );
 }

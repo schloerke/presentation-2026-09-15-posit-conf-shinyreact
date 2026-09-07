@@ -432,18 +432,11 @@ $presentation-block-margin: 44px !default;
 .reveal section.present h2 .dotcom {
   animation: dotcom-in .8s ease 2.2s forwards;
 }
-// Written out rather than one-lined: quarto's css-vars pass parses this file
-// itself, and a `@keyframes` with inline blocks makes it report an
-// SCSSParsingError and skip the pass (the render still succeeds, and drops a
-// `_quarto_internal_scss_error.scss` in the project root).
-@keyframes dotcom-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+// Keep the semicolon after the last declaration in each keyframe. Sass does
+// not need it, but quarto's css-vars pass parses this file with a stricter
+// parser, and without it that pass dies (SCSSParsingError) and takes the
+// revealjs libs out of the render with it. See CLAUDE.md.
+@keyframes dotcom-in { from { opacity: 0; } to { opacity: 1; } }
 
 // A QR inside the content of a slide (the gallery, on "Samuel Bharti"), as
 // opposed to the furniture QR the title and recap slides carry as a background
@@ -463,6 +456,293 @@ $presentation-block-margin: 44px !default;
   box-shadow: none;
   background: none;
 }
+
+// -- deck-local: state -> UI, on "UI is assembled from your data's state" -----
+// The point is that the picture is *derived*, so the whole chain sits on one
+// row: the raw waiting times and a bin count, the `data` they reduce to, and
+// the bars that data draws. Two of these stack in an `.r-stack`, so stepping
+// from 12 to 30 bins only changes the numbers. The svg is authored at 900x300
+// and scaled by the box.
+.reveal .state-stack {
+  height: 190px;
+  margin-top: 24px;
+}
+// Quarto puts the labels and the svg in one `<p>`, so that is the flex row -
+// styling the fragment div itself only lays out the paragraph.
+.reveal .state-viz {
+  width: 100%;
+  height: 100%;
+  > p {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin: 0;
+    height: 100%;
+  }
+  .state-json {
+    flex: none;
+    color: $muted;
+    padding: 16px 24px;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 20px;
+    background: $ink-deep;
+  }
+  // The panels hold code spans, one per line: `waiting` and `bins` stack into
+  // the input panel, `data` stands alone as what the bins reduced them to.
+  code {
+    display: block;
+    font-size: 30px;
+    line-height: 1.45;
+    color: inherit;
+    background: none;
+    padding: 0;
+  }
+  .state-count code { color: $cyan-text; font-weight: 700; }
+  // The arrows are the whole claim - the data on one side, the UI it implies
+  // on the other - so they sit between the panels, not inside them.
+  .state-arrow { flex: none; font-size: 48px; color: rgba($cyan, .5); }
+  svg { flex: 1; height: 100%; min-width: 0; }
+  rect { fill: $cyan-text; }
+}
+
+// -- deck-local: the chain under a stepped code block ------------------------
+// `input$bin_count` -> `breaks` -> ... , one link per code-line-numbers step.
+// Quarto's line-highlight plugin clones the <code> once per step (see
+// CLAUDE.md), so which clone is `.visible` *is* the step counter: the original
+// block is `code:nth-of-type(1)` and step n is `code:nth-of-type(n + 1)`. That
+// is also why this is CSS rather than fragments - a `.fragment` here would be
+// sorted after every clone and could not interleave with them.
+.reveal .chain {
+  margin-top: 16px;
+  color: $muted;
+  span { opacity: 0; transition: opacity .3s ease; }
+}
+// A slide carrying both a chain and an `.after-code` line puts two blocks under
+// the panel, which is more than the code master's bottom padding budgets for.
+.reveal section:has(.chain) .after-code { margin-top: 16px; }
+.reveal section:has(pre > code.fragment:nth-of-type(2).visible) .chain .chain-1,
+.reveal section:has(pre > code.fragment:nth-of-type(3).visible) .chain .chain-2,
+.reveal section:has(pre > code.fragment:nth-of-type(4).visible) .chain .chain-3 {
+  opacity: 1;
+}
+
+// -- deck-local: two marks becoming one --------------------------------------
+// A three-slide run, after slides 30-31 of the shinytest2 talk, where the Shiny
+// and testthat hexes merge into the shinytest2 hex: Shiny's own sticker and a
+// bare React atom start as a lockup in the corner of "Why Shiny + React?",
+// auto-animate to full size side by side on `.logo-slide`, and on one click
+// meet - the sticker becoming the deck's own mark as the atom flies round it.
+// The finished logo then auto-animates into the corner of the bullets slide.
+//
+// `.hexlogo` is the shinyreact logo PNG all the way through. What it *reads* as
+// is set by two layers over it: `.lb-shiny` is Shiny's sticker, and `.lb-hole`
+// is a disc in the hexagon's own ground colour ($ink; DESIGN.md 3 says the logo
+// bakes in #1C1D22) covering the logo's React atom. Sticker on = Shiny's mark;
+// sticker off, hole on = the shinyreact mark with its atom still missing; both
+// off = the finished logo.
+//
+// `.hexreact` is that missing atom, drawn from the orbit motif's primitives. It
+// flies the loop into the tail of the swoosh and hands off to the PNG's own atom
+// as the hole goes, so it never has to match the logo pixel for pixel.
+//
+// Auto-animate matches the two containers by `data-id` across all three slides.
+// Only the containers may be matched: reveal animates matched elements with
+// their own transform, so a matched child inside a matched parent compounds
+// both. Hence no data-id on any of the parts, and `auto-animate-unmatched="false"`
+// in the qmd, which stops reveal cross-fading them on every transition.
+//
+// The parts are sized in % of their box, so they ride every move for free. The
+// hexagon is 0.866 wide for 1 tall, so a length that is n% of the width is
+// n * 0.866 % of the height - that is where the paired numbers below come from,
+// and it is why every `.hexlogo` / `.hexreact` box keeps that ratio.
+.reveal .hexlogo,
+.reveal .hexreact { position: absolute; }
+
+.reveal .hexlogo {
+  // The hexagon's edge, in the text cyan. The logo bakes in its own #1C1D22
+  // ground, which *is* the slide background on every master except the divider,
+  // so without this the hexagon has no visible shape at all - the corner mark on
+  // the `shinyreact` slide especially. non-scaling-stroke because the box runs
+  // from 150px to 780px across, and a viewBox-relative stroke would go from a
+  // hairline to a band; this keeps it 4px at every size. It belongs to the
+  // *shinyreact* mark, so it is off wherever Shiny's own sticker is laid on top.
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: no-repeat center / 100% 100%
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 6 L554 164 L554 483 L280 641 L6 483 L6 164 Z" fill="none" stroke="%236FD4E8" stroke-width="4" vector-effect="non-scaling-stroke"/></svg>');
+  }
+  &:has(.lb-shiny)::after { opacity: 0; }
+
+  // Walks out of the compiled theme (…/libs/revealjs/dist/theme/) to the
+  // folder holding index.html, same as the title slide's logo. `theme/` is a
+  // project resource in _quarto.yml so this path exists in the render too.
+  background: no-repeat center / 100% 100%
+    url('../../../../../theme/shiny-react.png');
+
+  // Shiny's *own* hex sticker, laid over the shinyreact one. rstudio/hex-stickers
+  // draws it on the same 2521x2911 viewBox the logo PNG uses, so the two are in
+  // register and the swap reads as one mark changing rather than two images
+  // crossing. Present means shown: only the two slides that want Shiny's own
+  // clothes carry the div at all.
+  .lb-shiny {
+    position: absolute;
+    inset: 0;
+    background: no-repeat center / 100% 100%
+      url('../../../../../theme/shiny-hex.svg');
+  }
+
+  // The logo's atom sits at (25.4%, 68.5%) and is 21.9% of the width across.
+  .lb-hole {
+    position: absolute;
+    left: 14.15%; top: 58.76%;
+    width: 22.5%; height: 19.49%;
+    border-radius: 50%;
+    background: $ink;
+  }
+}
+
+// The React mark is the atom and nothing else - no hexagon of its own, on any
+// slide. Its box is invisible scaffolding: what it is for is to be the thing
+// auto-animate and offset-path move, with the atom sized off it.
+.reveal .hexreact {
+  // 60% of the box's width, centred - which is what lands it at 171px, the size
+  // of the logo's own atom, once the flight has shrunk the box to 285px.
+  .hr-atom {
+    position: absolute;
+    left: 20%; top: 24.02%;
+    width: 60%; height: 51.96%;
+    background: no-repeat center / 100% 100%
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200"><g fill="none" stroke="%2300D8FF" stroke-width="14"><ellipse rx="92" ry="35"/><ellipse rx="92" ry="35" transform="rotate(60)"/><ellipse rx="92" ry="35" transform="rotate(120)"/></g><circle r="22" fill="%2300D8FF"/></svg>');
+    // No `vector-effect: non-scaling-stroke` here, unlike the ring above: this
+    // one is scaled as it flies, so the stroke has to scale with it.
+  }
+}
+
+// -- where the marks sit, slide by slide -------------------------------------
+
+// 1. The corner lockup on "Why Shiny + React?": Shiny's own sticker, a plus, a
+//    bare React atom. Both marks are in their own clothes, which the `.lb-shiny`
+//    layer and the atom-only `.hexreact` already give for free.
+//
+//    The React box is 250px for a 150px atom because the atom is 60% of its box
+//    everywhere (it has to be, to land at the logo's own atom size), so the box
+//    is sized *around* the atom rather than the atom re-scaled inside it. The
+//    box is invisible, and keeping the ratio fixed is what lets auto-animate
+//    carry the pair to full size without the atom jumping.
+//    150 + 80 + 150 lands the visible pair's right edge on the 96px margin.
+.reveal .hexlogo.lockup  { top: 110px; left: 1444px; width: 150px; height: 173px; }
+.reveal .hexreact.lockup { top: 52px;  left: 1624px; width: 250px; height: 289px; }
+.reveal .hexplus {
+  position: absolute;
+  top: 110px; left: 1594px;
+  width: 80px; height: 173px;
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 173px;
+  text-align: center;
+  color: $cyan-text;
+}
+
+// 2. The build. No text, so no heading and no footer - the marks are the slide.
+.reveal section.logo-slide {
+  > h2 { display: none; }
+
+  // The lockup, blown up to the quarter points.
+  .hexlogo  { top: 240px; left: 300px;  width: 520px; height: 600px;
+              transition: top .9s, left .9s, width .9s, height .9s;
+              transition-timing-function: cubic-bezier(.3, .05, .2, 1); }
+  .hexreact { top: 240px; left: 1100px; width: 520px; height: 600px; }
+
+  // On the click the Shiny mark takes the centre at full size. It gets there
+  // well ahead of the atom, so the atom lands in a mark that has stopped
+  // moving - which is also what lets the flight path be authored against a
+  // fixed frame.
+  &:has(.hexreact.visible) .hexlogo {
+    top: 90px; left: 570px; width: 780px; height: 900px;
+  }
+}
+.reveal:has(section.logo-slide.present) .footer { display: none !important; }
+
+// Shiny's sticker becomes the deck's own mark on the *same* click that sends the
+// atom round, not on arrival: the slide is Shiny's logo until React comes for
+// it. So it is keyed off `.hexreact.visible`, like the flight.
+//
+// The 1s delay is the whole trick, and is why it is not 0: it is *Shiny's* blue
+// logo that slides in from the left and grows, and that move has to be over
+// (the transition above runs .9s) before the mark starts changing underneath.
+// Dissolve them together and the slide is still there, but you cannot read it -
+// the eye follows the colour change instead. It still lands well inside the
+// atom's 2.2s loop, so the mark has settled by the time the atom arrives.
+//
+// `both` is load-bearing: the keyframes spell out their own `from` value, so the
+// backwards fill holds the sticker up (and the ring down) through that delay
+// instead of falling back to the base declaration.
+.reveal section.logo-slide:has(.hexreact.visible) {
+  .lb-shiny       { animation: lb-unshiny .8s linear 1s both; }
+  .hexlogo::after { animation: lb-ring    .8s linear 1s both; }
+}
+@keyframes lb-unshiny { from { opacity: 1; } to { opacity: 0; } }
+@keyframes lb-ring    { from { opacity: 0; } to { opacity: 1; } }
+
+// 3. …and where the finished mark lands. The 230px column it takes comes off
+//    the text, or a bullet runs under it.
+.reveal .hexlogo.corner { top: 100px; left: 1594px; width: 230px; height: 266px; }
+.reveal section:has(.hexlogo.corner) > :is(p, ul, ol) { max-width: 1380px; }
+
+// -- the flight --------------------------------------------------------------
+// `.hexreact` is a `.fragment.fade-out` - visible on arrival, "shown" on the
+// click - so the animation is keyed off `.visible`, and it re-runs from the top
+// if the fragment is stepped back and forward again.
+//
+// The path's coordinates are relative to the element's **own** static top-left
+// (1100, 240 here) - not to the containing block, whatever the spec reads like -
+// and offset-path puts the element's *centre* on the path. So the first point is
+// its own centre, (260, 300), which is what makes 0% a no-op, and every later
+// point is an offset from where the box already sits. In slide coordinates the
+// loop runs clockwise - down to the bottom right, along the bottom to the left,
+// up the left side, across the top, down to the right by the "y" - and then
+// traces the swoosh's own tail down into the atom's final centre, which is
+// (570 + 25.4% of 780, 90 + 68.5% of 900) = (768, 706) on the slide, i.e.
+// (-332, 466) from here. The box shrinks about that same centre as it goes.
+// Scoped to `.logo-slide`: the path's first point is the element's centre *at
+// the size it has there*, so the same declaration on the corner lockup (a
+// 150x173 box) would shift it by the difference instead of being a no-op.
+.reveal section.logo-slide .hexreact {
+  // The first leg drops straight down the mark's right edge to its bottom
+  // vertex rather than swinging out past it. That vertex is (960, 990) on the
+  // slide; the waypoint sits at 930 because the box is still ~490px across
+  // there, and centring the atom on 990 would run it off the bottom of 1080.
+  offset-path: path("M 260 300 C 260 520, 120 690, -140 690 C -400 690, -420 640, -480 560 C -560 480, -600 200, -540 60 C -420 -70, -400 -110, -200 -60 C 100 -10, 200 80, 190 240 C 60 400, -150 500, -332 466");
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+  // Spelled out, not left at `auto`: `offset-anchor: auto` follows
+  // transform-origin, and reveal's auto-animate stylesheet sets
+  // `transform-origin: 0 0` on every `[data-id]` element - which silently moves
+  // the anchor to the box's top-left and parks the mark a half-box off.
+  offset-anchor: 50% 50%;
+}
+.reveal .hexreact.visible {
+  // opacity and visibility are in the keyframes because reveal's
+  // `.fragment.fade-out.visible` hides the element outright, and an animation
+  // outranks a normal declaration for as long as it is running.
+  animation: hr-fly 2.2s cubic-bezier(.3, .05, .2, 1) forwards;
+
+  // The atom spins its way round, then hands over to the logo's own on arrival.
+  .hr-atom  { animation: hr-spin 2.2s cubic-bezier(.3, .05, .2, 1),
+                         hex-fade .28s linear 2.12s forwards; }
+}
+.reveal section:has(.hexreact.visible) .lb-hole {
+  animation: hex-fade .28s linear 2.12s forwards;
+}
+
+@keyframes hr-fly {
+  from { offset-distance: 0%;   width: 520px; height: 600px; opacity: 1; visibility: visible; }
+  to   { offset-distance: 100%; width: 285px; height: 329px; opacity: 1; visibility: visible; }
+}
+@keyframes hr-spin { from { rotate: -720deg; } to { rotate: 0deg; } }
+@keyframes hex-fade { to { opacity: 0; } }
 
 // Text that lands on the same click as a code block's trailing `|` step (the
 // one that clears the highlight). It cannot be a `.fragment` with an explicit

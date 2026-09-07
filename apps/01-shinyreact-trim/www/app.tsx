@@ -40,7 +40,7 @@ const {
 // reactive_output on three different servers (Express, Core, R), and this
 // interface is the only place the shape they agree on is stated. `breaks` is
 // always `counts.length + 1` long. R needs I() to keep these as arrays when
-// bins = 1 — a violation of *this* type was the bug that caused.
+// bin_count = 1 — a violation of *this* type was the bug that caused.
 
 interface HistData {
   breaks: number[];
@@ -73,8 +73,8 @@ function xTicks(lo: number, hi: number): number[] {
   return ticks;
 }
 
-function Histogram({ data }: { data: HistData }) {
-  const { breaks, counts } = data;
+function Histogram({ bins }: { bins: HistData }) {
+  const { breaks, counts } = bins;
   const lo = breaks[0];
   const hi = breaks[breaks.length - 1];
   const { top, ticks } = yTicks(Math.max(...counts));
@@ -170,26 +170,26 @@ function Histogram({ data }: { data: HistData }) {
 // --- app -------------------------------------------------------------------
 
 export default function App() {
-  const [bins, setBins] = useShinyInput<number>("bins", 30);
-  const data = useShinyOutputValue<HistData | null>("dist_data", null);
+  const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
+  const bins = useShinyOutputValue<HistData | null>("dist_data", null);
 
   return (
     <main className="layout">
       <aside className="sidebar">
-        <label htmlFor="bins">Number of bins:</label>
+        <label htmlFor="bin_count">Number of bins:</label>
         <input
-          id="bins"
+          id="bin_count"
           type="range"
           min={1}
           max={50}
-          value={bins}
-          onChange={(e) => setBins(Number(e.target.value))}
+          value={binCount}
+          onChange={(e) => setBinCount(Number(e.target.value))}
         />
       </aside>
 
       <section className="panel">
         <div className="chart">
-          <Histogram data={data} />
+          <Histogram bins={bins} />
         </div>
       </section>
     </main>
