@@ -1,5 +1,9 @@
 "$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
 
+[[preview_urls]]
+name = "Slides"
+url = "http://localhost:$CONDUCTOR_PORT/index.html"
+
 [scripts]
 auto_run_after_setup = true
 run_mode = "concurrent"
