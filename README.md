@@ -1,27 +1,25 @@
 # Beyond Bootstrap: Building Custom Shiny UI with React
 
-Slides: https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/
+📽️ Slides: https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/
 
 ## Links
 
-* `{shinyreact}`: http://github.com/posit-dev/shinyreact
-* `{shiny}`: https://shiny.posit.co/r/
-* `React`: https://react.dev/
+* 📦 `{shinyreact}`: http://github.com/posit-dev/shinyreact
+* ✨ `{shiny}`: https://shiny.posit.co/r/
+* ⚛️ `React`: https://react.dev/
+* 🧑‍🔬 Samuel Bharti
+  * Posit Shiny Team - Summer 2026
+  * 🌐 https://www.samuelbharti.com/
+  * 🐙 https://github.com/samuelbharti
+  * 🖼️ App Gallery: https://github.com/posit-dev/shiny-showcase-bioinformatics
 
-### Samuel Bharti's summer of Shiny
-
-Posit engineering intern, summer 2026. The apps on the "In the wild" slide.
-
-* Samuel Bharti: https://www.samuelbharti.com/ · https://github.com/samuelbharti
-* The gallery: https://github.com/posit-dev/shiny-showcase-bioinformatics
-
-| app | live | source | DOI |
-|---|---|---|---|
-| tahoe-explorer | [live](https://posit-tahoe-explorer.share.connect.posit.cloud/) | [source](https://github.com/samuelbharti/tahoe-explorer) | [10.5281/zenodo.21950641](https://doi.org/10.5281/zenodo.21950641) |
-| genescout | [live](https://posit-genescout.share.connect.posit.cloud/) | [source](https://github.com/samuelbharti/genescout) | [10.5281/zenodo.21950644](https://doi.org/10.5281/zenodo.21950644) |
-| variant-reviewer | [live](https://posit-variant-reviewer.share.connect.posit.cloud/) | [source](https://github.com/samuelbharti/variant-reviewer) | [10.5281/zenodo.21950635](https://doi.org/10.5281/zenodo.21950635) |
-| gene-list-builder | [live](https://posit-gene-list-builder.share.connect.posit.cloud/) | [source](https://github.com/samuelbharti/gene-list-builder) | [10.5281/zenodo.21950640](https://doi.org/10.5281/zenodo.21950640) |
-| Plotomics Live | [live](https://posit-plotomics-live.share.connect.posit.cloud/) | [source](https://github.com/samuelbharti/plotomics-live) | [10.5281/zenodo.21950647](https://doi.org/10.5281/zenodo.21950647) |
+    | app | live | source | DOI |
+    |---|---|---|---|
+    | tahoe-explorer | [🚀 live](https://posit-tahoe-explorer.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/tahoe-explorer) | [📄 10.5281/zenodo.21950641](https://doi.org/10.5281/zenodo.21950641) |
+    | genescout | [🚀 live](https://posit-genescout.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/genescout) | [📄 10.5281/zenodo.21950644](https://doi.org/10.5281/zenodo.21950644) |
+    | variant-reviewer | [🚀 live](https://posit-variant-reviewer.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/variant-reviewer) | [📄 10.5281/zenodo.21950635](https://doi.org/10.5281/zenodo.21950635) |
+    | gene-list-builder | [🚀 live](https://posit-gene-list-builder.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/gene-list-builder) | [📄 10.5281/zenodo.21950640](https://doi.org/10.5281/zenodo.21950640) |
+    | Plotomics Live | [🚀 live](https://posit-plotomics-live.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/plotomics-live) | [📄 10.5281/zenodo.21950647](https://doi.org/10.5281/zenodo.21950647) |
 
 
 
