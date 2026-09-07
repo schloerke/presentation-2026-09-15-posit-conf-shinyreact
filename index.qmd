@@ -71,6 +71,9 @@ exactly the UI we have all seen before.
 #| viewerHeight: 1080
 {{< include apps/00-old-faithful-trim/app.R >}}
 ```
+::: {.notes}
+Let's dig into the code.
+:::
 
 ## Ownership {.code-slide}
 
@@ -108,55 +111,83 @@ server <- function(input, output) {
 
 
 ::: {.notes}
-Let's dig into the code.
-
-Traditionally, Shiny requires you to own both the UI and the server definitions.
-:::
-
-## The R UI is wonderful… until it isn't
+The R UI is wonderful… until it isn't
 
 - For an app like this, `bslib` gets you from nothing to something to be *proud of*
+:::
+
+## Ownership, moves to server {.code-slide .code-sm}
+
+::: {.columns}
+::: {.column .fragment width="38%"}
+```{.r filename="UI"}
+ui <- bslib::page_fillable(
+  uiOutput("app")
+)
+```
+:::
+::: {.column .fragment width="62%"}
+```{.r filename="Server"}
+server <- function(input, output) {
+  output$app <- renderUI({
+    req(has_state())
+    bslib::card(
+      sliderInput("bin_count", "Bins:", 1, 50, 30),
+      plotOutput("distPlot")
+    )
+  })
+
+  output$distPlot <- renderPlot({
+    x <- faithful$waiting
+    hist(x, breaks = input$bin_count)
+  })
+}
+```
+:::
+:::
+
+::: {.x-mark .fragment}
+```{=html}
+<svg viewBox="0 0 1019 329" aria-hidden="true">
+  <path pathLength="100" d="M 16 14 C 300 118, 690 208, 1003 315" />
+  <path pathLength="100" d="M 1001 20 C 700 118, 320 214, 18 311" />
+</svg>
+```
+:::
+
+::: {.circle-mark .fragment}
+```{=html}
+<svg viewBox="0 0 940 370" aria-hidden="true">
+  <path pathLength="100" d="M 903 253 C 892 342, 683 383, 463 378 C 232 373, 37 342,
+    33 216 C 29 87, 235 24, 470 19 C 698 13, 899 68, 911 185 C 918 278, 852 339,
+    760 370" />
+</svg>
+```
+:::
+
+::: {.notes}
 - Then a request comes in:
   - a distinctive interface
   - richer interaction
   - a component from a modern design system
 - Suddenly you're authoring an uphill battle of markup, styling, and interaction details
 
-::: {.notes}
-For an app like this, the R UI is wonderful. bslib gets us from nothing to
-something to be proud of in just a small set of functions.
+But the reactive data model is your domain expertise
 
-But when a request comes in for a distinctive interface, richer interaction, or
-a component from a modern design system… you're suddenly authoring an uphill
-battle of markup, styling, and interaction details.
-:::
-
-## But the reactive data model is your domain expertise
-
-::: {.nonincremental}
 - I do **not** want to replace Shiny
-:::
 
-::: {.fragment}
 Keep Shiny for **reactive computation**.
 
 Use a modern UI ecosystem — **React.js** — for the interface.
 :::
 
-::: {.notes}
-But you want to keep Shiny's reactive data model — it's your domain expertise!
-
-So… I do not want to replace Shiny. I want to keep Shiny for reactive
-computation while using a modern UI ecosystem (such as React.js) for the
-interface.
-:::
 
 ## React.js {.divider data-number="02"}
 
 ## What is React?
 
-- "The library for web and native user interfaces"
-- "…build user interfaces out of individual pieces called **components**"
+- > The library for web and native user interfaces
+- > "…build user interfaces out of individual pieces called **components**"
 
 ## Why React?
 
