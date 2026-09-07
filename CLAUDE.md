@@ -138,7 +138,12 @@ Master equivalents, applied as classes on a `##` heading:
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
-shared with `#title-slide` in one rule; the lockup is written out as a
+shared with `#title-slide` in one rule — but only the *ring* is: the title
+slide holds the mark back (`content: "???"`, white and light-weight, since the
+logo is the payoff of section 03) over an `$ink-deep`-filled hex, and `.recap`,
+coming after the reveal, re-adds the PNG layer over the unfilled ring. Both
+come from the `hex-ring($fill)` function, so the two stay in register.
+The lockup is written out as a
 `::: {.handle}` div (three lines) because only a real title slide has `author:`
 to build one from. Its footer is hidden — the lockup takes that corner — and
 `.recap ul` is capped at 1080px so bullets clear the logo's column.

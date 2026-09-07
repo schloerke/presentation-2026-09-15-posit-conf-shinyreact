@@ -63,6 +63,13 @@ $presentation-block-margin: 44px !default;
 
 /*-- scss:mixins --*/
 
+// The hex ring, shared by the title slide (a solid panel with `???` in it) and
+// the recap (unfilled, round the finished logo). One copy so the two stay in
+// register. `$fill` is a url-escaped colour - a bare `#` ends the data URI.
+@function hex-ring($fill: none) {
+  @return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="#{$fill}" stroke="%2300D8FF" stroke-width="4"/></svg>';
+}
+
 // The logo's swoosh: the exact bezier from build_theme.py, as a background
 // image so it can never absolutely-position itself onto the lede (DESIGN.md 6).
 @mixin swoosh($width) {
@@ -251,11 +258,36 @@ $presentation-block-margin: 44px !default;
     // title - measured against the rendered slide, not the box's own centre.
     top: 109px; right: 130px;
     width: 560px; height: 647px;
-    background:
-      no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
-      no-repeat center / 100% 100%
-        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 647" preserveAspectRatio="none"><path d="M280 2 L558 163 L558 485 L280 645 L2 485 L2 163 Z" fill="none" stroke="%2300D8FF" stroke-width="4"/></svg>');
+    background: no-repeat center / 100% 100% url('#{hex-ring()}');
   }
+}
+
+// The mark is the payoff of section 03, so the title slide holds it back: the
+// ring stands empty with three question marks in it. White, not $cyan-text -
+// it is the slide's loudest thing, and the ring is already cyan.
+#title-slide::after {
+  content: "???";
+  display: grid;
+  place-items: center;
+  font-size: 200px;
+  // The inlined Inter is a 400-900 variable face, so a lighter weight clamps to
+  // 400. Thinner than that means shaving the glyph: the stroke paints over the
+  // fill and is centred on the outline, so it eats half its width inwards.
+  font-weight: 400;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 10px $ink-deep;
+  // Filled, not just ringed: a shade off the slide's own ink, so the empty hex
+  // reads as a panel with something withheld in it.
+  background: no-repeat center / 100% 100%
+    url('#{hex-ring("%23" + str-slice("#{$ink-deep}", 2))}');
+}
+
+// The recap comes after the reveal, so it carries the finished logo.
+.reveal section.recap::after {
+  background:
+    no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
+    no-repeat center / 100% 100% url('#{hex-ring()}');
 }
 
 // The recap wears the title slide's furniture - it is the slide that stays up
