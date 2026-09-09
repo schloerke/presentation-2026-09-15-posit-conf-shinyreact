@@ -343,10 +343,20 @@ into further files: that is more things to keep in register for no gain.
   fragment is stepped back. `opacity`/`visibility` are in its keyframes because
   reveal's own `.fade-out.visible` rule hides the element outright, and a
   running animation outranks a normal declaration.
-- The Shiny mark's move to centre is a plain **transition** (`:has()` on the
+- The Shiny mark's move to centre is a **keyframe animation** (`:has()` on the
   same fragment state), timed well short of the flight so the atom lands in a
   mark that has stopped moving. That is also what lets the flight path be
-  authored against a fixed frame.
+  authored against a fixed frame. It was a `transition` and **that cannot
+  work**: reveal's auto-animate stylesheet outlives the arrival it was written
+  for — the slide keeps `data-auto-animate="running"`, so
+  `[data-auto-animate="running"] [data-auto-animate-target="N"]` is still
+  matching `.hexlogo` with `transition: transform 1s !important`. The computed
+  `transition-property` on the slide is therefore `transform`, and a
+  transition on top/left/width/height never fires: the mark snapped to the
+  centre. Animations are not filtered by `transition-property`, so the same
+  move keyframed runs regardless. Anything else on these slides that has to
+  animate a property reveal did not animate needs keyframes for the same
+  reason.
 - Every `.hexlogo` / `.hexreact` box keeps the hexagon's **0.866 ratio**, and
   the parts inside are sized in `%`, so they ride each move for free. That is
   where the paired numbers in the scss come from: a length that is n% of the
