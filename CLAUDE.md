@@ -435,8 +435,8 @@ consecutive slides. If a divider is ever wanted back, it has to go *before* the
 
 There are **two images**, and no more should be needed. `theme/shiny-react.png`
 is the finished shinyreact hex; the deck's "Shiny mark" is that same PNG with
-`.lb-hole` — a disc in the hexagon's own ground colour ($ink; the PNG bakes in
-`#1C1D22`) over its React atom. `theme/shiny-hex.svg` is Shiny's own sticker
+`.lb-hole` — the hexagon's own ground colour ($ink; the PNG bakes in `#1C1D22`)
+painted over its React atom. `theme/shiny-hex.svg` is Shiny's own sticker
 from [rstudio/hex-stickers](https://github.com/rstudio/hex-stickers), drawn on
 the **same 2521x2911 viewBox** the PNG uses — so the two are in register and the
 cross-dissolve reads as one mark changing rather than two images crossing. It
@@ -460,11 +460,61 @@ into further files: that is more things to keep in register for no gain.
   auto-animate carries the pair to full size; the box is invisible there anyway.
 - **The sticker converts on the click, not on arrival** — the slide is Shiny's
   logo until React comes for it. So the cross-dissolve is keyed off
-  `.hexreact.visible`, the same trigger as the flight, and runs alongside the
-  mark's slide to the centre. `animation-fill-mode: both` plus keyframes that
-  spell out their own `from` value is what holds the sticker up (and the ring
-  down) through the animation's delay instead of falling back to the base
-  declaration.
+  `.hexreact.visible`, the same trigger as the flight.
+  `animation-fill-mode: both` plus keyframes that spell out their own `from`
+  value is what holds the sticker up (and the ring down) through the animation's
+  delay instead of falling back to the base declaration.
+- **The dissolve must *end* on the atom's landing, and the flight is sized to
+  meet it there — both at 1.8s.** The two marks are *one piece of artwork*:
+  measured column by column on the 2521-wide viewBox, Shiny's swoosh and
+  shinyreact's are the same silhouette from x=950 rightwards, and shinyreact's
+  is Shiny's with the atom knocked out of the swoosh's tail (Shiny's wedge runs
+  on to x≈240, the deck's stops at the atom's ring). So the *whole* of what the
+  dissolve changes is that socket — and a socket with no atom in it is a
+  **partial wedge tip**, which reads as the tail of the `y` cut off in a
+  straight line. So the dissolve has to land on the *full* tip: `.8s` after a
+  `1s` delay, against a flight of `1.6s` plus a `.2s` hand-over. Four numbers,
+  one landing; retime one and retime all of them.
+- **Close that gap by shortening the flight, not by sitting on the delay.** The
+  flight was 2.2s, which put the atom's landing after the dissolve had already
+  finished on an empty socket. Pushing the dissolve out to 1.5s+.9s=2.4s to meet
+  it does fix the socket — and was rejected on sight: Shiny's blue mark then
+  hangs on half a second past the point where the slide is about anything, while
+  you wait for the atom to come round. The loop is the same path, flown faster.
+  Mid-dissolve the wedge's extra length (the part beyond the atom) desaturates
+  as it fades, but it stays full length — what must never appear is a *short*
+  tip.
+- **`.lb-hole` is masked to the atom's shape, not a disc**, for the same reason,
+  and this is the other half of that bug. A disc large enough to cover the PNG's
+  atom also covers the tip of the swoosh — the tail runs into the atom's
+  right-hand ring — so through the dissolve the tail of the `y` was being bitten
+  off in a circular arc by a layer that is supposed to be invisible. The mask
+  comes from `atom-svg()`, the same function the flying atom's background does,
+  so the geometry cannot drift; only the weights differ — stroke 17 and nucleus
+  24, against the atom's 8.36 and 17.15 — deliberately fat so the mask swallows
+  the PNG atom's antialiasing rather than leaving a cyan thread round the edge
+  of it. Both numbers are measured: counting leaked cyan pixels in the hole's
+  lower-left (where the swoosh never reaches) gives 30 at stroke 12, 17 at 14,
+  and a floor of 14 from 17 up — and that floor is the *nucleus* edge, not the
+  rings, so 17/24 leaks nothing where 19/17.15 still leaked. Wider than 17 only
+  eats more swoosh. The one notch it still leaves in the swoosh is exactly the
+  ring that is about to fly in over it.
+- **The atom's proportions are React's own, and they are easy to get wrong.**
+  react.dev's `logo.svg` is `rx="11" ry="4.2"`, `stroke-width="1"`, nucleus
+  `r="2.05"`, so on `atom-svg()`'s rx=92 everything follows from ×8.364: ry 35,
+  stroke 8.36, nucleus 17.15. Three sources agree on those ratios —
+  react.dev itself (stroke/rx .0909, nucleus/rx .1864), the atom baked into
+  `shiny-react.png` (measured off the file: rx 256.5px, 24px stroke, 47.5px
+  nucleus → .0936 / .1852) and an independent SVG Repo redraw (.0919 / .1852).
+  The deck shipped stroke 14 and nucleus 22 for a while — 1.7× and 1.3× too
+  heavy — which reads as a fat cartoon of the atom next to the PNG's own. Only
+  the radii were ever right. Re-measure against the rendered slide, not the
+  source: at the flight's start the rendered atom should come out ≈.089/.189.
+- **Do not "fix" that by editing either image.** Swapping shinyreact's wordmark
+  into `shiny-hex.svg` does make the dissolve seamless, and it was tried — but
+  it puts a chewed-looking swoosh on Shiny's own sticker, which the corner
+  lockup on "Why Shiny + React?" also shows. Shiny's logo keeps Shiny's shape;
+  the timing is where this problem gets solved.
 - The ring belongs to the *shinyreact* mark, so `:has(.lb-shiny)` turns it off
   wherever Shiny's own sticker is laid over the top. That is the whole of the
   per-slide styling: carrying the `.lb-shiny` div is what makes a slide show
