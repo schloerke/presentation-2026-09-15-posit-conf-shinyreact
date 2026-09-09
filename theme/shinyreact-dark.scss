@@ -423,37 +423,151 @@ $presentation-block-margin: 44px !default;
     &::before { content: none; }
   }
 }
-.reveal:has(section.demo-slide.present) .footer { display: none !important; }
+.reveal:has(section.demo-slide.present) .footer,
+// The recording now runs to the bottom of the canvas, through where the footer
+// would sit. Same call as `.demo-slide`: the picture is the slide.
+.reveal:has(section.gif-slide.present) .footer { display: none !important; }
 
 // One app, full slide, as a recording (deck-local, "Plotomics Live"). The GIF
 // is the slide, so everything above it is one heading and one caption line and
 // the rest of the canvas is the app. `section.gif-slide` for the same
 // specificity reason as `.app-slide` above.
+// Every number in here is bought from the recording's height, which is the
+// only thing that makes it bigger: at 1.617:1 the clip is height-limited on
+// this canvas, so it leaves ~600px of unused width and each pixel of vertical
+// room reclaimed above it is worth 1.6 across. Hence the smaller heading, the
+// tighter swoosh, and the zeroed `<p>` margins - quarto puts
+// `$presentation-block-margin` (44px) above *and* below the caption's
+// paragraph, which was 88px of nothing.
 .reveal .slides section.gif-slide {
-  padding-top: 72px;
-  h2 { font-size: 76px; }
-  > h2::after { margin-top: 20px; }
+  padding-top: 44px;
+  padding-bottom: 16px;
+  h2 { font-size: 60px; }
+  > h2::after { margin-top: 12px; }
+  p:has(> .gif-caption) { margin: 0; }
   .gif-caption {
     display: block;
-    font-size: 36px;
+    font-size: 34px;
     color: $muted;
-    margin: 8px 0 20px;
+    margin: 4px 0 14px;
   }
-  // Height-driven, not width: the canvas has height to spare only after the
-  // heading and the caption, and the GIF's own 1200px width is the ceiling on
-  // how far it can be scaled before it goes soft.
-  // Centred rather than flush left like the rest of the master: at 1.62:1 the
-  // recording can only be ~1100px wide at this height, and left-aligned that
-  // leaves 630px of empty canvas down one side.
+  // Height-driven, not width: what is left of the canvas under the heading and
+  // the caption. `max-width` is the 1728px content width, not the clip's own
+  // 1200px - h264 upscaled to ~1350 still reads clean on a projector, and
+  // refusing to scale past native would waste the room the tightening bought.
+  // Centred rather than flush left like the rest of the master: even at this
+  // height the clip cannot fill 1728, and left-aligned that leaves all the
+  // slack down one side.
+  // The package's own hex, in the corner the heading leaves free. Absolutely
+  // positioned against the section itself - reveal already positions sections
+  // absolutely, so this needs no `position: relative` anywhere (which would
+  // put the section back in flow and off the canvas; see CLAUDE.md). The `<p>`
+  // quarto wraps it in is left in flow with nothing in it, so zero its margin
+  // or it pushes the caption and the GIF down by a blank line.
+  p:has(> .corner-hex) { margin: 0; }
+  .corner-hex {
+    position: absolute;
+    top: 56px;
+    right: $margin;
+    width: 130px;   // 0.866 x 150, the hexagon's own ratio
+    height: 150px;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+  }
+  // `video` as well as `img`: the Plotomics Live recording is an mp4 (see the
+  // comment on the slide), and quarto's revealjs theme sizes the two
+  // differently if only one is named.
   .app-gif {
     display: block;
-    height: 680px;
+    height: 816px;
     width: auto;
     max-width: 100%;
     margin: 0 auto;
     border: 2px solid rgba($cyan, .18);
     border-radius: 16px;
     box-shadow: none;
+  }
+}
+
+// -- deck-local: the hex pack, on "Summer Packages" -------------------------
+//
+// Four one-item lists on the left, four hex logos on the right, each pair on
+// one click. Same `section.pkg-slide` specificity dodge as `.app-slide`.
+.reveal .slides section.pkg-slide {
+  ul { margin: 0 0 44px; }
+  // Three columns, so the four em-dashes line up into a gutter and the slide
+  // reads as a table rather than four ragged sentences. The columns are fixed
+  // px, not `max-content`, because each bullet is its own one-item list (they
+  // have to be, to carry a `fragment-index`) and separate grids cannot share a
+  // track size. The widths are the measured widest name and widest tag.
+  //
+  // The children are the `<a>`, the `.langs` span, and the "- description",
+  // which grid wraps in an anonymous item for free. The cyan rule is
+  // `position: absolute`, so it stays out of the flow and out of the tracks.
+  ul > li {
+    display: grid;
+    grid-template-columns: 240px 116px 1fr;
+    column-gap: 12px;
+    align-items: baseline;
+    font-size: 44px;
+    margin-bottom: 0;
+  }
+  // The language badges: the R and Python marks in the slide's own hexagon,
+  // in $muted, so they read as furniture rather than as a fifth logo
+  // competing with the four real ones on the right. Left-aligned in the track,
+  // so the R hex lands in the same column on all four rows and the Python one
+  // simply extends to its right; right-aligning them instead put a lone R
+  // under the second badge of the rows above it.
+  .langs {
+    justify-self: start;
+    white-space: nowrap;
+    line-height: 0; // the badges are the line; no leading of their own
+    img {
+      width: 48px;   // 0.866 x 56, the hexagon's own ratio
+      height: 56px;
+      margin: 0 8px 0 0;
+      vertical-align: -12px; // sits on the text baseline, not above it
+      border: none;
+      box-shadow: none;
+      background: none;
+    }
+  }
+  .columns { align-items: center; }
+}
+// A honeycomb, not a grid of pictures: pointy-top hexes have vertical left and
+// right edges, so two in a row touch at exactly one width, and the next row
+// interlocks by sitting 0.75 of a height down and half a width across. Hence
+// the paired numbers - the negative margin is -0.25 x $hex-h, and the shift is
+// half of $hex-w. Change $hex-w and the rest follows.
+// 240 wide is 277.1 tall at 0.866; the derived numbers below are that pair,
+// written out because this file has no `@use "sass:math"` and quarto's own
+// defaults/rules split makes adding one more trouble than four literals.
+.reveal .hexpack > p {
+  display: grid;
+  grid-template-columns: repeat(2, 240px);
+  width: fit-content;
+  margin: 0;
+  // Both dimensions, and both maxes off: quarto's `.reveal img` caps an image
+  // at the height of its box, and the second row's box is short (it has a
+  // negative top margin), so `height: auto` let those two shrink to fit and
+  // the honeycomb came out with four different sized hexes.
+  img {
+    width: 240px;
+    height: 277.1px;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+  }
+  // The second row: 0.75 of a height down (= -0.25 of the 277.1px height off
+  // the row it would otherwise start at) and half a width across.
+  img:nth-child(n + 3) {
+    margin-top: -69.3px;
+    transform: translateX(120px);
   }
 }
 

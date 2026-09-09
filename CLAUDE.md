@@ -131,6 +131,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `## Name {.demo-slide}` + a `shinylive-r` block |
 | (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
 | (none — deck-local) | `## Name {.gif-slide .nostretch}` + a `.gif-caption` span and one `.app-gif` |
+| (none — deck-local) | `## Name {.pkg-slide .nostretch}` + bullets and a `.hexpack` of hex logos |
 | (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
 | (none — deck-local) | `## Name {.logo-slide}` + `.hexlogo` / `.hexreact` divs |
@@ -155,7 +156,7 @@ slides on `##`, and it carries the slide id and speaker notes) but hidden, and
 padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
 Pair it with `#| viewerHeight: 1080`.
 
-`.app-slide` (deck-local, on "A summer of Shiny for bioinformatics") is bullets
+`.app-slide` (deck-local, on "Summer Bioinformatics Apps") is bullets
 on the left and **one screenshot per bullet** on the right, swapped on the same
 click as its bullet. Each bullet is the app's name linked to its Connect Cloud
 deployment, over a sub-bullet linked to the source: the deck is published, so
@@ -193,12 +194,113 @@ the box shrinks to unreadable, so crop it closer to the box's ratio
 (`magick in.png -crop WxH+0+0 +repage -resize 1600x out.png`) rather than
 growing the box.
 
+`images/app-plotomics-live.png` is the **last frame of that recording**, cropped
+to the same panel, so the still on the app slide and the clip on the next one
+are the same picture:
+
+```bash
+ffmpeg -sseof -0.1 -i .context/xenium-raw.mov -update 1 \
+  -vf "crop=1252:774:238:355" .context/last.png
+magick .context/last.png -resize 1100x images/app-plotomics-live.png
+```
+
 The five shots are **zoomed crops, not full pages**. A whole 1600px browser
 window in a ~930px box renders its 14px UI text at 8px — on a projector that is
 a screenshot of nothing. Crop to the one region the bullet is about, sized
 ~900x630 so it lands at roughly 1:1 in the box, and cut on an element boundary
 (a card gap, a panel edge) so nothing is sliced mid-word. Check by looking at
 the rendered slide, not at the crop.
+
+### `.pkg-slide` — "Summer Packages", as a honeycomb
+
+"Summer Packages" is the app slide's construction reused: four
+one-item `.nonincremental` fragment divs on the left, four hex logos on the
+right, each pair sharing a `fragment-index` so they land on one click. Unlike
+the app slide the hexes **accumulate** (plain `.fragment`, not
+`.fade-in-then-out`), so the honeycomb builds up as the bullets do.
+
+Its one-liners and its ordering (validate → fetch → transport) are Samuel's
+own, from
+<https://github.com/samuelbharti/bio-packages/blob/main/slides/>; `packages.yml`
+in the showcase repo is the source of truth for what each package is and which
+languages it ships. `plotomics` is the fourth and is not part of that trio — it
+earns its line because it is what Plotomics Live draws two slides later.
+
+The languages are **the R and Python marks in the slide's own hexagon**, not
+the text `[r, py]`: `images/lang-r.svg` and `images/lang-py.svg`, each a
+`$muted` hex on the same 173.2x200 pointy-top viewBox the package logos use,
+with the simple-icons glyph in `$ink` at 132 of those 200 units. Regenerate
+them (or add a language) with:
+
+```bash
+python3 - <<'PY'
+import re, urllib.request
+HEX="86.6,0 173.2,50 173.2,150 86.6,200 0,150 0,50"
+GREY, INK = "#a3acbb", "#1c1d22"
+def path_of(n):
+    return re.search(r'<path d="([^"]+)"', urllib.request.urlopen(
+        f"https://cdn.jsdelivr.net/npm/simple-icons@13/icons/{n}.svg").read().decode()).group(1)
+M = 132.0
+S, X, Y = M/24, 86.6-M/2, 100-M/2
+for out, icon, label in [("lang-r","r","R"), ("lang-py","python","Python")]:
+    open(f"images/{out}.svg","w").write(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 173.2 200" '
+        f'role="img" aria-label="{label}">\n  <title>{label}</title>\n'
+        f'  <polygon points="{HEX}" fill="{GREY}"/>\n'
+        f'  <g transform="translate({X:.1f} {Y:.1f}) scale({S:.4f})" fill="{INK}">'
+        f'<path d="{path_of(icon)}"/></g>\n</svg>\n')
+PY
+```
+
+They are 48x56 on the slide. Smaller was tried first (38x44, the glyph at 118
+units) and the marks read as smudges — check a zoomed crop of the rendered
+slide, not the file, before shrinking them again.
+
+**The languages were checked against the registries, not against prose.**
+`biobouncer` and `plotomics` are each on CRAN and PyPI; `biohttp` is CRAN and R
+only; `bioclients` is R only and is on r-universe rather than CRAN. Both of the
+first two are *also* on npm — their repos are monorepos with `pkg-r` /
+`pkg-py` / `pkg-js`, and the JS is the TypeScript core the other two are built
+out of — but the slide deliberately does not tag that: it is an implementation
+detail delivered inside the R and Python packages, not a third thing an R user
+would install. Upstream's own `packages.yml` is out of date here (it lists
+`biobouncer` as "R · Python" and `plotomics` as "TypeScript · R · Python"), so
+re-check the registries rather than copying it.
+
+Each `li` is itself a **three-column grid** — name, language badge, then the
+"– description", which grid wraps in an anonymous item for free — so the four
+en-dashes line up into a gutter and the block reads as a table. The tracks are
+fixed px, not `max-content`: each bullet is its own one-item list (it has to
+be, to carry a `fragment-index`) and separate grids cannot share a track size.
+Measure the widest name and the widest tag before changing them, and re-check
+that no description wraps — the description column is what is left over.
+The badge cell is `justify-self: start`, so the R hex lands in the same column
+on all four rows and the Python one extends to its right; `end` instead put a
+lone R under the *second* badge of the rows above it. The dash is an en dash, not the
+em dash the rest of the deck's prose uses: an em dash costs about 15px here,
+which was the difference between `biohttp`'s line fitting and wrapping. The
+cyan rule is `position: absolute`, so it stays out of the tracks.
+
+The pack is one `<p>` (four images, no blank lines between them, so pandoc
+keeps them in one paragraph) with `display: grid` **on the `p`**, which is what
+makes the images grid items and lets `nth-child` count them.
+
+- **All four logos are pointy-top hexes on a 173.2x200 viewBox** (ratio 0.866).
+  That is what makes the tessellation exact: pointy-top hexes have vertical
+  left and right edges, so two in a row touch at exactly one width, and the
+  next row interlocks at 0.75 of a height down and half a width across (hence
+  `margin-top: -69.3px` — a quarter of the 277.1px height — and
+  `translateX(120px)`, half the 240px width). Change the width and all three
+  of those numbers change with it.
+- **`biobouncer`'s own `logo.svg` is padded** inside a 440x500 box, so
+  `images/pkg-biobouncer.svg` is the upstream file with its viewBox cropped to
+  the hex itself (`41 32 358 416`). Without that it packs a size small and the
+  honeycomb has a hole. The other three are copies of the showcase repo's
+  `thumbnails/`.
+- **Both dimensions are set on the images, with both maxes off.** Quarto caps
+  an image at the height of its box; the second row's box is short (negative
+  top margin), so `height: auto` let those two shrink and the four hexes came
+  out at different sizes.
 
 ### `.gif-slide` — Plotomics Live, as a recording
 
@@ -214,6 +316,13 @@ are honestly plain Shiny.
 
 So the app slide is followed by a full slide for that one app: heading, one
 `.gif-caption` stat line, and a recording of the deployment filling the rest.
+`.corner-hex` parks the `plotomics` hex in the corner the heading leaves free —
+this is the app that package draws. It is markup, not a `url()` in the scss,
+because quarto does not trace url()s out of an scss file and `images/` is not
+a project resource; it is absolutely positioned against the section (reveal
+already positions sections absolutely, so nothing needs `position: relative`),
+and the `<p>` quarto wraps it in has its margin zeroed or it pushes the caption
+and the GIF down by a blank line.
 The measured numbers behind the caption (re-measure, do not trust these):
 26 visualizations, and 69 `reactive_output()` calls in `app.R` — 22 `*_data`
 feeds React reads through `useShinyOutputValue`, 28 `*_png` ggplot2 images, 14
@@ -222,23 +331,73 @@ feeds React reads through `useShinyOutputValue`, 28 `*_png` ggplot2 images, 14
 upstream's `apps.yml` no longer matches anything measurable, so the deck says
 "one line of UI" instead, which the next slide proves.
 
-A **GIF, not an iframe**: it is a Connect Cloud deployment, and a served render
-makes no off-origin request. `record-plotomics-gif.py` drives the live app with
-playwright and writes frames to `.context/frames/`; four beats, in the order
-the talk needs (React render → fade the spots to the H&E → recolour by ERBB2, a
-real server round trip → the same numbers as a ggplot2 PNG). Assemble with:
+A **recording, not an iframe**: it is a Connect Cloud deployment, and a served
+render makes no off-origin request. The recording is the **Xenium** page — one
+million single-molecule transcripts — in four beats: the points arrive, a hover
+names the molecule under the cursor, a zoom, and back out to the whole section.
+
+**It is an `<video>`, not a GIF, and it has to be.** A million-point field is
+close to incompressible in GIF: measured on this clip, 11 MB at 48 colours and
+6 fps (and visibly posterized), against 4 MB for h264 at full colour and 25
+fps. The old Visium GIF got away with 3.2 MB because most of its pixels were a
+static H&E photo. The file is local, so the deck is still offline-safe.
+
+Three things the switch needs, and it breaks if any one goes:
+
+- **`images/*.mp4` is a project resource in `_quarto.yml`.** Quarto traces an
+  `![](…)` but not a `src=` inside a raw-html block, so without it the slide is
+  a black box in a served render (`quarto preview` hides this, as ever).
+- **`theme/gif-restart.html` handles `video` as well as `img[src$=".gif"]`** —
+  `currentTime = 0` plus `play()`, so you always arrive at the first beat.
+- **`autoplay loop muted playsinline`.** `muted` is what makes autoplay legal.
+
+**Do not try to re-record this with playwright.** The WebGL render drops most
+of its points under automation — the same failure this file already noted for
+the UMAP page, and it is not SwiftShader: Chrome reported ANGLE/Metal on an M2
+Pro and 30 s of extra wait changed nothing (4.7% → 5.1% ink coverage). The
+decisive test is the app's own **ggplot2 (classic)** toggle, which is a
+server-rendered PNG: it showed dense, separated cell-type islands while the
+React view of the same data in the same browser was uniform dust. So this clip
+was **hand-recorded** in a real Chrome window and cut down:
 
 ```bash
-python3 record-plotomics-gif.py
-magick -delay 10 -loop 0 .context/frames/f*.png -resize 1200x -colors 96 \
-  -layers Optimize images/plotomics-live.gif    # ~3.2 MB, 59 frames
+# .mov in, 1200x742 mp4 out; the two trims drop the deep-zoom trough in the
+# middle of the take, which is pale and near-empty and reads as nothing.
+ffmpeg -i screen-recording.mov -filter_complex \
+  "[0:v]trim=1.2:6.0,setpts=PTS-STARTPTS[a];\
+   [0:v]trim=8.6:12.85,setpts=PTS-STARTPTS[b];[a][b]concat=n=2:v=1,\
+   crop=1252:774:238:355,fps=25,scale=1200:-2:flags=lanczos" \
+  -an -c:v libx264 -pix_fmt yuv420p -crf 28 -preset slower \
+  -movflags +faststart images/plotomics-live.mp4     # ~4.0 MB, 9.0s
 ```
 
-96 colours holds up on the H&E photography; 1200px wide is the native width, so
-`.app-gif`'s 680px height (all the canvas has spare under the heading and the
-caption) scales it *down*. Recording headless is fine for this page, but **not**
-for the UMAP page — 584k WebGL points come out sparse and wrong under
-SwiftShader.
+**Every pixel of the clip's size is bought from its height.** At 1.617:1 it is
+height-limited on this canvas, so it cannot use the full 1728px content width
+and each pixel reclaimed above it is worth 1.6 across. `.gif-slide` therefore
+runs a 60px heading (not the master's 76), a 12px swoosh margin, 44px of top
+pad, and zeroed margins on the `<p>` quarto wraps the caption in - that `<p>`
+alone was costing 88px, `$presentation-block-margin` above *and* below. The
+footer is hidden, as on `.demo-slide`, because the clip now runs past where it
+sat. That took the video from 1104x684 to **1324x820** - half again the area.
+
+A *narrower* clip would be worse, not better: it is height-limited, so a lower
+aspect ratio just makes it thinner at the same height. The remaining lever is a
+**wider** one. Cropping the panel's toolbar and stats strips off, leaving the
+plot canvas alone, is about 1252x630 (1.99:1) and would scale the actual point
+cloud up by a further ~23% - at the cost of the "Shiny React" pill and the
+"React draws 1,000,000 of them on the GPU" line, which are the two bits of
+on-screen evidence for the slide's claim. Not done, for that reason.
+
+The crop is the panel alone — toolbar ("WebGL – one million molecules") and
+stats footer ("React draws 1,000,000 of them on the GPU") included, browser
+chrome excluded; re-measure it for a new take. 1200px wide is the native width,
+so `.app-gif`'s 680px height (all the canvas has spare under the heading and
+the caption) scales it *down*.
+
+`record-plotomics-gif.py` still drives the **Visium** page headless, which
+works because that page is 3,798 spots over a photograph rather than mass
+WebGL. It is kept as the reference for that kind of capture; nothing in the
+deck uses its output now.
 
 `theme/gif-restart.html` (a third `include-after-body`) blanks and re-sets the
 `src` of any `.gif` on `slidechanged`. A GIF starts decoding at page load and
