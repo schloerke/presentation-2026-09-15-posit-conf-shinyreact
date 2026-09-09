@@ -23,6 +23,7 @@ theme/qr-showcase.svg      QR to the app gallery, on the "Samuel Bharti" slide
 theme/fit-width.html       scales the deck to the window's width, not its box
 theme/jsx-tokens.html      re-splits the JSX spans the grammar merges
 theme/gif-restart.html     replays a slide's GIF from frame 1 on arrival
+theme/qr-links.html        lays a clickable anchor over the repo QR
 record-plotomics-gif.py    drives the live app to record images/plotomics-live.gif
 apps/                      the apps demoed live in the talk (02 is React-only)
 images/                    slide images (headshot, app screenshots) - 1920x1080
@@ -116,7 +117,39 @@ if its URL changes:
 
 ```bash
 uv run --with segno python -c "import segno; segno.make('https://github.com/schloerke/presentation-2026-09-15-posit-conf-shinyreact', error='m').save('theme/qr-repo.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
-uv run --with segno python -c "import segno; segno.make('https://github.com/posit-dev/shiny-showcase-bioinformatics', error='m').save('theme/qr-showcase.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
+uv run --with segno python -c "import segno; segno.make('https://posit-shiny-showcase-bioinformatics.share.connect.posit.cloud/', error='m').save('theme/qr-showcase.svg', scale=10, border=2, dark='#141519', light='#f2f4f8')"
+```
+
+The showcase QR encodes the **deployed gallery**, not the repo the bullet next
+to it links to: one bullet, two doors — the text is the source, the code is the
+thing. Samuel's own site needs no QR; the heading's `[.com]{.dotcom}` gag spells
+his address out, and the four package bullets already link into it.
+
+**Both QRs are links as well as codes**, because the deck is published and a
+viewer reading it on a laptop cannot scan their own screen. Both open in a new
+tab (`target="_blank" rel="noopener"`) — a click mid-talk must not navigate the
+deck away, which would lose the slide you were on and, with it, the reveal state
+and the running shinylive apps. The inline one is a markdown link round the
+image, carrying those two as link attributes: `[![](…){.qr-inline}](url){target=
+"_blank" …}`. The repo one is a `background-image` layer
+on three slides, and a background cannot be clicked, so
+`theme/qr-links.html` (a fourth `include-after-body`) appends a transparent
+`a.qr-link` to each and the scss parks it on the layer — from the same
+`$margin + 170px` / 30px / 110px the `background-position` and `-size` use, so
+retiring one means retiring both. Injected by script rather than written into
+`index.qmd` because one of the three slides is `#title-slide`, which quarto
+builds from the yaml and has no authorable body.
+
+Verify a regenerated code by **decoding it back out of a screenshot of the
+rendered slide at the full 1920 canvas**, not out of the svg. OpenCV is enough
+and needs no system library (`pyzbar` wants a `zbar` that is not installed
+here), but `detectAndDecodeMulti` on a whole 1920x1080 frame misses a 110px
+code — crop to the code's own rect first, which `getBoundingClientRect()` on
+the element gives you:
+
+```bash
+uv run --with opencv-python-headless --with numpy python -c "
+import cv2; ok, i, *_ = cv2.QRCodeDetector().detectAndDecodeMulti(cv2.imread('.context/crop.png')); print(ok, list(i))"
 ```
 
 Master equivalents, applied as classes on a `##` heading:

@@ -1,0 +1,27 @@
+<script>
+  // Make the repo QR clickable. The deck is published, so a viewer reading it
+  // on a laptop cannot scan their own screen - the code has to be a link too.
+  //
+  // The inline QR (the gallery's, on the Samuel Bharti slide) is markup, so it
+  // is wrapped in a plain markdown link in index.qmd. This one is a
+  // `background-image` layer on three slides (see the theme's footer section),
+  // and a background cannot be clicked - so lay a transparent anchor over it.
+  // Injected rather than written into index.qmd because one of the three is
+  // `#title-slide`, which quarto builds from the yaml and has no authorable
+  // body. `.qr-link` in the scss positions it on top of the layer.
+  window.addEventListener("load", function () {
+    var url =
+      "https://github.com/schloerke/presentation-2026-09-15-posit-conf-shinyreact";
+    document
+      .querySelectorAll("#title-slide, section.recap, section.divider.end")
+      .forEach(function (slide) {
+        var a = document.createElement("a");
+        a.className = "qr-link";
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.setAttribute("aria-label", "This deck's source repository");
+        slide.appendChild(a);
+      });
+  });
+</script>

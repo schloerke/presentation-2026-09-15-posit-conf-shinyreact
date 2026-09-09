@@ -611,9 +611,15 @@ $presentation-block-margin: 44px !default;
 // layer. Indented past the bullet rule so it lines up with the bullet text.
 // Quarto wraps the image in its own `<p>`; that margin plus the list's block
 // margin leaves 80px of air this slide does not have, so zero it and let the
-// list's own bottom margin be the whole gap.
-.reveal .slides section:has(> .columns .qr-inline) p:has(> .qr-inline) {
+// list's own bottom margin be the whole gap. The image is wrapped in a link
+// (the deck is published, so the code is a link as well as a code), so neither
+// `:has()` may use a child combinator - the `<a>` sits between - and the link
+// itself is made a block, or the img's own block box picks up inline leading.
+.reveal .slides section:has(.columns .qr-inline) p:has(.qr-inline) {
   margin: 0;
+}
+.reveal a:has(.qr-inline) {
+  display: block;
 }
 .reveal .qr-inline {
   display: block;
@@ -1331,6 +1337,21 @@ $presentation-block-margin: 44px !default;
     $margin calc(100% - 30px),
     #{$margin + 170px} calc(100% - 30px);
   background-size: 130px 76px, 110px 110px;
+}
+
+// The repo QR, as a link. A background layer cannot be clicked, so
+// `theme/qr-links.html` appends a transparent anchor to each of the three
+// slides above and this parks it exactly over the layer - the same
+// `$margin + 170px` / 30px / 110px the background-position and -size use, so
+// the two move together. Absolute against the section, which reveal has
+// already positioned; no `position: relative` on the section (that would push
+// it back into flow and off-canvas).
+.reveal .qr-link {
+  position: absolute;
+  left: $margin + 170px;
+  bottom: 30px;
+  width: 110px;
+  height: 110px;
 }
 
 // The speaker lockup where a slide has no `author:` to build one from: the

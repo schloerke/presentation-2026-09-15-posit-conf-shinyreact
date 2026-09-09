@@ -35,6 +35,7 @@ format:
       - theme/fit-width.html
       - theme/jsx-tokens.html
       - theme/gif-restart.html
+      - theme/qr-links.html
     # Pre-render mermaid to svg: left to the browser, mermaid measures its
     # labels while reveal has the slide display:none'd and draws empty boxes.
     mermaid-format: svg
@@ -725,8 +726,13 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 :::
 
 <!-- The QR sits under the gallery bullet, not under the headshot: it is the
-     gallery's address, and next to the photo it would read as Samuel's. -->
-![](theme/qr-showcase.svg){.qr-inline}
+     gallery's address, and next to the photo it would read as Samuel's. It
+     encodes the *deployed* gallery, not the repo the bullet above links to —
+     one bullet, two doors: the text is the source, the QR is the thing. It
+     opens in a new tab, as the repo QR does: a click mid-talk must not
+     navigate the deck away and lose the slide you were on. -->
+
+[![](theme/qr-showcase.svg){.qr-inline}](https://posit-shiny-showcase-bioinformatics.share.connect.posit.cloud/){target="_blank" rel="noopener"}
 :::
 :::
 
