@@ -724,18 +724,31 @@ $presentation-block-margin: 44px !default;
   > h2 { display: none; }
 
   // The lockup, blown up to the quarter points.
-  .hexlogo  { top: 240px; left: 300px;  width: 520px; height: 600px;
-              transition: top .9s, left .9s, width .9s, height .9s;
-              transition-timing-function: cubic-bezier(.3, .05, .2, 1); }
+  .hexlogo  { top: 240px; left: 300px;  width: 520px; height: 600px; }
   .hexreact { top: 240px; left: 1100px; width: 520px; height: 600px; }
 
   // On the click the Shiny mark takes the centre at full size. It gets there
   // well ahead of the atom, so the atom lands in a mark that has stopped
   // moving - which is also what lets the flight path be authored against a
   // fixed frame.
+  //
+  // Keyframed, not transitioned, and that is not a style choice. Reveal's
+  // auto-animate stylesheet outlives the arrival it was written for: the
+  // slide keeps `data-auto-animate="running"`, so
+  // `[data-auto-animate="running"] [data-auto-animate-target="N"]` is still
+  // matching this element with `transition: transform 1s !important` and
+  // `will-change: transform !important`. A `transition` on top/left/width/
+  // height therefore never fires - the computed transition-property is
+  // `transform` and the move snaps. An animation is not filtered by
+  // transition-property, so it runs regardless. Same trick, and the same
+  // `both` fill spelling out its own `from`, as the sticker dissolve below.
   &:has(.hexreact.visible) .hexlogo {
-    top: 90px; left: 570px; width: 780px; height: 900px;
+    animation: lb-center .9s cubic-bezier(.3, .05, .2, 1) both;
   }
+}
+@keyframes lb-center {
+  from { top: 240px; left: 300px; width: 520px; height: 600px; }
+  to   { top:  90px; left: 570px; width: 780px; height: 900px; }
 }
 .reveal:has(section.logo-slide.present) .footer { display: none !important; }
 
