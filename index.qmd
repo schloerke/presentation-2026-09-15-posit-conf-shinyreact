@@ -720,7 +720,7 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 - Shiny summer '26 intern
 - Ph.D. candidate, UAB
 - Computational biologist
-- 10x Shiny apps. 4x supporting packages
+- 10x Shiny apps, and 4 packages under them
 - [posit-dev/shiny-showcase-bioinformatics](https://github.com/posit-dev/shiny-showcase-bioinformatics){.gh}
 :::
 
@@ -739,7 +739,79 @@ of them in one place — that is the QR, and the heading finishes his address on
 its own if you wait a beat.
 :::
 
-## A summer of Shiny for bioinformatics {.app-slide .nostretch}
+<!-- Samuel's own framing, from his packages talk:
+     https://github.com/samuelbharti/bio-packages/blob/main/slides/ — one line
+     per package, in the order a request travels. `plotomics` is the fourth and
+     is not part of that trio; it earns its line here because it is what
+     Plotomics Live draws with two slides from now.
+
+     The language badges are what each package actually ships, checked against
+     the registries rather than against upstream's prose: biobouncer and
+     plotomics are each on CRAN and PyPI; biohttp is CRAN-only; bioclients is
+     R-only and on r-universe rather than CRAN. Both of the first two are also
+     published to npm, but that is deliberately *not* tagged: the JS is what
+     the R and Python packages are built out of, not a third thing an R user
+     would reach for. -->
+## Summer Packages {#bio-packages .pkg-slide .nostretch}
+
+<!-- Same construction as `.app-slide`: one-item lists so each bullet is its own
+     fragment, matching `fragment-index` on the hex so the two land on one
+     click, `.nonincremental` so the `li` inside the div is not fragmented
+     again, and `.nostretch` so quarto does not lift the images out of their
+     `<p>`. Unlike the app slide the hexes accumulate, so they are plain
+     `.fragment`s rather than `.fade-in-then-out`. -->
+::: {.columns}
+::: {.column width="62%"}
+::: {.fragment .nonincremental fragment-index=1}
+- [biobouncer](https://www.samuelbharti.com/biobouncer/r/) [![](images/lang-r.svg)![](images/lang-py.svg)]{.langs} – Is this a valid ID?
+:::
+::: {.fragment .nonincremental fragment-index=2}
+- [bioclients](https://www.samuelbharti.com/bioclients/) [![](images/lang-r.svg)]{.langs} – What do the sources say?
+:::
+::: {.fragment .nonincremental fragment-index=3}
+- [biohttp](https://www.samuelbharti.com/biohttp/) [![](images/lang-r.svg)]{.langs} – Move bytes, cache results
+:::
+::: {.fragment .nonincremental fragment-index=4}
+- [plotomics](https://www.samuelbharti.com/plotomics/) [![](images/lang-r.svg)![](images/lang-py.svg)]{.langs} – 26 GPU-accelerated charts
+:::
+:::
+::: {.column width="38%"}
+<!-- One paragraph, four images: the `<p>` quarto wraps them in is what the
+     grid is declared on, so the hexes are its items and `nth-child` counts
+     them. All four logos are pointy-top hexes on a 173.2x200 viewBox (0.866),
+     which is what lets the second row interlock at exactly -0.25 of a height.
+     biobouncer's own logo.svg is padded inside a 440x500 box, so the vendored
+     copy is cropped to the hex itself - otherwise it packs a size small. -->
+::: {.hexpack}
+![](images/pkg-biobouncer.svg){.fragment fragment-index=1}
+![](images/pkg-bioclients.svg){.fragment fragment-index=2}
+![](images/pkg-biohttp.svg){.fragment fragment-index=3}
+![](images/pkg-plotomics.svg){.fragment fragment-index=4}
+:::
+:::
+:::
+
+::: {.notes}
+Four packages came out from under those apps, and each one answers a single
+question.
+
+`biobouncer` — is this even an identifier? Fifty sources, offline first, and
+one shared conformance corpus across R, Python and JavaScript, so the three
+cannot disagree. It is on CRAN, PyPI and npm. `bioclients` —
+what do the sources say about it? Twenty-nine biological web services, one
+table shape. `biohttp` is what those clients ride on: every call returns a
+value rather than raising, with retry, a circuit breaker, and a cache that
+stores only the successes.
+
+And `plotomics` — GPU-accelerated visualizations from one TypeScript core,
+wrapped three ways: npm for React, htmlwidgets for R, anywidget for Python.
+Headless factories, not React components, which is what lets one core serve
+all three. Seventeen chart *types* in the package; twenty-six of them on
+screen in the app you are about to see. Hold onto that one: it is what draws
+the app two slides from now.
+:::
+
+## Summer Bioinformatics Apps {.app-slide .nostretch}
 
 <!-- One screenshot per app, swapped on the same click as its bullet. Both
      halves carry matching `fragment-index`, which is the only way to land two
@@ -768,7 +840,7 @@ its own if you wait a beat.
 :::
 ::: {.fragment .nonincremental fragment-index=5}
 - **[Plotomics Live](https://posit-plotomics-live.share.connect.posit.cloud/)** · `shinyreact`
-  - 26 visualizations, one line of UI · [source](https://github.com/samuelbharti/plotomics-live){.gh}
+  - 1M WebGL points, one line of UI · [source](https://github.com/samuelbharti/plotomics-live){.gh}
 :::
 :::
 ::: {.column width="54%"}
@@ -800,55 +872,49 @@ That is the point — the last one is the only one that reaches for
 
 ## Plotomics Live {.gif-slide .nostretch}
 
-[26 visualizations · 22 data feeds + 28 ggplot2 PNGs · 65+ `reactive_output()`]{.gif-caption}
+<!-- The plotomics hex, parked in the corner the heading leaves free: this is
+     the app the package from two slides ago draws. Markup rather than a
+     `url()` in the scss, because quarto does not trace url()s out of an scss
+     file and `images/` is not a project resource. -->
+![](images/pkg-plotomics.svg){.corner-hex}
 
-<!-- A GIF of the deployment, not an iframe: it is a Connect Cloud app, and a
-     served render makes no off-origin request. Recorded with
-     record-plotomics-gif.py, which is not part of the build. -->
-![](images/plotomics-live.gif){.app-gif}
+[**1,000,000** transcripts on the GPU · 26 visualizations · 65+ `reactive_output()`]{.gif-caption}
+
+<!-- A recording of the deployment, not an iframe: it is a Connect Cloud app,
+     and a served render makes no off-origin request. An `<video>` rather than
+     a GIF - a million-point field is nearly incompressible as GIF (11 MB at 48
+     colours and 6fps, and posterized), where h264 holds full colour at 25fps
+     in 4 MB. Local file, so it is still offline-safe. See CLAUDE.md. -->
+```{=html}
+<video class="app-gif" src="images/plotomics-live.mp4"
+       autoplay loop muted playsinline></video>
+```
 
 ::: {.notes}
-One app, one page, both engines. Spatial transcriptomics: 3,798 capture spots
-at their real coordinates on a breast cancer section, over the H&E they came
-from.
+Xenium single-molecule transcripts. Every point is one mRNA molecule at the
+micrometre where it was detected in a breast cancer section — not a cell, not
+an embedding. The run found 42.6 million of them across a 313-gene panel, and
+a million of those are drawn here, on the GPU, from React.
 
-Watch the loop. The spots fade out and the histology underneath comes through.
-Then colour by a gene instead of a cluster — ERBB2 — and the server recomputes
-and the spots restyle. Then the engine toggle: *the same numbers*, drawn by
-ggplot2 as a PNG on the server. That is the whole argument in one control.
+Watch the loop. They arrive — a million points streamed as binary blobs and
+painted in one go. Hover one and you get the molecule under the cursor. Then
+zoom, and back out to the whole section: the red is tumour epithelium, the
+teal is stroma, and none of that structure is drawn by anything in R. R sent
+the numbers.
+
+The ggplot2 toggle is right there in the same panel, and on this page it has
+to fall back to a subsample. That contrast is the argument.
 
 Twenty-six visualizations, and the server publishes sixty-nine
 `reactive_output()` feeds to serve them: twenty-two data feeds React reads
 through `useShinyOutputValue`, twenty-eight ggplot2 PNGs for the classic side,
 and the rest stats and config.
 
-Two things to say out loud about that, because the next slide is the proof:
+Two things to say out loud about that:
 
 - `app.R` is **compute-only** — one `reactive_output()` per visualization, and
   not one line of it is UI
-- the entire UI, in R, is **one line**
-:::
-
-## What `shinyreact` bought him {.code-slide}
-
-<!-- No lead-in bullet on this one: those two points are spoken over the
-     Plotomics Live slide before it, so the panel is the whole slide and lands
-     with it rather than on a click. -->
-```{.r filename="app.R"}
-ui <- shinyreact::page_react_html("www/index.html")
-```
-
-::: {.fragment .spaced}
-584,207 cells on the GPU; **ggplot2 has to subsample**
-:::
-
-::: {.notes}
-The server does data work and nothing else: one `reactive_output()` per
-visualization, and in R the whole UI is a single line.
-
-The headline is the single-cell UMAP: 584,207 real cells, streamed as binary
-column blobs and drawn on the GPU. The ggplot2 engine can only show a static
-subsample. That contrast is the whole demo.
+- the entire UI, in R, is **one line**: `page_react_html("www/index.html")`
 :::
 
 ## What's next {.divider data-number="07"}

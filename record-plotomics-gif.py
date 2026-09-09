@@ -1,5 +1,11 @@
 """Record the Plotomics Live Visium panel as a frame sequence.
 
+NOTE: the deck no longer uses this. Its slide now shows a hand-recorded clip of
+the *Xenium* page (see CLAUDE.md) - that page's million WebGL points come out
+sparse and wrong under automation, so it cannot be captured this way. This
+script is kept because it still works for the Visium page, which is 3,798 spots
+over a photograph rather than mass WebGL.
+
 Four beats, in the order the talk needs them: the React render, fading the
 spots to reveal the H&E underneath, recolouring by gene (a server round trip),
 and the same computation as a classic ggplot2 image. Frames land in

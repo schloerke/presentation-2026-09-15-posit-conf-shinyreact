@@ -16,6 +16,10 @@ project:
     # only resolve under `quarto preview`, which serves the project root.
     - theme/*.png
     - theme/*.svg
+    # Quarto traces an `![](…)` but not a `src=` inside a raw-html block, and
+    # the Plotomics Live recording is a `<video>`. Without this the slide is a
+    # black box in a served render.
+    - images/*.mp4
   # Bundles wasm-repo/ into the render so the deck runs with no network.
   post-render:
     - bundle-wasm.R
