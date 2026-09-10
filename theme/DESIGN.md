@@ -73,7 +73,8 @@ because projector gamma and ambient light erode measured contrast in the room.
 | `--cyan-text` | `#6FD4E8` | `--ink` | **9.82:1** | AAA |
 | `--cyan-text` on panel | `#6FD4E8` | `--ink-deep` | **10.65:1** | AAA |
 | `--mark-red` (graphic only) | `#FF7B72` | `--ink-deep` | 7.23:1 | hand-drawn annotation X ("this goes") |
-| `--mark-amber` (graphic only) | `#FFC15E` | `--ink-deep` | 11.35:1 | hand-drawn annotation circle ("this stays") |
+| `--mark-amber` | `#FFC15E` | `--ink-deep` | 11.35:1 | hand-drawn annotation circle ("this stays") |
+| `--mark-amber` on body | `#FFC15E` | `--ink` | **10.45:1** | AAA — `.amber`, a second accent in a bullet where a cyan span would read as one more number |
 
 **Why cyan is split into two tokens.** Contrast is not the reason — the two are
 within 0.01 of each other. Fully saturated `#00D8FF` at 52px bold on a near-black
