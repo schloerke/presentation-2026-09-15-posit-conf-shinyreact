@@ -200,14 +200,18 @@ Use a modern UI ecosystem — **React.js** — for the interface.
      "user interfaces out of individual pieces". The right-hand panel is not a
      screenshot: it is the deck's own `.stats` markup, the same class names the
      JSX writes, so what you read on the left is literally what draws on the
-     right. 272 is `nrow(faithful)` and 30 is the app's default bin count. -->
+     right. 272 is `nrow(faithful)` and 30 is the app's default bin count.
+     The labels are written out upper-case there because the JSX upper-cases
+     them itself - the point being that a component computes its markup, it is
+     not a template. Change one side and change the other. -->
 ::: {.columns}
 ::: {.column .fragment width="64%"}
 ```{.javascriptreact filename="Stat.jsx"}
 function Stat({ label, value }) {
+  const name = label.toUpperCase();
   return (
     <div className="stat">
-      <span className="stat-label">{label}</span>
+      <span className="stat-label">{name}</span>
       <span className="stat-value">{value}</span>
     </div>
   );
@@ -222,11 +226,11 @@ function Stat({ label, value }) {
 ::: {.render-out}
 ::: {.stats}
 ::: {.stat}
-[Eruptions]{.stat-label}
+[ERUPTIONS]{.stat-label}
 [272]{.stat-value}
 :::
 ::: {.stat}
-[Bins]{.stat-label}
+[BINS]{.stat-label}
 [30]{.stat-value}
 :::
 :::
@@ -256,12 +260,33 @@ name a piece of UI, and then you reuse it.
      171,637,376 in the week to 2026-08-29 (api.npmjs.org/downloads/point/
      last-week/react) against shiny's 50,465,284 since cranlogs began on
      2012-10-01 (cranlogs.r-pkg.org). Re-measure before the talk; the ratio
-     only grows. -->
+     only grows. The comparison is now carried by the two timespans rather than
+     by a "3x", so "last week" is cyan like the numbers and "14 years" is amber:
+     four cyan spans in two lines and the eye stops seeing which is which. -->
 - **Massive** adoption in the JS community
   - GitHub: ![](images/react-used-by.png){.used-by fig-alt="GitHub's sidebar badge: Used by 30M"}
-  - `react` alone pulled **170M downloads last week**\
-    3x Shiny's 14-year CRAN total of 50M
-- Proven component libraries, design systems, charts, tables, maps, ...
+  - `react` alone pulled **170M** downloads **last week**
+    - **Shiny** has **50M** downloads in [14 years]{.amber}!
+- Proven component libraries, design systems, charts, tables, maps
+
+<!-- The bullet's trailing ", ..." is gone because the strip below it is the
+     "...", and at 52px those three dots wrapped to a line of their own -
+     68px of canvas for an orphan, which is what the strip needs to clear the
+     footer.
+     Seven marks for that bullet, in its own word order: components (MUI,
+     shadcn/ui), a design system (Ant Design), charts (Plotly, D3), tables
+     (TanStack), maps (Leaflet). Plotly, D3 and Leaflet are not React libraries
+     - you reach them through react-plotly.js, visx and react-leaflet - and they
+     are here precisely because this room knows them from R already: the strip
+     has to be read as shape, with no brand colour to help.
+     It costs no click of its own: the marks wave in by themselves, .75s after
+     the bullet above them lands (see `.logo-strip` in the theme).
+     Each mark links to its project and opens in a new tab, for the same reason
+     the QRs do: the deck is published, and a click mid-talk must not navigate
+     the deck away and lose the reveal state and the running shinylive apps. -->
+::: {.logo-strip}
+[![](images/logo-mui.svg){fig-alt="MUI"}](https://mui.com){target="_blank" rel="noopener"} [![](images/logo-shadcnui.svg){fig-alt="shadcn/ui"}](https://ui.shadcn.com){target="_blank" rel="noopener"} [![](images/logo-antdesign.svg){fig-alt="Ant Design"}](https://ant.design){target="_blank" rel="noopener"} [![](images/logo-d3.svg){fig-alt="D3.js"}](https://d3js.org){target="_blank" rel="noopener"} [![](images/logo-plotly.svg){fig-alt="Plotly"}](https://plotly.com/javascript/react/){target="_blank" rel="noopener"} [![](images/logo-tanstack.svg){fig-alt="TanStack"}](https://tanstack.com/table){target="_blank" rel="noopener"} [![](images/logo-leaflet.svg){fig-alt="Leaflet"}](https://leafletjs.com){target="_blank" rel="noopener"}
+:::
 
 ::: {.notes}
 A MASSIVE ecosystem of proven components, ready for production environments. It

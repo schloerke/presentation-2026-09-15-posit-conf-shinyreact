@@ -171,6 +171,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | bullets + an `.r-stack.state-stack` of `.state-viz` rows |
 | (none — deck-local) | `.hexreact.corner` — a bare React atom, top right |
 | (none — deck-local) | `img.used-by` — a screenshot inline in a bullet |
+| (none — deck-local) | `.logo-strip` — a row of linked brand marks under a bullet |
 | (none — deck-local) | `.render-out` — a code panel holding rendered UI, not code |
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
@@ -644,6 +645,81 @@ badge, on "Why React?"). It was shot over an `$ink` ground so it needs no frame
 is a screenshot and not deck typography. Keep it. `theme/`'s numbers assume a
 4x raster: 88px of image at 64px tall puts 15px browser UI text at ~44px, over
 DESIGN.md's 36px floor. Re-shoot at 4x if the badge is refreshed.
+
+### `.logo-strip` — seven brand marks, on "Why React?"
+
+Under the "component libraries, design systems, charts, tables, maps" bullet:
+MUI, shadcn/ui, Ant Design, D3, Plotly, TanStack, Leaflet, in the bullet's own
+word order. The bullet is the label, so the strip carries no captions — its job
+is recognition, not classification. The bullet's trailing `, ...` was removed
+when the strip went in: at 52px those three dots wrapped to a line of their own,
+and the strip is the "…".
+
+- **The marks wave in by themselves and cost no click.** The strip is not a
+  fragment; each `<a>` runs `logo-wave` (fade + a 14px rise, .4s), the first at
+  `.75s` and one every `.12s` after, so the row is settled ~1.6s after the
+  bullet lands. Measured on the render: all seven at opacity 0 on the bullet's
+  click, two in flight at 900ms, all seven at 1 by 2.2s.
+- **The trigger is that bullet's own `visible` class**
+  (`section:has(> ul > li:last-child.fragment.visible)`), not a bare
+  `animation-delay` — reveal keeps the coming slides in the DOM, so an
+  unconditional delay would have run out before you ever arrived (the same trap
+  as `.dotcom`). `animation-fill-mode: both`, plus a `from` that restates the
+  base `opacity: 0`, is what holds each mark down through its delay; stepping
+  the bullet back un-matches the rule and the base declaration takes over, so
+  the wave replays on the way forward again (verified by stepping back and
+  forward).
+
+- **The marks are in brand colour** — the one place in the deck showing colours
+  DESIGN.md does not own — because colour is most of what makes a logo
+  recognizable. Two fills are *not* the brand hex, because the brand hex is
+  unreadable on `$ink`: shadcn/ui's is `#000000` (1.25:1), so it takes `$text`,
+  which is also the mark its own site shows in dark mode; Plotly's glyph hex is
+  `#3F4F75` (2.07:1), so it takes Plotly blue `#119DFF` (5.84:1). The other four
+  are their own — MUI 4.39:1, Ant Design 3.81:1, D3 8.11:1, Leaflet 4.48:1.
+  These are graphics, so DESIGN.md 9's 7:1 floor does not bind, but re-measure
+  any mark swapped in.
+- **D3 comes before Plotly** so that two blues are not adjacent (MUI, shadcn/ui,
+  Ant Design already run blue-white-blue). Both are the "charts" pair, so
+  swapping them inside it leaves the category order intact.
+- Six marks are simple-icons glyphs with the brand fill **baked onto the file**
+  (nothing can inherit `currentColor`, and quarto does not trace a `url()` out
+  of the scss). Regenerate them the way `images/lang-*.svg` are generated:
+
+  ```bash
+  python3 -c "
+  import urllib.request
+  for slug, out, fill in [('mui','mui','#007FFF'), ('shadcnui','shadcnui','#F2F4F8'),
+                          ('antdesign','antdesign','#0170FE'), ('plotly','plotly','#119DFF'),
+                          ('d3dotjs','d3','#F9A03C'), ('leaflet','leaflet','#199900')]:
+      s = urllib.request.urlopen(f'https://cdn.jsdelivr.net/npm/simple-icons@13/icons/{slug}.svg').read().decode()
+      open(f'images/logo-{out}.svg','w').write(s.replace('<svg ', f'<svg fill=\"{fill}\" ', 1))"
+  ```
+
+  The seventh is TanStack's own coloured mark, its sunset-gradient tile taken
+  straight from the brand kit (`public/favicon-dark.svg` in
+  `TanStack/tanstack.com`). simple-icons has **no** TanStack, AG Grid, Recharts,
+  deck.gl or Observable Plot glyph — any of those has to be vendored by hand.
+- **The row is a grid of equal-width columns, not a flex row with a gap.** The
+  marks are not the same width, so a fixed gap puts their centres at uneven
+  intervals; `repeat(7, 190px)` puts them exactly 190px apart (measured).
+  TanStack's is the only *filled* mark, so it runs 98px against the others' 110
+  — at a shared height a solid tile reads a size larger than a bare glyph. The
+  row sits 908→1018 on the canvas, which is all the height there is: the footer
+  starts at 1039, so growing the marks again means buying the pixels somewhere.
+- **The images are a markdown paragraph, not a raw-html `<img>` row**, because
+  quarto traces `![](images/…)` into `_site/` and does not trace a `src=` inside
+  a raw block — and `images/` is not a project resource (only `images/*.mp4`
+  is). Same trap as the GIF slide.
+- **Every mark links to its project, in a new tab** (`target="_blank"
+  rel="noopener"`), for the same reason the QRs do: the deck is published, and a
+  click mid-talk must not navigate the deck away and lose the reveal state and
+  the running shinylive apps. The grid items are therefore the `<a>`s, which
+  need `line-height: 0` or the link's own leading pads the cell.
+- Plotly, D3 and Leaflet are **not** React libraries — you reach them through
+  `react-plotly.js`, visx and `react-leaflet` — and they are on the strip
+  precisely because this room knows them from R already. Do not describe them as
+  React libraries in the notes.
 
 `.hexreact.corner` is a bare React atom in the top-right corner, on every
 section-02 slide. It shares `.hexreact.lockup`'s geometry (one rule, so they

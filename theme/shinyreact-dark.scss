@@ -167,6 +167,9 @@ $presentation-block-margin: 44px !default;
   // 6: bullets are a 5px cyan rule with 42px of padding, running the height of
   // the item, so a wrapped bullet stays aligned.
   ul, ol { margin: 60px 0 0; }
+  // Depth 3 hangs off a single line of its parent rather than off a heading, so
+  // the 60px above reads as a paragraph break in the middle of one thought.
+  ul ul ul { margin-top: 16px; }
   ul { list-style: none; }
   ul > li {
     position: relative;
@@ -190,6 +193,15 @@ $presentation-block-margin: 44px !default;
   em { color: $muted; font-style: normal; }
 
   .muted  { color: $muted; }
+  // 4.1: the second accent in a bullet, for the one span that must not read as
+  // another cyan number ("in 14 years", against 50M and 170M). Same amber as
+  // the annotation circle, and the only text use of it - see DESIGN.md 3.
+  // The italic is *synthesized*: `theme/fonts.scss` inlines four upright faces
+  // and no italic one, and the deck is offline-safe, so the browser skews the
+  // upright rather than loading Inter Italic. That is also why `em` above is
+  // flattened to upright. It reads fine at 46px; if the deck ever wants real
+  // italic letterforms, `build_fonts.py` has to inline the italic face too.
+  .amber  { color: $mark-amber; font-weight: 700; font-style: italic; }
   .lede   { font-size: 46px; font-weight: 400; color: $muted; }
   .kicker {
     font-size: 34px;
@@ -646,6 +658,83 @@ $presentation-block-margin: 44px !default;
   box-shadow: none;
   background: none;
 }
+
+// -- deck-local: the logo strip on "Why React?" ------------------------------
+// Seven marks under the "component libraries, design systems, charts, tables,
+// maps" bullet - the bullet is the label, so the strip carries no captions and
+// its job is recognition, not classification.
+//
+// The marks are in **brand colour** - the one place in the deck that shows a
+// colour DESIGN.md does not own - because colour is most of what makes a logo
+// recognizable, and recognition is the whole job here. Six are simple-icons
+// glyphs on a 24x24 viewBox with the brand fill baked onto the root (the deck
+// is offline, and quarto never traces a `url()` out of this file, so nothing
+// can inherit `currentColor`); TanStack's is its own gradient tile, straight
+// from their brand kit.
+//
+// Two fills are *not* the brand hex, because the brand hex is unreadable on
+// $ink (#1C1D22): shadcn/ui is #000000 (1.25:1), so it takes $text, which is
+// also the mark their own site shows in dark mode; Plotly's glyph hex is
+// #3F4F75 (2.07:1), so it takes Plotly blue #119DFF (5.84:1). The other four
+// are their own: MUI #007FFF (4.39:1), Ant Design #0170FE (3.81:1), D3 #F9A03C
+// (8.11:1), Leaflet #199900 (4.48:1). These are graphics, not text, so
+// DESIGN.md 9's 7:1 floor does not bind - but re-check any mark swapped in.
+//
+// The images are a markdown paragraph, not a raw-html `<img>` row: quarto
+// traces `![](images/…)` into `_site/` and does not trace a `src=` inside a raw
+// block, and `images/` is not a project resource (see CLAUDE.md).
+// Equal-width columns rather than a flex row with a gap: the marks are not the
+// same width, so a fixed gap puts their centres at uneven intervals and the row
+// reads as mis-set. Each cell is an `<a>` (every mark links to its project), so
+// the grid items are the links, not the images.
+.reveal .slides section .logo-strip p {
+  display: grid;
+  grid-template-columns: repeat(7, 190px);
+  align-items: center;
+  justify-items: center;
+  // Clears the bullet rule and lands the first mark on the bullets' text edge.
+  margin: 16px 0 0;
+  padding-left: 42px;
+}
+.reveal .logo-strip a {
+  display: block;
+  line-height: 0;   // or the link's own leading pads the cell
+  border: none;
+  opacity: 0;       // the wave below fades each one in
+}
+
+// The strip is *not* a fragment: the marks arrive on their own, .75s after the
+// bullet above them lands and then one every .12s, so the row reads as a wave
+// instead of costing a click. The trigger has to be that bullet's own `visible`
+// class rather than a bare `animation-delay`, because reveal keeps the coming
+// slides in the DOM and the delay would have run out before you ever arrived
+// (the same trap as `.dotcom` on the "Samuel Bharti" slide).
+// `both` plus a `from` that restates the base opacity is what holds each mark
+// down through its delay; stepping the bullet back un-matches the rule and the
+// base `opacity: 0` takes over again, so the wave replays.
+.reveal .slides section:has(> ul > li:last-child.fragment.visible) .logo-strip a {
+  animation: logo-wave .4s ease-out both;
+  @for $i from 1 through 7 {
+    &:nth-child(#{$i}) { animation-delay: 0.75s + ($i - 1) * 0.12s; }
+  }
+}
+@keyframes logo-wave {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal .logo-strip img {
+  // Equal height is the baseline for a mixed set of marks; the one that carries
+  // more ink than the rest is trimmed below rather than growing the row.
+  height: 110px;
+  width: auto;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+}
+// TanStack's brand mark is a *filled* tile rather than a bare glyph, so at the
+// shared height it reads a size larger than the six around it.
+.reveal .logo-strip img[src$="logo-tanstack.svg"] { height: 98px; }
 
 // -- deck-local: state -> UI, on "UI is assembled from data's state" ---------
 // The point is that the picture is *derived*, so the whole chain sits on one
