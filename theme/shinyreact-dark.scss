@@ -401,6 +401,31 @@ $presentation-block-margin: 44px !default;
   }
 }
 
+// Two demos keep their heading: both apps' pages are white from the first
+// pixel, so full-bleed left the corner mark floating on nothing. Flex rather
+// than a computed height - the section is a fixed 1080px border-box, so
+// `flex: 1` hands the app whatever the heading leaves. The `display` needs
+// `!important`: reveal's own `.slides section.present` rule loads after the
+// theme.
+.reveal .slides section.demo-slide.demo-titled {
+  // `!important` to win back the padding `.demo-slide` above zeroes with one.
+  padding: 176px $margin 0 !important;
+  flex-direction: column;
+  // Air between the swoosh and the app's white edge. The corner mark's box
+  // ends at 366px, so this is also what keeps the app from butting into it.
+  gap: 48px;
+  &.present { display: flex !important; }
+  > h2 { display: block; }
+  > iframe { flex: 1; min-height: 0; }
+  // The shinylive demo is three wrappers deep, and `viewerHeight` lands as an
+  // inline `height` on the container - hence `!important` rather than a
+  // matching number here. Keep `viewerHeight: 1080`: it is what the block is
+  // worth full-bleed, and this only ever shrinks it.
+  .shinylive-wrapper { flex: 1; min-height: 0; }
+  .shinylive-container { height: 100% !important; }
+  .shinylive-viewer, iframe.app-frame { height: 100%; }
+}
+
 // -- app showcase: one screenshot per bullet, swapped on the bullet's click ---
 // Reveal's `.r-stack` already puts every image in one grid cell, so this only
 // has to give that cell a size the screenshots can share - they do not share an
@@ -1041,7 +1066,7 @@ $presentation-block-margin: 44px !default;
 // 3. …and where the finished mark lands. The 230px column it takes comes off
 //    the text, or a bullet runs under it.
 .reveal .hexlogo.corner { top: 100px; left: 1594px; width: 230px; height: 266px; }
-.reveal section:has(.hexlogo.corner) > :is(p, ul, ol) { max-width: 1380px; }
+.reveal section:has(.hexlogo.corner) > :is(h2, p, ul, ol) { max-width: 1380px; }
 
 // The corner atom sits at the heading's own height, and its ink starts at 1674
 // (1624 + the atom's 20% inset), so a heading on one of these slides has 1578px

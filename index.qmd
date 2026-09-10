@@ -333,7 +333,7 @@ only thing that changed between these two is the number. Nobody added, removed,
 or resized a bar.
 :::
 
-## Old Faithful {.demo-slide}
+## Old Faithful {.demo-slide .demo-titled}
 
 <!-- A static page, not shinylive: no server, no webR. `.demo-slide > iframe`
      in the theme sizes it to the full 1920x1080. -->
@@ -639,7 +639,12 @@ const bins = useShinyOutputValue<HistData>("distPlot", null);
 R computes the value; React decides how it looks.
 :::
 
-## Live: Old Faithful w/ `shinyreact` {.demo-slide}
+## Live: Old Faithful w/ `shinyreact` {.demo-slide .demo-titled}
+
+<!-- The finished mark, in the corner it lands in on the section-03 bullets
+     slide. No `data-id`: this slide is nowhere near the logo build's
+     auto-animate chain, and adding one would enlist it. -->
+<div class="hexlogo corner"></div>
 
 ```{shinylive-r}
 #| standalone: true

@@ -193,6 +193,43 @@ slides on `##`, and it carries the slide id and speaker notes) but hidden, and
 padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
 Pair it with `#| viewerHeight: 1080`.
 
+`.demo-titled` is the variant that keeps the heading, on both Old Faithful
+demos: those apps' pages are white from the first pixel, so full-bleed left the
+corner mark floating on nothing. The section becomes a flex column and the app
+`flex: 1`, so it takes whatever the heading leaves with no measured height to
+keep in sync — and the padding has to be `!important`, because `.demo-slide`'s
+own `padding: 0` already is. The shinylive demo is three wrappers deep and
+`viewerHeight` lands as an *inline* height on `.shinylive-container`, so that
+one is overridden with `!important` too; leave `viewerHeight: 1080` alone, it
+is what the block is worth full-bleed and this only shrinks it.
+
+Each carries the mark of what it is running: the React-only slide a bare
+`.hexreact.corner` atom, the `shinyreact` one a `.hexlogo.corner` hex. Neither
+takes a `data-id` — that would enlist it in the logo build's auto-animate
+chain. `:has(.hexlogo.corner)` caps the heading at 1380px alongside the body
+text, so a longer one wraps instead of running into the hex.
+
+**Both demo apps are sized for a projector, not a laptop**, because they run at
+1:1 with the 1920x1080 canvas. `.layout` is left-aligned and full-width (a
+centred `max-width: 60rem` block parked ~400px of uncollapsible white beside
+the sidebar and shrank the chart to nothing), and `html { font-size: 26px }` is
+the single lever behind the page's rem sizes. Two things do *not* follow that
+lever and are handled on their own:
+
+- **The chart's text is in svg user units** (`fontSize: 17`/`18` on a 620x320
+  viewBox), so how big it reads is set by how wide the svg is drawn — ~34px at
+  the panel's width here. Widening the chart enlarges its labels; nothing else
+  does. `H` is 320 rather than 380 so a full-width chart still clears the
+  slide's height, and `.panel svg`'s `max-width` is the backstop for that.
+- **A range input's thumb is a fixed ~16px** whatever the font size, so the
+  slider is `transform: scale(1.5)` at `width: 66.7%` — the two multiply back
+  to the sidebar's full width.
+
+`apps/01-shinyreact/www/{app.css,app.js,app.tsx}` and
+`apps/02-react-only/www/{app.css,app.js}` hold the same UI and the same chart
+on purpose — the pair's whole point is that only the two hooks differ. Change
+all of them together, and `diff` the css afterwards.
+
 `.app-slide` (deck-local, on "Summer Bioinformatics Apps") is bullets
 on the left and **one screenshot per bullet** on the right, swapped on the same
 click as its bullet. Each bullet is the app's name linked to its Connect Cloud

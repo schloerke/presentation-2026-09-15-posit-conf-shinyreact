@@ -13,8 +13,8 @@ const { useState, useMemo, createElement: h } = React;
 // the chart has to look identical.
 
 const W = 620;
-const H = 380;
-const M = { top: 16, right: 16, bottom: 48, left: 56 };
+const H = 320;
+const M = { top: 16, right: 16, bottom: 52, left: 64 };
 const PLOT_W = W - M.left - M.right;
 const PLOT_H = H - M.top - M.bottom;
 
@@ -72,7 +72,7 @@ function Histogram({ bins }) {
             y: y(t),
             textAnchor: "end",
             dominantBaseline: "middle",
-            fontSize: 12,
+            fontSize: 17,
             fill: "#666",
           },
           t,
@@ -106,9 +106,9 @@ function Histogram({ bins }) {
         {
           key: `x${t}`,
           x: x(t),
-          y: M.top + PLOT_H + 20,
+          y: M.top + PLOT_H + 24,
           textAnchor: "middle",
-          fontSize: 12,
+          fontSize: 17,
           fill: "#666",
         },
         t,
@@ -120,7 +120,7 @@ function Histogram({ bins }) {
         x: M.left + PLOT_W / 2,
         y: H - 8,
         textAnchor: "middle",
-        fontSize: 13,
+        fontSize: 18,
         fill: "#333",
       },
       "Waiting time to next eruption (minutes)",
@@ -130,7 +130,7 @@ function Histogram({ bins }) {
       {
         transform: `translate(16 ${M.top + PLOT_H / 2}) rotate(-90)`,
         textAnchor: "middle",
-        fontSize: 13,
+        fontSize: 18,
         fill: "#333",
       },
       "Frequency",
