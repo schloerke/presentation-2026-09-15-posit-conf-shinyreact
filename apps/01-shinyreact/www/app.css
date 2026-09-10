@@ -1,3 +1,11 @@
+/* The only viewer of these two apps is a projector: they run in an iframe on a
+   1920x1080 slide, at 1:1 with the deck's canvas. So the whole page is sized up
+   from a laptop's defaults - everything below is in rem, and this is the one
+   number that scales it. */
+html {
+  font-size: 26px;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -10,8 +18,10 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  max-width: 60rem;
-  margin: 2rem auto;
+  /* Left-aligned and full-width, not a centred 60rem block: on the deck's
+     1920px slide that left ~400px of white beside the sidebar that nothing
+     collapses, and shrank the chart to something unreadable from the back. */
+  margin: 1rem 0;
   padding: 0 1.5rem;
 }
 
@@ -26,16 +36,21 @@ body {
 .sidebar label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
 }
 
+/* A range input's thumb is a fixed ~16px whatever the font size, so it is
+   scaled rather than sized; 2/3 width at 1.5x lands back on the full width. */
 .sidebar input[type="range"] {
-  width: 100%;
+  width: 66.7%;
+  transform: scale(1.5);
+  transform-origin: left center;
 }
 
 .bin-count-value {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 1rem;
+  font-size: 1.3rem;
   font-variant-numeric: tabular-nums;
   color: #666;
 }
@@ -44,9 +59,15 @@ body {
   flex: 3 1 24rem;
 }
 
+/* The chart is width-driven (viewBox 620x320, `width: 100%`), so this cap is
+   what keeps it inside the slide's height once the heading is above it. */
+.panel svg {
+  max-width: 1200px;
+}
+
 .panel h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
 }
 
 .placeholder {
