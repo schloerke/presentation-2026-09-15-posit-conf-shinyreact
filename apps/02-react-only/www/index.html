@@ -16,11 +16,19 @@
     <script src="app.js"></script>
     <!-- The deck loads this page in an iframe, so reveal never sees these keys.
          Hand them back via reveal's postMessage API: triggerKey runs whatever
-         reveal itself has bound to the code, so no keymap is duplicated here. -->
+         reveal itself has bound to the code, so no keymap is duplicated here.
+         Kept identical in all three demos (see apps/01-shinyreact/www/index.html
+         and apps/00-old-faithful-trim/app.R) - change one, change all three. -->
     <script>
-      const deckKeys = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, " ": 32, Escape: 27 };
+      // PageUp/PageDown is what most presenter remotes send and no widget wants
+      // them, so they always go to the deck. A focused slider owns the arrows
+      // and space, or advancing the deck would also drag the control.
+      const deckKeys = { PageUp: 33, PageDown: 34 };
+      const sharedKeys = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, " ": 32, Escape: 27 };
       addEventListener("keydown", (e) => {
-        const keyCode = deckKeys[e.key];
+        const widget = e.target instanceof Element &&
+          e.target.closest("input, select, textarea, button, [contenteditable]");
+        const keyCode = deckKeys[e.key] || (widget ? 0 : sharedKeys[e.key]);
         if (keyCode && parent !== window) {
           parent.postMessage(JSON.stringify({ method: "triggerKey", args: [keyCode] }), "*");
         }

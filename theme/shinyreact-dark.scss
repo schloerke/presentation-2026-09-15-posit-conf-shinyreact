@@ -1622,3 +1622,25 @@ $presentation-block-margin: 44px !default;
 .reveal .progress { color: $cyan; height: 5px; }
 .reveal .controls { color: $cyan-text; }
 .reveal .slide-number { font-size: 24px; color: $muted; background: none; }
+
+// -- reduced motion ----------------------------------------------------------
+// The deck moves a lot: the logo build flies an atom across the slide, the
+// brand strip waves in, `.dotcom` fades up, the X draws itself. Every one of
+// those *ends* on a state a slide needs, and most are held there by
+// `animation-fill-mode: both/forwards` - so this collapses the durations rather
+// than writing `animation: none`, which would drop each element back to its
+// base declaration (the atom at `opacity: 0`, the ring hidden) and leave the
+// logo build half-assembled. 1ms rather than 0s so the animations still run,
+// and still fire their end state, in one frame.
+// The looping video is playback, not CSS: `theme/gif-restart.html` leaves it
+// paused on its first frame under the same query.
+@media (prefers-reduced-motion: reduce) {
+  .reveal *,
+  .reveal *::before,
+  .reveal *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}

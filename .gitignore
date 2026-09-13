@@ -13,3 +13,6 @@ _site/
 **/*.quarto_ipynb
 
 /.quarto/
+
+# debug screenshots and agent scratch (see CLAUDE.md)
+.context/

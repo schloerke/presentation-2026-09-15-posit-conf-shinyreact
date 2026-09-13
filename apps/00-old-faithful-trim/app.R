@@ -20,6 +20,25 @@ ui <- page_sidebar(
     .irs--shiny .irs-grid { top: 52px; height: 24px; }
     .irs--shiny .irs-grid-text { font-size: 16px; top: 12px; }
   ")),
+  # shinylive runs this app in an iframe, so reveal never sees these keys. Hand
+  # them back via reveal's postMessage API: triggerKey runs whatever reveal has
+  # bound to the code. PageUp/PageDown is what most presenter remotes send and
+  # no widget wants them, so they always go to the deck; a focused slider owns
+  # the arrows and space, or advancing the deck would also drag the control.
+  # Identical in all three demos (apps/0{1,2}-*/www/index.html) - change one,
+  # change all three.
+  tags$script(HTML('
+    const deckKeys = { PageUp: 33, PageDown: 34 };
+    const sharedKeys = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, " ": 32, Escape: 27 };
+    addEventListener("keydown", (e) => {
+      const widget = e.target instanceof Element &&
+        e.target.closest("input, select, textarea, button, [contenteditable]");
+      const keyCode = deckKeys[e.key] || (widget ? 0 : sharedKeys[e.key]);
+      if (keyCode && parent !== window) {
+        parent.postMessage(JSON.stringify({ method: "triggerKey", args: [keyCode] }), "*");
+      }
+    });
+  ')),
   title = "Hello Shiny!",
   sidebar = sidebar(
     width = 420,
