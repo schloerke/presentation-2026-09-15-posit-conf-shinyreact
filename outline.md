@@ -36,9 +36,9 @@
 * React.js
   * "The library for web and native user interfaces"
   * "... build user interfaces out of individual pieces called components"
-  * A component is a function that returns markup
+  * A component is a function that returns HTML-like markup
 
-  * UI is assembled given data's state
+  * Components draw data's state
     * > React is _REALLY_ good at just taking JSON at mapping data to UI
     * > Don't worry about managing the transitions from one data state to another!
 

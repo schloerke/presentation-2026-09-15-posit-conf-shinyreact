@@ -82,9 +82,12 @@ for (let i = 0; i < Reveal.getTotalSlides(); i++) {
 Show every fragment first or a slide measures short. Three kinds of false
 positive come back over 1080 and are fine: the title and `.recap` slides (their
 lockup is anchored to the *bottom*, so it sits at canvas height − 30), the
-`.demo-slide`s (the app flexes to the canvas), and a block whose last
-*margin* crosses the line while its ink does not. Everything else is a real
-clip. The deck currently has none.
+`.demo-slide`s (the app flexes to the canvas), and a block whose last *margin or
+padding* crosses the line while its ink does not. Everything else is a real
+clip. The deck currently has none: the only slide over 1080 is `#react-code` at
+1085, which is `pre`'s own 40px bottom padding plus the line-highlight clones —
+its lowest *text* is 1034. When one comes back over, measure the ink before
+touching anything: `range.selectNodeContents(code)` and take the lowest rect.
 
 The audit has to be run at **1080**, not at whatever window is open. A window
 that is taller than 16:9 gets a canvas *taller* than 1080 from
@@ -106,6 +109,16 @@ never commit `_quarto_internal_scss_error.scss`, treat it as "the SCSS you just
 wrote broke a build pass", and check `ls _site/index_files/libs` before
 concluding anything about a change — otherwise you debug the CSS of a deck that
 never loaded the theme.
+
+A **second**, unrelated way to get a themeless deck: deleting `_site/` or
+`index_files/` by hand without also deleting `.quarto/`. Quarto's sass cache
+still believes the compiled theme was already copied, so the render fails with
+`ERROR: NotFound … copy '.quarto/…/sass/<hash>.css' -> 'index_files/libs/
+revealjs/dist/theme/quarto-<hash>.css'` and leaves `revealjs/` holding only
+`plugin/`, no `dist/`. Note it exits **1** here, unlike the SCSSParsingError
+case. `rm -rf .quarto` and render again. Simplest rule: never hand-delete those
+two directories — `quarto render` already replaces `_site/` — and if you do,
+take `.quarto` with them.
 
 `quarto render` **deletes and recreates `_site/`**, so a server started *inside*
 it keeps serving the old, unlinked directory: every later check silently reads a
@@ -137,7 +150,13 @@ The "Samuel Bharti" slide has two deck-local pieces. `[.com]{.dotcom}` in the
 heading fades in 2.2s after the slide lands, in `$muted`, so the heading turns
 into his address on its own; the animation is keyed off `section.present`, not
 a bare `animation-delay`, because reveal keeps the coming slides in the DOM and
-a plain delay would have run out before you ever arrived. `.qr-inline` is a QR
+a plain delay would have run out before you ever arrived. Section 02's opener
+wears the same gag — "React" becomes "React.dev" — but it is **not** on a timer:
+it lands on the first bullet's click, so the address finishes as React's own
+description arrives. That takes two rules, because the shared one above would
+otherwise fire on arrival: `animation: none` for `#what-is-react`, then a
+`:has(> ul > li:first-child.fragment.visible)` rule that re-keys it (the
+`.logo-strip` trick, which reverses correctly when stepped back). `.qr-inline` is a QR
 in a slide's *content* (the gallery's, under its bullet) rather than the
 furniture QR the title and recap slides carry as a background layer; it also
 zeroes the margin on the `<p>` quarto wraps the image in, which otherwise puts
@@ -747,15 +766,51 @@ React?" carried two blockquotes *and* the `Stat.jsx` panel and ran 1358px —
 278px past the canvas, with the bottom of the code silently gone. It is now two
 slides: the quotes keep "What is React?" (a plain content slide, so it takes
 the swoosh back), and the panel moved to `## Components` under the one-line
-lead-in "A component is a function that returns markup." Nothing was shrunk or
-cut; both slides carry the corner atom.
+lead-in "A component is a function that returns HTML-like markup." Nothing was
+shrunk or cut; both slides carry the corner atom.
 
-When you do that check, **measure the rendered block; do not compute it from
-`$code-block-font-size`.** That variable is 34px, but the effective size on a
-slide is **36px** — quarto's own revealjs css beats `.reveal pre`'s declaration.
-A budget worked out from 34 is wrong by ~2px a line, which is a whole line over
-ten of them; one shrink-the-font "fix" was made on that arithmetic and then
-reverted, because at 36px the block fit all along.
+When you do that check, **measure the rendered block, and measure the right
+`pre`.** A `.code-slide` has two: `div.sourceCode pre` (the code, **34px**) and
+`.code-with-filename-file pre` (the cyan filename caption, **36px** — quarto's
+own revealjs css beats `.reveal pre` there). A bare `section.querySelector
+('pre')` returns the caption, which is 47px tall and will tell you a 13-line
+block is fine when it is 66px off the canvas. Measured across all ten code
+slides: every one is 34/36. A line costs ~47px at 34px.
+
+### "JavaScript, in a string" — the hook into section 02
+
+The slide that turns Old Faithful toward React. It replaced one built on
+`renderUI`, which was **the wrong defendant**: dynamic UI is a perfectly good
+Shiny tool, so the room did not buy it. What actually hurts is authoring a
+*second language inside a quoted string*, where no editor, linter, formatter or
+test can reach it — and everyone in that room has done it.
+
+- **The slide makes its own argument, with no annotation.** Skylighting colours
+  an R string as a string, so the CSS and JS inside the two `HTML("…")` bodies
+  render as one flat green while the R around them is highlighted. That *is*
+  what your editor shows you. Verified on the render: 11 `span.st` tokens cover
+  all of the foreign code. Don't "fix" that rendering — the flat block is the
+  evidence.
+- **The question is `.nonincremental`**, so it is up on arrival rather than on a
+  click: the show of hands happens while the panel is still blank and the code
+  lands as the answer. At 52px it has to stay on **one line** — "How many of you
+  have written JavaScript or CSS as a string in R?" is 1621px; adding back "your
+  … code" makes it 1672px, which wraps and costs the panel ~70px it does not
+  have. The slide measures 986 of 1080 with the question on one line.
+- **The `.x-mark` covers the two `HTML("…")` bodies only** (131/506, 1305x312),
+  not the panel. An X over all of it reads as "Shiny is wrong", which is the
+  opposite of the talk's claim. Measure those lines specifically — the first cut
+  unioned every `span.st` in the block, which swept in `uiOutput("cards")`'s
+  perfectly ordinary R string and stretched the X over the last two lines.
+- `.circle-mark` is the unused partner of that rule; it said "this stays" on the
+  `renderUI` version. Kept because the pair is one rule.
+- **It pre-pays for the elephant.** By the time "You want me to write
+  JavaScript?!?" lands in section 05, the room has already put its hands up to
+  writing it — so the honest answer is *you already do, in the one place where
+  nothing can help you*. Don't retire one of those slides without the other.
+- `.code-sm` (a 32px override) was deleted with the old slide — it had exactly
+  one user. Shorten the code instead; that is what got this panel from 13 lines
+  to 11 and from 1146px to 986px.
 
 `.render-out` is the other half of a `.code-slide`: a panel that holds *rendered
 UI* rather than code (used on "What is React?", where the right column shows what
