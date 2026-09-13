@@ -682,9 +682,14 @@ $presentation-block-margin: 44px !default;
 // revealjs libs out of the render with it. See CLAUDE.md.
 @keyframes dotcom-in { from { opacity: 0; } to { opacity: 1; } }
 // Section 02's opener wears the same gag - "React" becomes "React.dev" - but
-// it has to outlast the quotes being read aloud, so it waits 5s rather than
-// Samuel's 2.2s. Scoped by id, so the shorthand above still supplies the rest.
-.reveal section#what-is-react.present h2 .dotcom { animation-delay: 5s; }
+// it lands on the first bullet's click rather than on a timer, so the address
+// finishes as React's own description arrives. So the timed rule above is
+// cancelled for this slide and re-keyed off that bullet's own `visible` class
+// (the `.logo-strip` trick), which reverses correctly when stepped back.
+.reveal section#what-is-react.present h2 .dotcom { animation: none; }
+.reveal section#what-is-react.present:has(> ul > li:first-child.fragment.visible) h2 .dotcom {
+  animation: dotcom-in .8s ease forwards;
+}
 // A heading that is also a link is a heading first: the deck is published, so
 // the title of that slide is `react.dev`, but it must not take the link colour.
 .reveal h2 a { color: inherit; text-decoration: none; }
@@ -807,7 +812,7 @@ $presentation-block-margin: 44px !default;
 // shared height it reads a size larger than the six around it.
 .reveal .logo-strip img[src$="logo-tanstack.svg"] { height: 98px; }
 
-// -- deck-local: state -> UI, on "UI is assembled from data's state" ---------
+// -- deck-local: state -> UI, on "Components draw data's state" --------------
 // The point is that the picture is *derived*, so the whole chain sits on one
 // row: the raw waiting times and a bin count, the `data` they reduce to, and
 // the bars that data draws. Two of these stack in an `.r-stack`, so stepping
@@ -1179,9 +1184,10 @@ $presentation-block-margin: 44px !default;
 // The corner atom sits at the heading's own height, and its ink starts at 1674
 // (1624 + the atom's 20% inset), so a heading on one of these slides has 1578px
 // before it runs into the mark. No current heading is near that - the longest,
-// "UI is assembled from data's state", ends at 1463 - but an earlier draft of
-// that one came within 8px of the atom, which reads as a rendering bug. The cap
-// turns the next such heading into a visible wrap instead.
+// "Components draw data's state", ends at 1270 - but an earlier draft of that
+// one ran 1883 and wrapped, and one before that came within 8px of the atom,
+// which reads as a rendering bug. The cap turns the next such heading into a
+// visible wrap instead of a collision.
 .reveal section:has(.hexreact.corner) > h2 { max-width: 1578px; }
 
 // -- the flight --------------------------------------------------------------
@@ -1268,14 +1274,11 @@ $presentation-block-margin: 44px !default;
   ul { margin-top: 0; margin-bottom: 32px; }
 }
 
-// One slide's panel runs long enough that 34px hangs into the footer. 32px is
-// DESIGN.md 9's floor for code, not a licence to shrink any block that is
-// awkward - shorten the code first, and only then reach for this.
-.reveal section.code-sm pre { font-size: 32px; }
-
-// Hand-drawn marks over parts of a code panel ("Ownership, moves to server":
-// an X through the renderUI, then a circle round the four `output$distPlot`
-// lines that survive it). Absolute against the section - reveal positions
+// Hand-drawn marks over parts of a code panel ("JavaScript, in a string": an X
+// through the two `HTML("…")` bodies). `.circle-mark` is the unused partner -
+// it said "this stays" next to the X's "this goes" on an earlier version of
+// that slide; kept because the pair is one rule and the gesture may come back
+// on `## Ownership`. Absolute against the section - reveal positions
 // sections absolutely, so they are already the containing block; do not add
 // `position: relative` (see the note above). Both boxes are measured off the
 // rendered slide (getBoundingClientRect over the section, divided by reveal's
@@ -1328,12 +1331,20 @@ $presentation-block-margin: 44px !default;
 
 // The X is two strokes, so the second waits for the first rather than both
 // appearing at once - one hand, two goes.
+//
+// The box is the two `HTML("…")` bodies plus ~20px of air: the CSS and JS lines
+// measure 151->1416 across and 526->798 down on the rendered slide. It
+// deliberately does not cover the R around them - the scaffolding is fine, and
+// an X over the whole panel would read as "Shiny is wrong". Measure those lines
+// specifically, not every `span.st` in the block: `uiOutput("cards")` holds a
+// perfectly ordinary R string, and including it stretched the X over the last
+// two lines.
 .reveal .x-mark {
   path { stroke: $mark-red; }
-  left: 796px;
-  top: 332px;
-  width: 1019px;
-  height: 329px;
+  left: 131px;
+  top: 506px;
+  width: 1305px;
+  height: 312px;
   &.visible path:last-child { animation-delay: .22s; }
 }
 

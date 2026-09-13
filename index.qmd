@@ -122,36 +122,48 @@ The R UI is wonderful… until it isn't
 - For an app like this, `bslib` gets you from nothing to something to be *proud of*
 :::
 
-## Ownership, moves to server {.code-slide .code-sm}
+<!-- The hook for section 02, and the slide makes its own argument with no
+     annotation: skylighting colours an R string as a string, so the CSS and the
+     JS inside these `HTML("…")` bodies render as one flat colour while the R
+     around them is highlighted. That *is* what your editor shows you. Don't
+     "fix" the rendering - the flat block is the evidence, and the X only names
+     which part of it the talk is about.
+     This slide replaced a `renderUI` one: dynamic UI was the wrong defendant,
+     since `renderUI` is a perfectly good Shiny tool. The thing that hurts is
+     authoring a second language inside a quoted string, where no editor,
+     linter, formatter or test can reach it. It also pre-pays for the "Wait…
+     what?" meme two slides later - by the time "You want me to write
+     JavaScript?!?" lands, the room has already put its hands up to writing
+     it. -->
+## JavaScript, in a string {.code-slide}
 
-::: {.columns}
-::: {.column .fragment width="38%"}
-```{.r filename="UI"}
-ui <- bslib::page_fillable(
-  uiOutput("app")
+<!-- The question is up on arrival rather than on a click, so the show of hands
+     happens while the panel is still blank and the code lands as the answer. -->
+::: {.nonincremental}
+- How many of you have written JavaScript or CSS as a string in R?
+:::
+
+::: {.fragment}
+```{.r filename="app.R"}
+ui <- bslib::page_sidebar(
+  tags$head(tags$style(HTML("
+    .stat-card { display: grid; gap: .5rem; cursor: pointer; }
+  "))),
+  tags$script(HTML("
+    $(document).on('click', '.stat-card', function() {
+      Shiny.setInputValue('card_clicked', this.dataset.id);
+    });
+  ")),
+  uiOutput("cards")
 )
 ```
 :::
-::: {.column .fragment width="62%"}
-```{.r filename="Server"}
-server <- function(input, output) {
-  output$app <- renderUI({
-    req(has_state())
-    bslib::card(
-      sliderInput("bin_count", "Bins:", 1, 50, 30),
-      plotOutput("distPlot")
-    )
-  })
 
-  output$distPlot <- renderPlot({
-    x <- faithful$waiting
-    hist(x, breaks = input$bin_count)
-  })
-}
-```
-:::
-:::
-
+<!-- Aimed at the JS body alone, not at the whole panel: the R scaffolding is
+     fine, and an X over all of it would read as "Shiny is wrong". Measured off
+     the rendered slide; re-measure if the block's length or font size changes.
+     Its partner `.circle-mark` is unused for now - the "this stays" gesture
+     belongs on the `## Ownership` slide if it comes back. -->
 ::: {.x-mark .fragment}
 ```{=html}
 <svg viewBox="0 0 1019 329" aria-hidden="true">
@@ -161,30 +173,41 @@ server <- function(input, output) {
 ```
 :::
 
-::: {.circle-mark .fragment}
-```{=html}
-<svg viewBox="0 0 940 370" aria-hidden="true">
-  <path pathLength="100" d="M 903 253 C 892 342, 683 383, 463 378 C 232 373, 37 342,
-    33 216 C 29 87, 235 24, 470 19 C 698 13, 899 68, 911 185 C 918 278, 852 339,
-    760 370" />
-</svg>
-```
-:::
-
 ::: {.notes}
-- Then a request comes in:
-  - a distinctive interface
-  - richer interaction
-  - a component from a modern design system
-- Suddenly you're authoring an uphill battle of markup, styling, and interaction details
+*Ask it. Wait for the hands.* Then thin them out, one question at a time — each
+one should drop some hands and leave the rest more committed:
 
-But the reactive data model is your domain expertise
+- "Keep them up if that string was more than **ten** lines." *(most stay up)*
+- "Keep them up if it was more than a **hundred**." *(fewer — and those are the
+  people this talk is for)*
+- "Keep them up if you wrote it without **one squiggly underline** telling you
+  you'd made a typo." *(they all stay up; nothing in R was ever going to
+  underline it)*
+- *(hands down)* "And how many of you have thought about just using a **real
+  JavaScript framework** instead?" *(hands again — this is the turn; the room
+  has already had the idea, and the rest of the talk is permission to act on
+  it)*
 
-- I do **not** want to replace Shiny
+`bslib` got us from nothing to something to be proud of. Then a request comes
+in — a distinctive interface, richer interaction, a component from a modern
+design system — and there is no `bslib` function for it. So you reach for this.
 
-Keep Shiny for **reactive computation**.
+And look at what the slide is showing you. All of that is one colour, because
+to R it is one thing: **text**.
 
-Use a modern UI ecosystem — **React.js** — for the interface.
+- Your editor thinks this is a string.
+- Your linter thinks this is a string.
+- Your formatter, your tests, your diff — all of them think this is a string.
+
+It's a program.
+
+So: you are *already* writing JavaScript. You are just writing it in the one
+place where nothing can help you. Hold onto that — we come back to it.
+
+I do **not** want to replace Shiny. The reactive data model is your domain
+expertise. Keep Shiny for **reactive computation**, and use a modern UI
+ecosystem — **React.js** — for the interface. React is not adding JavaScript to
+your app; it is taking the JavaScript you already wrote *out of the string*.
 :::
 
 
@@ -199,6 +222,14 @@ Use a modern UI ecosystem — **React.js** — for the interface.
 
 ::: {.notes}
 At this point you might be thinking… "You want me to write JavaScript?!?"
+
+<!-- The payoff for the show of hands two slides ago, on "JavaScript, in a
+     string" - whose notes promise "we come back to it". This is where. Don't
+     retire one of those slides without the other. -->
+And the honest answer is: **you already do.** Every hand that went up a minute
+ago was a hand that has written JavaScript. The question was never *whether* —
+it is whether you write it somewhere your tools can see it, or inside a quoted
+string where nothing can.
 
 That is the big question in the room, so let's take it now. Joe Cheng has
 always said Shiny authors shouldn't need to write JavaScript — and I believe
@@ -239,7 +270,7 @@ build those interfaces out of individual pieces called components.
 <div class="hexreact corner"><div class="hr-atom"></div></div>
 
 ::: {.incremental}
-- A component is a function that returns markup.
+- A component is a function that returns HTML-like markup.
 :::
 
 <!-- One component, defined once and used twice - the smallest honest picture of
@@ -285,12 +316,14 @@ function Stat({ label, value }) {
 :::
 
 ::: {.notes}
-A component is a function that returns markup. Define `Stat` once, and you use
+A component is a function that returns HTML-like markup. Define `Stat` once, and you use
 it as `<Stat>` — twice here, and it draws twice. That is the whole idea: you
 name a piece of UI, and then you reuse it.
 :::
 
-## UI is assembled from data's state
+<!-- The id is kept from the old "UI is assembled from data's state" wording, so
+     the published deck's slide address survives the rename. -->
+## Components draw data's state {#ui-is-assembled-from-datas-state}
 
 <div class="hexreact corner"><div class="hr-atom"></div></div>
 
@@ -453,8 +486,12 @@ Shiny's entire 14-year total on CRAN, which is about 50 million.
 - 🤖 AI excels at building well-known frameworks
 
 ::: {.notes}
-Hands up if you've ever hand-rolled HTML and JavaScript into a Shiny app. It
-works — right up until the app gets big, and then you are the framework.
+<!-- Do NOT ask for hands here: the "JavaScript, in a string" slide already did,
+     and asking twice reads as having forgotten. Refer back instead - the hands
+     are the evidence this bullet rests on, and they are already in the room's
+     memory. -->
+Those hands you put up earlier — that is this first bullet. It works, right up
+until the app gets big, and then *you* are the framework.
 
 I'm happy to do car maintenance with a multitool. But using the proper tool for
 the job saves time, effort, and the skin on your knuckles. React is that tool:
@@ -627,6 +664,12 @@ UI inputs and outputs now live in TypeScript.
 Now let's look at the UI definitions.
 
 Note that you're signing up for all UI inputs and outputs living in TypeScript!
+
+<!-- Half of that "cost" is a refund, given the section-01 string slide. Say so
+     here or the slide reads as pure downside. -->
+Which sounds like a cost — and some of it is. But remember where we started: if
+you were already writing the interesting parts of the UI as JavaScript in a
+string, this is not new work. It is the same work, in a file, with types.
 :::
 
 ## React {#react-ui .code-slide auto-animate="true"}
@@ -717,6 +760,21 @@ const bins = useShinyOutputValue<HistData>("distPlot", null);
 
 ::: {.fragment}
 R computes the value; React decides how it looks.
+:::
+
+::: {.notes}
+<!-- The visual payoff for "JavaScript, in a string": that slide's
+     `Shiny.setInputValue(...)` and this slide's `useShinyInput<number>(...)` do
+     the same job, and the audience has seen both. One was flat green. -->
+Compare the first line to what we had in section 01. Getting a value out of the
+browser and into R was `Shiny.setInputValue('card_clicked', …)` — inside a
+string, flat green, unchecked by anything.
+
+Here it is the same job, with a **type** on it. Your editor knows `bin_count` is
+a number. It will autocomplete it, and it will tell you when you get it wrong.
+
+That is the whole trade: the JavaScript you were already writing, moved
+somewhere it can be read.
 :::
 
 ## Live: Old Faithful w/ `shinyreact` {.demo-slide .demo-titled}
@@ -821,6 +879,12 @@ The other three hops, in a line each: `wire_tap` asserts on the `shinyreact`
 messages crossing the websocket; the client's own unit tests are the agent's
 choice of JS runner; and `features.md` is a nested list of features you can read
 and other agents can confirm against.
+
+<!-- Callback to "JavaScript, in a string": the third hop is only available
+     because the client is a file now. -->
+That third hop is worth a beat. The JavaScript in section 01 had no tests, and
+could not have had any — you cannot unit-test a string. Getting it into a file
+is what put it on this list at all.
 :::
 
 ## In the wild {.divider data-number="06"}
@@ -1102,6 +1166,14 @@ posit / Shiny Team
 - **No** — but highly recommended
 - TSX is much more readable than vanilla JavaScript
 - A build system can lint and strongly type your code
+
+::: {.notes}
+<!-- The third bullet is the direct answer to the section-01 string slide - lean
+     on it if this question comes up. -->
+That last bullet is the whole reason we started where we did. The complaint
+about JavaScript in a string was never about JavaScript — it was that nothing
+could lint it, type it, or format it. A build step is what buys all three back.
+:::
 
 ## How do I review generated code? {visibility="hidden"}
 
