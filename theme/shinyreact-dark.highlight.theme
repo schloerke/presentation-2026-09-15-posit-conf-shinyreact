@@ -1,5 +1,5 @@
 {
-  "_comment": "Pandoc/KDE highlight theme. Colours are DESIGN.md 4.1, measured against the #141519 code panel; every one clears 7:1. Sibling of shinyreact-dark.theme (the `highlight` Lua file used for Keynote clipboard pastes) - keep the two in sync.",
+  "_comment": "Pandoc/KDE highlight theme. Colours are DESIGN.md 4.1, measured against the #141519 code panel; every one clears 7:1.",
   "text-color": "#f2f4f8",
   "background-color": "#141519",
   "line-number-color": "#9aa3b2",

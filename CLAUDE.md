@@ -13,11 +13,8 @@ index.qmd                  the deck (Quarto revealjs) - primary authoring surfac
 theme/DESIGN.md            the design spec - single source of truth for the look
 theme/shinyreact-dark.scss revealjs theme, ported from DESIGN.md
 theme/shinyreact-dark.highlight.theme  pandoc code colours (DESIGN.md 4.1)
-theme/build_theme.py       generates the Keynote/pptx theme from the same spec
 theme/fonts.scss           the DESIGN.md faces, inlined as data URIs (generated)
 theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
-theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
-theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 theme/qr-repo.svg          QR to this repo, bottom-centre of the title/end slides
 theme/qr-showcase.svg      QR to the app gallery, on the "Samuel Bharti" slide
 theme/fit-width.html       scales the deck to the window's width, not its box
@@ -31,9 +28,9 @@ _extensions/drop/          quarto-drop (webR console in a drawer)
 _extensions/EmilHvitfeldt/ quarto-revealjs-editable (live slide editing)
 ```
 
-**`theme/DESIGN.md` outranks both renderers.** The SCSS and `build_theme.py` are
-two ports of it. If a colour, size, or margin needs to change, change DESIGN.md
-first, then both ports — otherwise they silently drift.
+**`theme/DESIGN.md` outranks the renderer.** The SCSS is a port of it. If a
+colour, size, or margin needs to change, change DESIGN.md first, then the port —
+otherwise they silently drift.
 
 ## Working on the deck
 
@@ -122,7 +119,7 @@ image in the repo root; if one is already there, delete it rather than adding
 it to a commit or `.gitignore`.
 
 The canvas is **1920x1080** (set in the qmd), which is why the SCSS uses the
-same px values DESIGN.md and `build_theme.py` do. Do not rescale them; reveal
+same px values DESIGN.md does. Do not rescale them; reveal
 fits the canvas to the viewport.
 
 `theme/fit-width.html` (wired in via `include-after-body`) makes the deck scale
@@ -1333,7 +1330,7 @@ Types in use here: `feat` (new slide, demo, or app), `fix`, `docs` (this file,
 `outline.md`, `DESIGN.md` prose), `style` (theme/SCSS/typography), `refactor`,
 `chore` (CI, deps, vendored assets), `build`.
 
-Scopes are the repo's own nouns: `deck`, `theme`, `apps`, `wasm`, `ci`, `keynote`.
+Scopes are the repo's own nouns: `deck`, `theme`, `apps`, `wasm`, `ci`.
 
 ```
 feat(deck): add a React-only Old Faithful demo
@@ -1373,15 +1370,6 @@ These were measured, not estimated (DESIGN.md 9). Verify, don't assume:
 - One motif per slide (hexagon / orbit / swoosh). See DESIGN.md 8.
 - `#00D8FF` is graphic-only; text cyan is `#6FD4E8` (fringing, not contrast).
 - Chart series colours are assigned in fixed order and never cycled.
-
-Check work against `theme/preview/master-N-blank.png`, which is what the Keynote
-theme actually produces.
-
-## The Keynote path
-
-Still live, for when Keynote's presenter tooling is wanted. See
-`theme/README.md` — in particular that Save Theme captures *master slides*, not
-content slides, and must be run from the right window.
 
 ## Reference
 
