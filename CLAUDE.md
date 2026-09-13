@@ -112,6 +112,12 @@ zeroes the margin on the `<p>` quarto wraps the image in, which otherwise puts
 the code through the bottom of the canvas. 140px on the 1920 canvas decodes
 fine — verified by decoding it back out of a screenshot of the rendered slide.
 
+`images/samuel-bharti.png` is Samuel's own studio headshot, resized from
+`assets/photos/sb-headshot-1.jpeg` on his resource site (1073px square there;
+880px here, 2x the slide's 440). It replaced a 400px avatar that was being
+upscaled. The site's "Headshot 2" is a casual shot with sunglasses — not slide
+material.
+
 `theme/qr-repo.svg` and `theme/qr-showcase.svg` are generated; regenerate one
 if its URL changes:
 
@@ -240,6 +246,34 @@ source of truth for all three addresses (deployment, source, Zenodo DOI) — the
 deployment URL is *derived* there, as
 `https://<pcc-account>-<app>.share.connect.posit.cloud/`, so read it from that
 file rather than guessing. The README carries the full table.
+
+The gallery is **ten** apps, not nine: six under `samuelbharti/` (with versions
+and DOIs) and four inside `posit-dev/shiny-showcase-bioinformatics` itself.
+Samuel's own resource site lists all ten with every address, and is easier to
+read than `apps.yml`: <https://www.samuelbharti.com/genomes-prompts-shiny/> —
+note its tables are empty in the HTML and come from `data/apps.json` and
+`data/packages.json`, so fetch those two files, not the page.
+
+**The README's DOIs are the Zenodo *concept* DOIs, deliberately.** Every app
+has two: a concept DOI that always resolves to the newest version, and a
+version DOI pinned to one release. The README shipped version DOIs at first and
+went stale within weeks — its variant-reviewer entry pointed at v2.3.1 after
+v2.3.2 was out. Samuel's `apps.json` lists the concept ones, which is what the
+README now carries. To tell them apart, ask Zenodo for the version record: its
+`conceptrecid` field *is* the concept id (`curl -s
+https://zenodo.org/api/records/<id>`). Querying a concept id through that API
+404s — it only redirects in a browser — so a 404 there is the confirmation, not
+a failure.
+
+**Samuel's "high-res thumbnails" are illustrations, not screenshots.**
+`assets/app-thumbnails/*.png` are 4800x3200 marketing cards: cream ground, a
+mascot, their own title and caption typography, and — on the Plotomics one — a
+hand-drawn field of a few hundred dots under a stylized "1,000,000". Lovely,
+and wrong for this deck twice over: they fight the `$ink` ground, and they
+replace evidence of the app with a drawing of it. The slide's own claim is that
+these are the real apps, so the zoomed crops stay. His `assets/demo/*.mp4` are
+likewise out — 12.7 MB for the Plotomics gallery tour against the 4.0 MB Xenium
+clip, and a tour rather than the four beats that slide is cut to.
 
 Two lines per app is the ceiling: five apps at two lines each already reach
 966px of the 1080 canvas, so a wrapped sub-bullet pushes the fifth caption off
