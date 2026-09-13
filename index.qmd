@@ -332,7 +332,7 @@ removes, or resizes a bar.
 
 <div class="hexreact corner"><div class="hr-atom"></div></div>
 
-```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,5,6|3,4,5,6|11-12|13"}
+```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,5,6|3,4,5,6|11|11-12|13"}
 function App() {
   const [binCount, setBinCount] = useState(30);
   const bins = useMemo(
