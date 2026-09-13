@@ -790,8 +790,8 @@ somewhere it can be read.
 #| viewerHeight: 1080
 
 ## file: app.R
-# `shinyreact` (and `brio`) are mounted from the deck's own assets by
-# bundle-wasm.R, so nothing is installed at runtime. See CLAUDE.md.
+# shinylive bundles `shinyreact` (and `brio`) into the render at build time,
+# so nothing is installed at runtime. See CLAUDE.md.
 {{< include apps/01-shinyreact/app.R >}}
 
 ## file: www/index.html

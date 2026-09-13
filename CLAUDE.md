@@ -8,7 +8,6 @@ document to support future sessions.
 
 ```
 outline.md                 the talk's narrative, in speaker-note form
-bundle-wasm.R              post-render: vendors wasm-repo/ into the render
 index.qmd                  the deck (Quarto revealjs) - primary authoring surface
 theme/DESIGN.md            the design spec - single source of truth for the look
 theme/shinyreact-dark.scss revealjs theme, ported from DESIGN.md
@@ -1279,75 +1278,47 @@ demo skip a bundler.)
 repo". Install the subdirectory:
 
 ```r
-pak::pak("posit-dev/shinyreact/pkg-r")
+pak::pak("posit-dev/shinyreact/pkg-r@r/v0.1.0")
 ```
 
-### Getting `shinyreact` into webR — the fiddly part
+### Getting `shinyreact` into webR — install it from the tagged release
 
-Four things had to line up. If any one regresses, the slide goes blank.
+**The tag is the whole mechanism.** `posit-dev/shinyreact`'s `r/v0.1.0` release
+carries `library.data.gz` + `library.js.metadata` (built by
+<https://github.com/r-wasm/actions>), and that is the one path shinylive has for
+a GitHub-installed package: at render time `prepare_wasm_metadata()` sees
+`RemoteType: github` in the *locally installed* DESCRIPTION and asks
+`/repos/{RemoteUsername}/{RemoteRepo}/releases/tags/{RemoteRef}` for those two
+assets. So:
 
-1. **`wasm-repo/` at the deck root** holds a webR-format binary of
-   `shinyreact`, because it is on neither CRAN nor repo.r-wasm.org. It is a
-   pure-R package, so a plain local build is enough — no emscripten toolchain:
+- **Install with the tag, everywhere** — locally and in `publish.yml`. A plain
+  `pak::pak("posit-dev/shinyreact/pkg-r")` records `RemoteRef: HEAD`, there is
+  no release named `HEAD`, and the render *aborts* ("Can't find GitHub release").
+  The slash in the tag is fine; `gh::gh()` does not escape it.
+- **Bump both together** when a newer release lands, or the deck ships an older
+  wasm binary than the code on the slides.
+- `brio` — the one `shinyreact` Import not already in shinylive's library image
+  — needs nothing: it is on CRAN, so shinylive pulls its wasm binary from
+  repo.r-wasm.org at render time like any other dependency.
+- Both land in `_site/…/shinylive-0.10.8/shinylive/webr/packages/` with a
+  `metadata.rds`, which is what the runtime's `.mount_vfs_images()` reads
+  *before* `.start_app()`'s "install anything the app imports" loop. So nothing
+  is fetched at runtime. Check that directory after a render; it is the tell.
 
-   ```bash
-   git clone --depth 1 https://github.com/posit-dev/shinyreact /tmp/sr
-   R CMD INSTALL --build --library=/tmp/lib /tmp/sr/pkg-r      # -> .tgz
-   mkdir -p wasm-repo/bin/emscripten/contrib/4.5
-   cp shinyreact_*.tgz wasm-repo/bin/emscripten/contrib/4.5/
-   Rscript -e 'tools::write_PACKAGES("wasm-repo/bin/emscripten/contrib/4.5", type = "mac.binary")'
-   ```
+Two things this still needs:
 
-   `4.5` must match webR's R version, **not** yours: shinylive 0.10.8 runs
-   R 4.5.1. Building under a local R 4.5.x is what keeps it loadable — a 4.6
-   build would be the wrong series. (Verified by probing shinylive's own
-   `webr.mjs`: `R version 4.5.1`, `wasm32-unknown-emscripten`.)
-
-   `wasm-repo/` also carries **`brio`** — the one `shinyreact` Import that is
-   not already in shinylive's library image. It needs no local build; it is the
-   prebuilt wasm binary, fetched once:
-
-   ```bash
-   curl -O https://repo.r-wasm.org/bin/emscripten/contrib/4.5/brio_1.1.5.tgz
-   ```
-
-   (Re-run `write_PACKAGES` after adding anything.)
-
-2. **`bundle-wasm.R` copies both into the render** as a quarto `post-render`
-   step, writing the `packages/metadata.rds` that shinylive's runtime
-   `.mount_vfs_images()` reads. That runs *before* `.start_app()`'s "install
-   anything the app imports" loop, so by the time the loop looks, both packages
-   are installed and it asks no repo for anything.
-
-   This replaced a `webr::install("shinyreact", repos = …)` call in the slide
-   block. Don't put it back: it ran *after* `.start_app()` had already tried and
-   failed to find `shinyreact` on repo.r-wasm.org, i.e. one guaranteed off-origin
-   request on the venue's wifi before the local install could rescue it.
-
-3. **`_environment`** carries `SHINYLIVE_WASM_PACKAGES=0`. Without
-   it the render *fails*: shinylive sees `shinyreact` installed from a GitHub
-   remote and calls `get_github_wasm_assets()`, which looks for a GitHub release
-   tagged with the install's `RemoteRef` (`HEAD`) carrying `library.data` +
-   `library.js.metadata` assets. `posit-dev/shinyreact` has no releases, so
-   `gh::gh()` 404s. The env var skips render-time wasm bundling entirely, and
-   `bundle-wasm.R` does the bundling instead. `_quarto.yml` exists so quarto
-   reads `_environment` (it does that for projects, not single-file renders) and
-   to hold the `post-render` hook.
-
-4. **The `www/` files ship as `## file:` entries** in the block, because
-   `page_react_html()` does `brio::read_file("www/index.html")` inside the webR
-   VFS.
-
-**The clean way out of all four:** publish a GitHub release on
-`posit-dev/shinyreact` with WebAssembly assets built by
-<https://github.com/r-wasm/actions>. Then shinylive resolves the package itself
-and steps 1–3 all delete. Adding the package to an r-universe does *not* help —
-r-universe wasm builds are currently R 4.6 only (`bin/emscripten/contrib/4.6/`),
-and shinylive keys off GitHub releases rather than the r-universe repo.
+- **The `www/` files ship as `## file:` entries** in the block, because
+  `page_react_html()` does `brio::read_file("www/index.html")` inside the webR
+  VFS.
+- **`_quarto.yml`**, but only for the resources — the `SHINYLIVE_WASM_PACKAGES=0`
+  escape hatch (and the `_environment` file that carried it, and the
+  `bundle-wasm.R` post-render hook, and the hand-built `wasm-repo/`) are all
+  gone. `git log` has them if the release ever disappears.
 
 The `preload error:` console lines are webR writing to stderr, not failures;
-`package 'shinyreact' was built under R version 4.5.2` is a harmless warning
-from the local build.
+`package 'shinyreact' was built under R version 4.6.0` is a harmless warning —
+the release's binary is built under 4.6 and webR runs 4.5.1, which a pure-R
+package survives.
 
 ### Running the demos offline — done, keep it that way
 
@@ -1369,11 +1340,12 @@ The four things that hold it up:
    python3 -c "import json;print(sorted({f['filename'].split('/')[1] for f in json.load(open('_site/index_files/libs/quarto-contrib/shinylive-0.10.8/shinylive/webr/library.js.metadata'))['files']}))"
    ```
 
-   So `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` and the 30-package / 20 MB
-   recursive-dependency bundling described on issue #7 are **not needed** — the
-   only gaps were `shinyreact` and `brio`.
+   So `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` is **not needed** — shinylive's
+   own bundler already skips `shiny`/`bslib`/`renv` and their dependencies, and
+   the only gaps were `shinyreact` and `brio`.
 
-2. **`bundle-wasm.R`** puts those two in the render (above).
+2. **shinylive bundles those two at render time** (above), from the tagged
+   GitHub release and from repo.r-wasm.org respectively.
 
 3. **Fonts are inlined.** `theme/fonts.scss` is generated by
    `theme/build_fonts.py`: the DESIGN.md 5.1 faces as variable-weight woff2
@@ -1414,15 +1386,15 @@ chore(wasm): refresh the vendored shinyreact build for R 4.5
 
 `.github/workflows/publish.yml` renders on every push to `main` and deploys
 `_site/` to GitHub Pages (Settings → Pages → Source: **GitHub Actions**). It
-needs the same three things a local render does, which is all the workflow is:
+needs the same two things a local render does, which is all the workflow is:
 
 - Quarto, plus `quarto install chromium` — `mermaid-format: svg` pre-renders
   the diagram with headless Chrome.
-- R 4.5 with `shinylive` and `shinyreact` installed (the shinylive filter reads
-  the app's installed packages).
-- `wasm-repo/`, which is checked in, so `bundle-wasm.R` has nothing to fetch.
-  Building it in CI with <https://github.com/r-wasm/actions> instead is the
-  alternative, and only worth it if the checked-in binary goes stale.
+- R with `shinylive` and `shinyreact` installed (the shinylive filter reads the
+  app's installed packages). `shinyreact` must be installed **at its release
+  tag**, `posit-dev/shinyreact/pkg-r@r/v0.1.0` — see the webR section above; at
+  `HEAD` the render aborts. The render fetches the wasm binaries (the release's
+  assets, plus `brio` from repo.r-wasm.org), so CI needs network for that step.
 
 `apps/01-shinyreact` is upstream's `examples/01-hello` with the bundle renamed
 `app.js`/`app.tsx`, so upstream is the reference when something is missing —

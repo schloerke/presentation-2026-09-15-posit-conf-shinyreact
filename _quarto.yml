@@ -1,6 +1,3 @@
-# Only here so quarto reads `_environment` (it does that for projects, not for
-# single-file renders) - that file carries SHINYLIVE_WASM_PACKAGES=0, which the
-# shinyreact shinylive app needs. See CLAUDE.md.
 project:
   type: default
   render:
@@ -20,6 +17,3 @@ project:
     # the Plotomics Live recording is a `<video>`. Without this the slide is a
     # black box in a served render.
     - images/*.mp4
-  # Bundles wasm-repo/ into the render so the deck runs with no network.
-  post-render:
-    - bundle-wasm.R

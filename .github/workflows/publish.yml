@@ -34,12 +34,14 @@ jobs:
       # There is no package here, so `packages` replaces the `local::.` default.
       - uses: rstudio/shiny-workflows/setup-r-package@v1
         with:
-          # Must match webR's R series - see the wasm-repo/ notes in CLAUDE.md.
           r-version: "4.5"
           cache: always
+          # The tag is load-bearing: shinylive looks for the Wasm assets on the
+          # GitHub release named by the install's RemoteRef, and plain `HEAD`
+          # has no release. See CLAUDE.md.
           packages: |
             any::shinylive
-            posit-dev/shinyreact/pkg-r
+            posit-dev/shinyreact/pkg-r@r/v0.1.0
 
       # shinylive's web assets are deliberately *not* cached. They live outside
       # the R library (`~/.cache/shinylive`), so the package cache above misses
