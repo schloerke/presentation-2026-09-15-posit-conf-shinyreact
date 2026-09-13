@@ -8,7 +8,6 @@ document to support future sessions.
 
 ```
 outline.md                 the talk's narrative, in speaker-note form
-bundle-wasm.R              post-render: vendors wasm-repo/ into the render
 index.qmd                  the deck (Quarto revealjs) - primary authoring surface
 theme/DESIGN.md            the design spec - single source of truth for the look
 theme/shinyreact-dark.scss revealjs theme, ported from DESIGN.md
@@ -187,7 +186,7 @@ uv run --with segno python -c "import segno; segno.make('https://posit-shiny-sho
 The showcase QR encodes the **deployed gallery**, not the repo the bullet next
 to it links to: one bullet, two doors — the text is the source, the code is the
 thing. Samuel's own site needs no QR; the heading's `[.com]{.dotcom}` gag spells
-his address out, and the four package bullets already link into it.
+his address out, and the five package bullets already link into it.
 
 **Both QRs are links as well as codes**, because the deck is published and a
 viewer reading it on a laptop cannot scan their own screen. Both open in a new
@@ -408,8 +407,8 @@ the rendered slide, not at the crop.
 
 ### `.pkg-slide` — "Summer Packages", as a honeycomb
 
-"Summer Packages" is the app slide's construction reused: four
-one-item `.nonincremental` fragment divs on the left, four hex logos on the
+"Summer Packages" is the app slide's construction reused: five
+one-item `.nonincremental` fragment divs on the left, five hex logos on the
 right, each pair sharing a `fragment-index` so they land on one click. Unlike
 the app slide the hexes **accumulate** (plain `.fragment`, not
 `.fade-in-then-out`), so the honeycomb builds up as the bullets do.
@@ -418,8 +417,23 @@ Its one-liners and its ordering (validate → fetch → transport) are Samuel's
 own, from
 <https://github.com/samuelbharti/bio-packages/blob/main/slides/>; `packages.yml`
 in the showcase repo is the source of truth for what each package is and which
-languages it ships. `plotomics` is the fourth and is not part of that trio — it
-earns its line because it is what Plotomics Live draws two slides later.
+languages it ships. `biocohort` and `plotomics` are fourth and fifth and are
+not part of that trio — `plotomics` earns its line because it is what Plotomics
+Live draws two slides later, and `biocohort` (R only, r-universe rather than
+CRAN) because it is the object the study itself lives in. There is no
+`slides/biocohort.qmd` upstream, so its line was written from the package's own
+DESCRIPTION and README.
+
+**The hex source of truth is each package's `pkg-r/man/figures/logo.svg`.**
+Samuel's site lists `biocohort`'s logo as a **png** (240x277, exactly the
+slide's own hex size but raster), which is not what to vendor — the repo has
+the svg, already drawn on the same 173.2x200 pointy-top viewBox the other
+packs use, so it drops straight in.
+
+**Five hexes means three rows, and rows alternate.** `img:nth-child(n + 3)`
+pulls every row after the first up by 69.3px and shifts it 120px across;
+`img:nth-child(n + 5)` then takes the shift *back* off row 3, which is what
+puts the fifth hex over row 1's columns instead of floating half a width out.
 
 The languages are **the R and Python marks in the slide's own hexagon**, not
 the text `[r, py]`: `images/lang-r.svg` and `images/lang-py.svg`, each a
@@ -453,7 +467,8 @@ slide, not the file, before shrinking them again.
 
 **The languages were checked against the registries, not against prose.**
 `biobouncer` and `plotomics` are each on CRAN and PyPI; `biohttp` is CRAN and R
-only; `bioclients` is R only and is on r-universe rather than CRAN. Both of the
+only; `bioclients` and `biocohort` are R only and are on r-universe rather than
+CRAN. Both of the
 first two are *also* on npm — their repos are monorepos with `pkg-r` /
 `pkg-py` / `pkg-js`, and the JS is the TypeScript core the other two are built
 out of — but the slide deliberately does not tag that: it is an implementation
@@ -463,24 +478,24 @@ would install. Upstream's own `packages.yml` is out of date here (it lists
 re-check the registries rather than copying it.
 
 Each `li` is itself a **three-column grid** — name, language badge, then the
-"– description", which grid wraps in an anonymous item for free — so the four
+"– description", which grid wraps in an anonymous item for free — so the five
 en-dashes line up into a gutter and the block reads as a table. The tracks are
 fixed px, not `max-content`: each bullet is its own one-item list (it has to
 be, to carry a `fragment-index`) and separate grids cannot share a track size.
 Measure the widest name and the widest tag before changing them, and re-check
 that no description wraps — the description column is what is left over.
 The badge cell is `justify-self: start`, so the R hex lands in the same column
-on all four rows and the Python one extends to its right; `end` instead put a
+on all five rows and the Python one extends to its right; `end` instead put a
 lone R under the *second* badge of the rows above it. The dash is an en dash, not the
 em dash the rest of the deck's prose uses: an em dash costs about 15px here,
 which was the difference between `biohttp`'s line fitting and wrapping. The
 cyan rule is `position: absolute`, so it stays out of the tracks.
 
-The pack is one `<p>` (four images, no blank lines between them, so pandoc
+The pack is one `<p>` (five images, no blank lines between them, so pandoc
 keeps them in one paragraph) with `display: grid` **on the `p`**, which is what
 makes the images grid items and lets `nth-child` count them.
 
-- **All four logos are pointy-top hexes on a 173.2x200 viewBox** (ratio 0.866).
+- **All five logos are pointy-top hexes on a 173.2x200 viewBox** (ratio 0.866).
   That is what makes the tessellation exact: pointy-top hexes have vertical
   left and right edges, so two in a row touch at exactly one width, and the
   next row interlocks at 0.75 of a height down and half a width across (hence
@@ -490,11 +505,12 @@ makes the images grid items and lets `nth-child` count them.
 - **`biobouncer`'s own `logo.svg` is padded** inside a 440x500 box, so
   `images/pkg-biobouncer.svg` is the upstream file with its viewBox cropped to
   the hex itself (`41 32 358 416`). Without that it packs a size small and the
-  honeycomb has a hole. The other three are copies of the showcase repo's
-  `thumbnails/`.
+  honeycomb has a hole. `biocohort` comes from its own repo's
+  `pkg-r/man/figures/logo.svg`; the other three are copies of the showcase
+  repo's `thumbnails/`.
 - **Both dimensions are set on the images, with both maxes off.** Quarto caps
   an image at the height of its box; the second row's box is short (negative
-  top margin), so `height: auto` let those two shrink and the four hexes came
+  top margin), so `height: auto` let those two shrink and the hexes came
   out at different sizes.
 
 ### `.gif-slide` — Plotomics Live, as a recording
@@ -1293,99 +1309,69 @@ demo skip a bundler.)
 repo". Install the subdirectory:
 
 ```r
-pak::pak("posit-dev/shinyreact/pkg-r")
+pak::pak("posit-dev/shinyreact/pkg-r@r/v0.1.0")
 ```
 
-### Getting `shinyreact` into webR — the fiddly part
+### Getting `shinyreact` into webR — install it from the tagged release
 
-Four things had to line up. If any one regresses, the slide goes blank.
+**The tag is the whole mechanism.** `posit-dev/shinyreact`'s `r/v0.1.0` release
+carries `library.data.gz` + `library.js.metadata` (built by
+<https://github.com/r-wasm/actions>), and that is the one path shinylive has for
+a GitHub-installed package: at render time `prepare_wasm_metadata()` sees
+`RemoteType: github` in the *locally installed* DESCRIPTION and asks
+`/repos/{RemoteUsername}/{RemoteRepo}/releases/tags/{RemoteRef}` for those two
+assets. So:
 
-1. **`wasm-repo/` at the deck root** holds a webR-format binary of
-   `shinyreact`, because it is on neither CRAN nor repo.r-wasm.org. It is a
-   pure-R package, so a plain local build is enough — no emscripten toolchain:
+- **Install with the tag, everywhere** — locally and in `publish.yml`. A plain
+  `pak::pak("posit-dev/shinyreact/pkg-r")` records `RemoteRef: HEAD`, there is
+  no release named `HEAD`, and the render *aborts* ("Can't find GitHub release").
+  The slash in the tag is fine; `gh::gh()` does not escape it.
+- **Bump both together** when a newer release lands, or the deck ships an older
+  wasm binary than the code on the slides.
+- `brio` — the one `shinyreact` Import not already in shinylive's library image
+  — needs nothing: it is on CRAN, so shinylive pulls its wasm binary from
+  repo.r-wasm.org at render time like any other dependency.
+- Both land in `_site/…/shinylive-<version>/shinylive/webr/packages/` with a
+  `metadata.rds`, which is what the runtime's `.mount_vfs_images()` reads
+  *before* `.start_app()`'s "install anything the app imports" loop. So nothing
+  is fetched at runtime. Check that directory after a render; it is the tell.
 
-   ```bash
-   git clone --depth 1 https://github.com/posit-dev/shinyreact /tmp/sr
-   R CMD INSTALL --build --library=/tmp/lib /tmp/sr/pkg-r      # -> .tgz
-   mkdir -p wasm-repo/bin/emscripten/contrib/4.5
-   cp shinyreact_*.tgz wasm-repo/bin/emscripten/contrib/4.5/
-   Rscript -e 'tools::write_PACKAGES("wasm-repo/bin/emscripten/contrib/4.5", type = "mac.binary")'
-   ```
+Two things this still needs:
 
-   **`contrib/4.5` is our own filing, not a path shinylive reads.**
-   `bundle-wasm.R` copies the `.tgz` into the render and writes
-   `packages/metadata.rds` itself, so nothing ever resolves that directory as a
-   repo — name it after the R series you *built* under and move on.
-
-   Which R webR itself runs is set by the shinylive **web assets**, which are
-   set by the shinylive R package, which CI pins
-   (`.github/workflows/publish.yml`). Today that is two different runtimes and
-   both work:
-
-   | where | shinylive R pkg | assets | webR's R |
-   |---|---|---|---|
-   | CI / published | 0.5.0 (pinned) | 0.10.12 | 4.6.0 |
-   | a local dev install | 0.4.0.9000 | 0.10.8 | 4.5.1 |
-
-   A **pure-R** package built under 4.5 loads under either — verified by driving
-   all three demos on the published site, where the vendored 4.5 build runs on
-   webR 4.6.0 and only warns. So the series does not have to match; it would if
-   the package ever gained compiled code. Read both numbers off the render
-   rather than trusting this table — the assets version is the `shinylive-*/`
-   directory under `_site/index_files/libs/quarto-contrib/`, and webR's own R
-   version is the one file in it that says so in plain text (this is how the
-   4.6.0 above was measured, against the published site):
-
-   ```bash
-   D=index_files/libs/quarto-contrib/shinylive-0.10.12/shinylive/webr
-   curl -sL "https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/$D/vfs/usr/lib/R/library/translations/DESCRIPTION"
-   ```
-
-   `wasm-repo/` also carries **`brio`** — the one `shinyreact` Import that is
-   not already in shinylive's library image. It needs no local build; it is the
-   prebuilt wasm binary, fetched once:
-
-   ```bash
-   curl -O https://repo.r-wasm.org/bin/emscripten/contrib/4.5/brio_1.1.5.tgz
-   ```
-
-   (Re-run `write_PACKAGES` after adding anything.)
-
-2. **`bundle-wasm.R` copies both into the render** as a quarto `post-render`
-   step, writing the `packages/metadata.rds` that shinylive's runtime
-   `.mount_vfs_images()` reads. That runs *before* `.start_app()`'s "install
-   anything the app imports" loop, so by the time the loop looks, both packages
-   are installed and it asks no repo for anything.
-
-   This replaced a `webr::install("shinyreact", repos = …)` call in the slide
-   block. Don't put it back: it ran *after* `.start_app()` had already tried and
-   failed to find `shinyreact` on repo.r-wasm.org, i.e. one guaranteed off-origin
-   request on the venue's wifi before the local install could rescue it.
-
-3. **`_environment`** carries `SHINYLIVE_WASM_PACKAGES=0`. Without
-   it the render *fails*: shinylive sees `shinyreact` installed from a GitHub
-   remote and calls `get_github_wasm_assets()`, which looks for a GitHub release
-   tagged with the install's `RemoteRef` (`HEAD`) carrying `library.data` +
-   `library.js.metadata` assets. `posit-dev/shinyreact` has no releases, so
-   `gh::gh()` 404s. The env var skips render-time wasm bundling entirely, and
-   `bundle-wasm.R` does the bundling instead. `_quarto.yml` exists so quarto
-   reads `_environment` (it does that for projects, not single-file renders) and
-   to hold the `post-render` hook.
-
-4. **The `www/` files ship as `## file:` entries** in the block, because
-   `page_react_html()` does `brio::read_file("www/index.html")` inside the webR
-   VFS.
-
-**The clean way out of all four:** publish a GitHub release on
-`posit-dev/shinyreact` with WebAssembly assets built by
-<https://github.com/r-wasm/actions>. Then shinylive resolves the package itself
-and steps 1–3 all delete. Adding the package to an r-universe does *not* help —
-r-universe wasm builds are currently R 4.6 only (`bin/emscripten/contrib/4.6/`),
-and shinylive keys off GitHub releases rather than the r-universe repo.
+- **The `www/` files ship as `## file:` entries** in the block, because
+  `page_react_html()` does `brio::read_file("www/index.html")` inside the webR
+  VFS.
+- **`_quarto.yml`**, but only for the resources — the `SHINYLIVE_WASM_PACKAGES=0`
+  escape hatch (and the `_environment` file that carried it, and the
+  `bundle-wasm.R` post-render hook, and the hand-built `wasm-repo/`) are all
+  gone. `git log` has them if the release ever disappears.
 
 The `preload error:` console lines are webR writing to stderr, not failures;
-`package 'shinyreact' was built under R version 4.5.2` is a harmless warning
-from the local build.
+`package 'shinyreact' was built under R version 4.6.0` is a harmless warning —
+the release's binary is built under 4.6 and the webR you are looking at may run
+4.5.1, which a pure-R package survives.
+
+**Which webR you get is set by the shinylive R package, and CI pins it**
+(`.github/workflows/publish.yml`). The two are not the same today, which is why
+that warning appears locally and not on the published site:
+
+| where | shinylive R pkg | assets | webR's R |
+|---|---|---|---|
+| CI / published | 0.5.0 (pinned) | 0.10.12 | 4.6.0 |
+| a local dev install | 0.4.0.9000 | 0.10.8 | 4.5.1 |
+
+The pin matters because that column *is* the deck's runtime: unpinned, an
+upstream release re-cuts it on the next push, which is not a thing to discover
+on the morning of the talk. Read both numbers off a render rather than trusting
+this table — the assets version is the `shinylive-*/` directory under
+`_site/index_files/libs/quarto-contrib/`, and webR's own R version is the one
+file inside it that says so in plain text (this is how the 4.6.0 above was
+measured, against the published site):
+
+```bash
+D=index_files/libs/quarto-contrib/shinylive-0.10.12/shinylive/webr
+curl -sL "https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/$D/vfs/usr/lib/R/library/translations/DESCRIPTION"
+```
 
 ### Running the demos offline — done, keep it that way
 
@@ -1407,11 +1393,12 @@ The four things that hold it up:
    python3 -c "import json;print(sorted({f['filename'].split('/')[1] for f in json.load(open('_site/index_files/libs/quarto-contrib/shinylive-0.10.8/shinylive/webr/library.js.metadata'))['files']}))"
    ```
 
-   So `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` and the 30-package / 20 MB
-   recursive-dependency bundling described on issue #7 are **not needed** — the
-   only gaps were `shinyreact` and `brio`.
+   So `SHINYLIVE_DOWNLOAD_WASM_CORE_PACKAGES` is **not needed** — shinylive's
+   own bundler already skips `shiny`/`bslib`/`renv` and their dependencies, and
+   the only gaps were `shinyreact` and `brio`.
 
-2. **`bundle-wasm.R`** puts those two in the render (above).
+2. **shinylive bundles those two at render time** (above), from the tagged
+   GitHub release and from repo.r-wasm.org respectively.
 
 3. **Fonts are inlined.** `theme/fonts.scss` is generated by
    `theme/build_fonts.py`: the DESIGN.md 5.1 faces as variable-weight woff2
@@ -1452,15 +1439,15 @@ chore(wasm): refresh the vendored shinyreact build for R 4.5
 
 `.github/workflows/publish.yml` renders on every push to `main` and deploys
 `_site/` to GitHub Pages (Settings → Pages → Source: **GitHub Actions**). It
-needs the same three things a local render does, which is all the workflow is:
+needs the same two things a local render does, which is all the workflow is:
 
 - Quarto, plus `quarto install chromium` — `mermaid-format: svg` pre-renders
   the diagram with headless Chrome.
-- R 4.5 with `shinylive` and `shinyreact` installed (the shinylive filter reads
-  the app's installed packages).
-- `wasm-repo/`, which is checked in, so `bundle-wasm.R` has nothing to fetch.
-  Building it in CI with <https://github.com/r-wasm/actions> instead is the
-  alternative, and only worth it if the checked-in binary goes stale.
+- R with `shinylive` and `shinyreact` installed (the shinylive filter reads the
+  app's installed packages). `shinyreact` must be installed **at its release
+  tag**, `posit-dev/shinyreact/pkg-r@r/v0.1.0` — see the webR section above; at
+  `HEAD` the render aborts. The render fetches the wasm binaries (the release's
+  assets, plus `brio` from repo.r-wasm.org), so CI needs network for that step.
 
 `apps/01-shinyreact` is upstream's `examples/01-hello` with the bundle renamed
 `app.js`/`app.tsx`, so upstream is the reference when something is missing —

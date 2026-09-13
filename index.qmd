@@ -791,8 +791,8 @@ somewhere it can be read.
 #| viewerHeight: 1080
 
 ## file: app.R
-# `shinyreact` (and `brio`) are mounted from the deck's own assets by
-# bundle-wasm.R, so nothing is installed at runtime. See CLAUDE.md.
+# shinylive bundles `shinyreact` (and `brio`) into the render at build time,
+# so nothing is installed at runtime. See CLAUDE.md.
 {{< include apps/01-shinyreact/app.R >}}
 
 ## file: www/index.html
@@ -905,7 +905,7 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 - Shiny summer '26 intern
 - Ph.D. candidate, UAB
 - Computational biologist
-- 10x Shiny apps, and 4 packages under them
+- 10x Shiny apps, 5x packages
 - [posit-dev/shiny-showcase-bioinformatics](https://github.com/posit-dev/shiny-showcase-bioinformatics){.gh}
 :::
 
@@ -962,27 +962,31 @@ its own if you wait a beat.
 - [biohttp](https://www.samuelbharti.com/biohttp/) [![](images/lang-r.svg){fig-alt="R"}]{.langs} – Move bytes, cache results
 :::
 ::: {.fragment .nonincremental fragment-index=4}
+- [biocohort](https://www.samuelbharti.com/biocohort/) [![](images/lang-r.svg){fig-alt="R"}]{.langs} – One study, one object
+:::
+::: {.fragment .nonincremental fragment-index=5}
 - [plotomics](https://www.samuelbharti.com/plotomics/) [![](images/lang-r.svg){fig-alt="R"}![](images/lang-py.svg){fig-alt="Python"}]{.langs} – 17 GPU-accelerated charts
 :::
 :::
 ::: {.column width="38%"}
-<!-- One paragraph, four images: the `<p>` quarto wraps them in is what the
+<!-- One paragraph, five images: the `<p>` quarto wraps them in is what the
      grid is declared on, so the hexes are its items and `nth-child` counts
-     them. All four logos are pointy-top hexes on a 173.2x200 viewBox (0.866),
-     which is what lets the second row interlock at exactly -0.25 of a height.
+     them. All five logos are pointy-top hexes on a 173.2x200 viewBox (0.866),
+     which is what lets rows 2 and 3 interlock at exactly -0.25 of a height.
      biobouncer's own logo.svg is padded inside a 440x500 box, so the vendored
      copy is cropped to the hex itself - otherwise it packs a size small. -->
 ::: {.hexpack}
 ![](images/pkg-biobouncer.svg){fig-alt="" .fragment fragment-index=1}
 ![](images/pkg-bioclients.svg){fig-alt="" .fragment fragment-index=2}
 ![](images/pkg-biohttp.svg){fig-alt="" .fragment fragment-index=3}
-![](images/pkg-plotomics.svg){fig-alt="" .fragment fragment-index=4}
+![](images/pkg-biocohort.svg){fig-alt="" .fragment fragment-index=4}
+![](images/pkg-plotomics.svg){fig-alt="" .fragment fragment-index=5}
 :::
 :::
 :::
 
 ::: {.notes}
-Four packages came out from under those apps, and each one answers a single
+Five packages came out from under those apps, and each one answers a single
 question.
 
 `biobouncer` — is this even an identifier? Fifty sources, offline first, and
@@ -991,7 +995,10 @@ cannot disagree. It is on CRAN, PyPI and npm. `bioclients` —
 what do the sources say about it? Twenty-nine biological web services, one
 table shape. `biohttp` is what those clients ride on: every call returns a
 value rather than raising, with retry, a circuit breaker, and a cache that
-stores only the successes.
+stores only the successes. `biocohort` — which subjects and samples *are* this
+study? The manifest, the subject table and every analysis output in one
+validated object, with species and assay as values in the data rather than
+types, so the same object serves any organism and any assay.
 
 And `plotomics` — GPU-accelerated visualizations from one TypeScript core,
 wrapped three ways: npm for React, htmlwidgets for R, anywidget for Python.
