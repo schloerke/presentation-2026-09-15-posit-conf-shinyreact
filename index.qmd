@@ -190,6 +190,28 @@ Use a modern UI ecosystem — **React.js** — for the interface.
 
 ## React.js {.divider data-number="02"}
 
+<!-- The room's reaction to the sentence before it, so it sits here rather than
+     after `shinyreact` is introduced: the objection lands the moment React is
+     proposed, and the rest of section 02 is the answer to it. The picture is
+     the whole slide, so it is a reveal background and the heading (which
+     quarto needs to split the slide, and which carries the notes) is hidden. -->
+## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519"}
+
+::: {.notes}
+At this point you might be thinking… "You want me to write JavaScript?!?"
+
+That is the big question in the room, so let's take it now. Joe Cheng has
+always said Shiny authors shouldn't need to write JavaScript — and I believe
+that still holds true.
+
+Agents today have far more examples of mainstream React patterns than custom
+Shiny UI apps. I trust any frontier model to write React.js code better than I
+can. That narrow IDs-and-JSON contract makes the client boundary practical to
+review and maintain.
+
+Your job is to describe your UI and review the result.
+:::
+
 <!-- The heading finishes React's own address a beat after the slide lands, the
      same gag the "Samuel Bharti" heading carries - and it is a link, because
      the deck is published and a viewer should be able to reach react.dev from
@@ -496,24 +518,6 @@ these frameworks a joy to work in.
 
 ::: {.notes}
 Experimental package for the brave few.
-:::
-
-## You want me to<br>write JavaScript?!?! {.divider}
-
-<div class="elephant"><span>🐘</span></div>
-
-::: {.notes}
-At this point you might be thinking… "You want me to write JavaScript?!?"
-
-There's the elephant in the room. Joe Cheng has always said Shiny authors
-shouldn't need to write JavaScript — and I believe that still holds true.
-
-Agents today have far more examples of mainstream React patterns than custom
-Shiny UI apps. I trust any frontier model to write React.js code better than I
-can. That narrow IDs-and-JSON contract makes the client boundary practical to
-review and maintain.
-
-Your job is to describe your UI and review the result.
 :::
 
 ## Old Faithful, remixed {.divider data-number="04"}
