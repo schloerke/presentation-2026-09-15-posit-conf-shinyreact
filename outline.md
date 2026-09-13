@@ -33,6 +33,16 @@
       * > So... I do not want to replace Shiny. I want to keep Shiny for reactive computation while using a modern UI ecosystem (such as react.js) for the interface.
 
 
+* "Wait... what?" - full-bleed meme, straight after the React.js divider.
+  The big question in the room is asked the moment React is proposed, not
+  twelve slides later, so the rest of section 02 is the answer to it.
+  * "You want me to write JavaScript?!?"
+  * Joe: "Shiny authors shouldn't need to write JavaScript"
+    * Barret: I believe this still holds true!
+  * > Agents today have far more examples of mainstream React patterns than custom Shiny UI apps. I trust any frontier model to write react.js code better than I can
+    * > That narrow IDs and JSON contract makes the client boundary practical to review and maintain
+  * > You need to be able to describe your UI and review the result.
+
 * React.js
   * "The library for web and native user interfaces"
   * "... build user interfaces out of individual pieces called components"
@@ -71,16 +81,6 @@
     * > This make both of these frameworks a joy to work in
   * Build the whole UI from the ground up using react / typescript
     * > Experimental package for the brave few
-
-> At this point you might be thinking... "You want me to write JavaScript?!?"
-> >With baby pink logo for shinyreact
-* "You want me to write JavaScript?!?"
-  * Joe: "Shiny authors shouldn't need to write JavaScript"
-    * Barret: I believe this still holds true!
-  * > Agents today have far more examples of mainstream React patterns than custom Shiny UI apps. I trust any frontier model to write react.js code better than I can
-    * > That narrow IDs and JSON contract makes the client boundary practical to review and maintain
-  * > You need to be able to describe your UI and review the result.
-
 
 * Old Faithful w/ `shinyreact`
   * > Let's re-imagine our Old Faithful app using `shinyreact`

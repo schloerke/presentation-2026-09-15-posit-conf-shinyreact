@@ -131,9 +131,10 @@ The R UI is wonderful… until it isn't
      This slide replaced a `renderUI` one: dynamic UI was the wrong defendant,
      since `renderUI` is a perfectly good Shiny tool. The thing that hurts is
      authoring a second language inside a quoted string, where no editor,
-     linter, formatter or test can reach it. It also pre-pays for the elephant
-     divider in section 05 - by the time "You want me to write JavaScript?!?"
-     lands, the room has already put its hands up to writing it. -->
+     linter, formatter or test can reach it. It also pre-pays for the "Wait…
+     what?" meme two slides later - by the time "You want me to write
+     JavaScript?!?" lands, the room has already put its hands up to writing
+     it. -->
 ## JavaScript, in a string {.code-slide}
 
 <!-- The question is up on arrival rather than on a click, so the show of hands
@@ -211,6 +212,36 @@ your app; it is taking the JavaScript you already wrote *out of the string*.
 
 
 ## React.js {.divider data-number="02"}
+
+<!-- The room's reaction to the sentence before it, so it sits here rather than
+     after `shinyreact` is introduced: the objection lands the moment React is
+     proposed, and the rest of section 02 is the answer to it. The picture is
+     the whole slide, so it is a reveal background and the heading (which
+     quarto needs to split the slide, and which carries the notes) is hidden. -->
+## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519"}
+
+::: {.notes}
+At this point you might be thinking… "You want me to write JavaScript?!?"
+
+<!-- The payoff for the show of hands two slides ago, on "JavaScript, in a
+     string" - whose notes promise "we come back to it". This is where. Don't
+     retire one of those slides without the other. -->
+And the honest answer is: **you already do.** Every hand that went up a minute
+ago was a hand that has written JavaScript. The question was never *whether* —
+it is whether you write it somewhere your tools can see it, or inside a quoted
+string where nothing can.
+
+That is the big question in the room, so let's take it now. Joe Cheng has
+always said Shiny authors shouldn't need to write JavaScript — and I believe
+that still holds true.
+
+Agents today have far more examples of mainstream React patterns than custom
+Shiny UI apps. I trust any frontier model to write React.js code better than I
+can. That narrow IDs-and-JSON contract makes the client boundary practical to
+review and maintain.
+
+Your job is to describe your UI and review the result.
+:::
 
 <!-- The heading finishes React's own address a beat after the slide lands, the
      same gag the "Samuel Bharti" heading carries - and it is a link, because
@@ -356,7 +387,7 @@ removes, or resizes a bar.
 
 <div class="hexreact corner"><div class="hr-atom"></div></div>
 
-```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,5,6|3,4,5,6|11-12|13"}
+```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,5,6|3,4,5,6|11|11-12|13"}
 function App() {
   const [binCount, setBinCount] = useState(30);
   const bins = useMemo(
@@ -515,43 +546,9 @@ two and ships zero UI components itself.
 Two frameworks, one reactive model: pure functional programming makes logic easy
 to reason about as apps scale up in complexity, and that is what makes *both* of
 these frameworks a joy to work in.
-:::
 
-## Two frameworks, one reactive model
-
-- Build the whole UI from the ground up in React / TypeScript
-- *Experimental package, for the brave few*
-
-::: {.notes}
-Experimental package for the brave few.
-:::
-
-## You want me to<br>write JavaScript?!?! {.divider}
-
-<div class="elephant"><span>🐘</span></div>
-
-::: {.notes}
-At this point you might be thinking… "You want me to write JavaScript?!?"
-
-There's the elephant in the room.
-
-<!-- The payoff for the show of hands on "JavaScript, in a string". That slide's
-     notes promise "we come back to it"; this is where. Don't retire one of
-     those slides without the other. -->
-And the honest answer is: **you already do.** Most of this room put a hand up
-back in section 01. The question was never *whether* you write JavaScript — it
-is whether you write it somewhere your tools can see it, or inside a quoted
-string where nothing can.
-
-Joe Cheng has always said Shiny authors shouldn't need to write JavaScript — and
-I believe that still holds true.
-
-Agents today have far more examples of mainstream React patterns than custom
-Shiny UI apps. I trust any frontier model to write React.js code better than I
-can. That narrow IDs-and-JSON contract makes the client boundary practical to
-review and maintain.
-
-Your job is to describe your UI and review the result.
+You build the whole UI from the ground up in React / TypeScript. It is an
+experimental package, for the brave few.
 :::
 
 ## Old Faithful, remixed {.divider data-number="04"}
