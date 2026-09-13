@@ -455,8 +455,12 @@ Shiny's entire 14-year total on CRAN, which is about 50 million.
 - 🤖 AI excels at building well-known frameworks
 
 ::: {.notes}
-Hands up if you've ever hand-rolled HTML and JavaScript into a Shiny app. It
-works — right up until the app gets big, and then you are the framework.
+<!-- Do NOT ask for hands here: the "JavaScript, in a string" slide already did,
+     and asking twice reads as having forgotten. Refer back instead - the hands
+     are the evidence this bullet rests on, and they are already in the room's
+     memory. -->
+Those hands you put up earlier — that is this first bullet. It works, right up
+until the app gets big, and then *you* are the framework.
 
 I'm happy to do car maintenance with a multitool. But using the proper tool for
 the job saves time, effort, and the skin on your knuckles. React is that tool:
@@ -529,8 +533,18 @@ Experimental package for the brave few.
 ::: {.notes}
 At this point you might be thinking… "You want me to write JavaScript?!?"
 
-There's the elephant in the room. Joe Cheng has always said Shiny authors
-shouldn't need to write JavaScript — and I believe that still holds true.
+There's the elephant in the room.
+
+<!-- The payoff for the show of hands on "JavaScript, in a string". That slide's
+     notes promise "we come back to it"; this is where. Don't retire one of
+     those slides without the other. -->
+And the honest answer is: **you already do.** Most of this room put a hand up
+back in section 01. The question was never *whether* you write JavaScript — it
+is whether you write it somewhere your tools can see it, or inside a quoted
+string where nothing can.
+
+Joe Cheng has always said Shiny authors shouldn't need to write JavaScript — and
+I believe that still holds true.
 
 Agents today have far more examples of mainstream React patterns than custom
 Shiny UI apps. I trust any frontier model to write React.js code better than I
@@ -653,6 +667,12 @@ UI inputs and outputs now live in TypeScript.
 Now let's look at the UI definitions.
 
 Note that you're signing up for all UI inputs and outputs living in TypeScript!
+
+<!-- Half of that "cost" is a refund, given the section-01 string slide. Say so
+     here or the slide reads as pure downside. -->
+Which sounds like a cost — and some of it is. But remember where we started: if
+you were already writing the interesting parts of the UI as JavaScript in a
+string, this is not new work. It is the same work, in a file, with types.
 :::
 
 ## React {#react-ui .code-slide auto-animate="true"}
@@ -743,6 +763,21 @@ const bins = useShinyOutputValue<HistData>("distPlot", null);
 
 ::: {.fragment}
 R computes the value; React decides how it looks.
+:::
+
+::: {.notes}
+<!-- The visual payoff for "JavaScript, in a string": that slide's
+     `Shiny.setInputValue(...)` and this slide's `useShinyInput<number>(...)` do
+     the same job, and the audience has seen both. One was flat green. -->
+Compare the first line to what we had in section 01. Getting a value out of the
+browser and into R was `Shiny.setInputValue('card_clicked', …)` — inside a
+string, flat green, unchecked by anything.
+
+Here it is the same job, with a **type** on it. Your editor knows `bin_count` is
+a number. It will autocomplete it, and it will tell you when you get it wrong.
+
+That is the whole trade: the JavaScript you were already writing, moved
+somewhere it can be read.
 :::
 
 ## Live: Old Faithful w/ `shinyreact` {.demo-slide .demo-titled}
@@ -847,6 +882,12 @@ The other three hops, in a line each: `wire_tap` asserts on the `shinyreact`
 messages crossing the websocket; the client's own unit tests are the agent's
 choice of JS runner; and `features.md` is a nested list of features you can read
 and other agents can confirm against.
+
+<!-- Callback to "JavaScript, in a string": the third hop is only available
+     because the client is a file now. -->
+That third hop is worth a beat. The JavaScript in section 01 had no tests, and
+could not have had any — you cannot unit-test a string. Getting it into a file
+is what put it on this list at all.
 :::
 
 ## In the wild {.divider data-number="06"}
@@ -1128,6 +1169,14 @@ posit / Shiny Team
 - **No** — but highly recommended
 - TSX is much more readable than vanilla JavaScript
 - A build system can lint and strongly type your code
+
+::: {.notes}
+<!-- The third bullet is the direct answer to the section-01 string slide - lean
+     on it if this question comes up. -->
+That last bullet is the whole reason we started where we did. The complaint
+about JavaScript in a string was never about JavaScript — it was that nothing
+could lint it, type it, or format it. A build step is what buys all three back.
+:::
 
 ## How do I review generated code? {visibility="hidden"}
 

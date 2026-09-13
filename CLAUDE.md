@@ -110,15 +110,21 @@ wrote broke a build pass", and check `ls _site/index_files/libs` before
 concluding anything about a change — otherwise you debug the CSS of a deck that
 never loaded the theme.
 
-A **second**, unrelated way to get a themeless deck: deleting `_site/` or
-`index_files/` by hand without also deleting `.quarto/`. Quarto's sass cache
-still believes the compiled theme was already copied, so the render fails with
-`ERROR: NotFound … copy '.quarto/…/sass/<hash>.css' -> 'index_files/libs/
-revealjs/dist/theme/quarto-<hash>.css'` and leaves `revealjs/` holding only
-`plugin/`, no `dist/`. Note it exits **1** here, unlike the SCSSParsingError
-case. `rm -rf .quarto` and render again. Simplest rule: never hand-delete those
-two directories — `quarto render` already replaces `_site/` — and if you do,
-take `.quarto` with them.
+A **second**, unrelated failure: **hand-deleting `_site/` or `index_files/`**.
+Quarto keeps state in `.quarto/` *and* in the project-root `index_files/`, so
+removing either behind its back breaks the next render with exit **1** (unlike
+the SCSSParsingError case, which exits 0). Two messages seen, same cause:
+
+- `ERROR: NotFound … copy '.quarto/…/sass/<hash>.css' -> 'index_files/libs/
+  revealjs/dist/theme/quarto-<hash>.css'` — the sass cache believes the compiled
+  theme was already copied. Leaves `revealjs/` holding only `plugin/`, no
+  `dist/`. Fix: `rm -rf .quarto`.
+- `ERROR: NotFound … stat '…/index_files/figure-revealjs'` — survives
+  `rm -rf .quarto`. Fix: just render a second time, which recreates it.
+
+Simplest rule: **never hand-delete those directories.** `quarto render` already
+replaces `_site/` on its own, so there is nothing to clean; doing it manually
+only buys you one of these.
 
 `quarto render` **deletes and recreates `_site/`**, so a server started *inside*
 it keeps serving the old, unlinked directory: every later check silently reads a
@@ -811,10 +817,21 @@ test can reach it — and everyone in that room has done it.
   perfectly ordinary R string and stretched the X over the last two lines.
 - `.circle-mark` is the unused partner of that rule; it said "this stays" on the
   `renderUI` version. Kept because the pair is one rule.
-- **It pre-pays for the elephant.** By the time "You want me to write
-  JavaScript?!?" lands in section 05, the room has already put its hands up to
-  writing it — so the honest answer is *you already do, in the one place where
-  nothing can help you*. Don't retire one of those slides without the other.
+- **Five later slides call back to it, in their speaker notes only.** The setup
+  is only worth its slide if they are kept; grep the notes for "string" before
+  changing any of them:
+  - **"You want me to write JavaScript?!?"** (the elephant) — the payoff. *You
+    already do.* Don't retire either slide without the other.
+  - **"Why Shiny + React?"** — must **not** ask for hands again, though its
+    first bullet is about hand-rolled HTML. Asking twice reads as having
+    forgotten, and the second ask gets half the hands. Its note refers back
+    instead. (Barret's bullet text stays as it is; only the note does this.)
+  - **"Two hooks are the whole API"** — the visual payoff:
+    `Shiny.setInputValue('card_clicked', …)` in flat green against
+    `useShinyInput<number>("bin_count", 30)`, same job, typed.
+  - **"The UI moves to TypeScript"** — half of that "cost" is a refund.
+  - **"Test coverage at every hop"** and the hidden Q&A **"Is node.js needed?"**
+    — you cannot unit-test or lint a string; a build step buys it back.
 - `.code-sm` (a 32px override) was deleted with the old slide — it had exactly
   one user. Shorten the code instead; that is what got this panel from 13 lines
   to 11 and from 1146px to 986px.
