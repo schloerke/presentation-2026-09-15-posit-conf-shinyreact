@@ -36,21 +36,29 @@
 * React.js
   * "The library for web and native user interfaces"
   * "... build user interfaces out of individual pieces called components"
+  * A component is a function that returns markup
+
+  * UI is assembled given data's state
+    * > React is _REALLY_ good at just taking JSON at mapping data to UI
+    * > Don't worry about managing the transitions from one data state to another!
+
+  * DEMO SLIDE + its code
+
+  (The mechanics run uninterrupted - what it is, how you write it, how it
+   thinks, watch it work, here is the whole file - and *then* the two "why"
+   slides land together as the on-ramp to the mark.)
+
   * Why React?
     * > MASSIVE ecosystem of proven components ready for production environments
     * > ... dwarfs what R/python readily has available
     * > show off existing libraries
 
-  * DEMO SLIDE
-    * UI is assembled given data's state
-      * > React is _REALLY_ good at just taking JSON at mapping data to UI
-      * > Don't worry about managing the transitions from one data state to another!
-
-  TODO: better placement
   * Why Shiny + React?
-    * > If you've found yourself writing custom HTML and JavaScript, React.js is a perfect framework to help scale your larger projects
-    * "We picked it up off the shelf to not write JS.. Happy with the tradeoffs"
-    * AI does better when building on top of existing frameworks is safer.
+    * Hand-rolled HTML and JavaScript in Shiny
+    * Use the proper tool for the job
+      * > happy to do car maintenance with a multitool - but the proper tool
+        saves time, effort, and the skin on your knuckles
+    * AI excels at building well-known frameworks
 
 * Animation: shiny + react. Hex logo creation slide
 

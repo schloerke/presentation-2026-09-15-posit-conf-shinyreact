@@ -190,7 +190,13 @@ Use a modern UI ecosystem — **React.js** — for the interface.
 
 ## React.js {.divider data-number="02"}
 
-## What is React?
+<!-- The heading finishes React's own address a beat after the slide lands, the
+     same gag the "Samuel Bharti" heading carries - and it is a link, because
+     the deck is published and a viewer should be able to reach react.dev from
+     it. New tab, as everywhere else: a click mid-talk must not navigate the
+     deck away. The id is kept from the old "What is React?" wording so nothing
+     linking to this slide breaks. -->
+## [React[.dev]{.dotcom}](https://react.dev){target="_blank" rel="noopener"} {#what-is-react}
 
 <!-- The atom marks every slide in section 02 as a React slide. `.hexreact` is
      atom-only by design (see the theme) and `.corner` parks it where
@@ -262,59 +268,6 @@ it as `<Stat>` — twice here, and it draws twice. That is the whole idea: you
 name a piece of UI, and then you reuse it.
 :::
 
-## Why React? {.nostretch}
-
-<div class="hexreact corner"><div class="hr-atom"></div></div>
-
-<!-- The two sub-bullets are the evidence for "massive", so they are screenshot
-     and number rather than more prose. The badge is github.com/facebook/react's
-     own "Used by", screenshotted at 4x on 2026-09-06 (the raw count that day was
-     30,088,518; the avatar row and that number are cropped off). Shot over an
-     $ink ground, so only `.used-by`'s border marks it as a screenshot.
-     The download numbers, also measured 2026-09-06: npm's `react` did
-     171,637,376 in the week to 2026-08-29 (api.npmjs.org/downloads/point/
-     last-week/react) against shiny's 50,465,284 since cranlogs began on
-     2012-10-01 (cranlogs.r-pkg.org). Re-measure before the talk; the ratio
-     only grows. The comparison is now carried by the two timespans rather than
-     by a "3x", so "last week" is cyan like the numbers and "14 years" is amber:
-     four cyan spans in two lines and the eye stops seeing which is which. -->
-- **Massive** adoption in the JS community
-  - GitHub: ![](images/react-used-by.png){.used-by fig-alt="GitHub's sidebar badge: Used by 30M"}
-  - `react` alone pulled **170M** downloads **last week**
-    - **Shiny** has **50M** downloads in [14 years]{.amber}!
-- Proven component libraries, design systems, charts, tables, maps
-
-<!-- The bullet's trailing ", ..." is gone because the strip below it is the
-     "...", and at 52px those three dots wrapped to a line of their own -
-     68px of canvas for an orphan, which is what the strip needs to clear the
-     footer.
-     Seven marks for that bullet, in its own word order: components (MUI,
-     shadcn/ui), a design system (Ant Design), charts (Plotly, D3), tables
-     (TanStack), maps (Leaflet). Plotly, D3 and Leaflet are not React libraries
-     - you reach them through react-plotly.js, visx and react-leaflet - and they
-     are here precisely because this room knows them from R already: the strip
-     has to be read as shape, with no brand colour to help.
-     It costs no click of its own: the marks wave in by themselves, .75s after
-     the bullet above them lands (see `.logo-strip` in the theme).
-     Each mark links to its project and opens in a new tab, for the same reason
-     the QRs do: the deck is published, and a click mid-talk must not navigate
-     the deck away and lose the reveal state and the running shinylive apps. -->
-::: {.logo-strip}
-[![](images/logo-mui.svg){fig-alt="MUI"}](https://mui.com){target="_blank" rel="noopener"} [![](images/logo-shadcnui.svg){fig-alt="shadcn/ui"}](https://ui.shadcn.com){target="_blank" rel="noopener"} [![](images/logo-antdesign.svg){fig-alt="Ant Design"}](https://ant.design){target="_blank" rel="noopener"} [![](images/logo-d3.svg){fig-alt="D3.js"}](https://d3js.org){target="_blank" rel="noopener"} [![](images/logo-plotly.svg){fig-alt="Plotly"}](https://plotly.com/javascript/react/){target="_blank" rel="noopener"} [![](images/logo-tanstack.svg){fig-alt="TanStack"}](https://tanstack.com/table){target="_blank" rel="noopener"} [![](images/logo-leaflet.svg){fig-alt="Leaflet"}](https://leafletjs.com){target="_blank" rel="noopener"}
-:::
-
-::: {.notes}
-A MASSIVE ecosystem of proven components, ready for production environments. It
-dwarfs what R and Python readily have available.
-
-Thirty million repositories on GitHub depend on React.
-
-And react alone pulled 170 million downloads *last week* — more than three times
-Shiny's entire 14-year total on CRAN, which is about 50 million.
-
-*Show off existing libraries.*
-:::
-
 ## UI is assembled from data's state
 
 <div class="hexreact corner"><div class="hr-atom"></div></div>
@@ -379,7 +332,7 @@ removes, or resizes a bar.
 
 <div class="hexreact corner"><div class="hr-atom"></div></div>
 
-```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,4,6|3,4,5,6|11-12|13"}
+```{.javascriptreact filename="app.tsx" code-line-numbers="|2|3,6|3,5,6|3,4,5,6|11-12|13"}
 function App() {
   const [binCount, setBinCount] = useState(30);
   const bins = useMemo(
@@ -409,6 +362,59 @@ Hold on to those two lines. In a few minutes the only thing that changes is
 *where they get their values from*.
 :::
 
+## Why React? {.nostretch}
+
+<div class="hexreact corner"><div class="hr-atom"></div></div>
+
+<!-- The two sub-bullets are the evidence for "massive", so they are screenshot
+     and number rather than more prose. The badge is github.com/facebook/react's
+     own "Used by", screenshotted at 4x on 2026-09-06 (the raw count that day was
+     30,088,518; the avatar row and that number are cropped off). Shot over an
+     $ink ground, so only `.used-by`'s border marks it as a screenshot.
+     The download numbers, also measured 2026-09-06: npm's `react` did
+     171,637,376 in the week to 2026-08-29 (api.npmjs.org/downloads/point/
+     last-week/react) against shiny's 50,465,284 since cranlogs began on
+     2012-10-01 (cranlogs.r-pkg.org). Re-measure before the talk; the ratio
+     only grows. The comparison is now carried by the two timespans rather than
+     by a "3x", so "last week" is cyan like the numbers and "14 years" is amber:
+     four cyan spans in two lines and the eye stops seeing which is which. -->
+- **Massive** adoption in the JS community
+  - GitHub: ![](images/react-used-by.png){.used-by fig-alt="GitHub's sidebar badge: Used by 30M"}
+  - `react` alone pulled **170M** downloads **last week**
+    - **Shiny** has **50M** downloads in [14 years]{.amber}!
+- Proven component libraries, design systems, charts, tables, maps
+
+<!-- The bullet's trailing ", ..." is gone because the strip below it is the
+     "...", and at 52px those three dots wrapped to a line of their own -
+     68px of canvas for an orphan, which is what the strip needs to clear the
+     footer.
+     Seven marks for that bullet, in its own word order: components (MUI,
+     shadcn/ui), a design system (Ant Design), charts (Plotly, D3), tables
+     (TanStack), maps (Leaflet). Plotly, D3 and Leaflet are not React libraries
+     - you reach them through react-plotly.js, visx and react-leaflet - and they
+     are here precisely because this room knows them from R already: the strip
+     has to be read as shape, with no brand colour to help.
+     It costs no click of its own: the marks wave in by themselves, .75s after
+     the bullet above them lands (see `.logo-strip` in the theme).
+     Each mark links to its project and opens in a new tab, for the same reason
+     the QRs do: the deck is published, and a click mid-talk must not navigate
+     the deck away and lose the reveal state and the running shinylive apps. -->
+::: {.logo-strip}
+[![](images/logo-mui.svg){fig-alt="MUI"}](https://mui.com){target="_blank" rel="noopener"} [![](images/logo-shadcnui.svg){fig-alt="shadcn/ui"}](https://ui.shadcn.com){target="_blank" rel="noopener"} [![](images/logo-antdesign.svg){fig-alt="Ant Design"}](https://ant.design){target="_blank" rel="noopener"} [![](images/logo-d3.svg){fig-alt="D3.js"}](https://d3js.org){target="_blank" rel="noopener"} [![](images/logo-plotly.svg){fig-alt="Plotly"}](https://plotly.com/javascript/react/){target="_blank" rel="noopener"} [![](images/logo-tanstack.svg){fig-alt="TanStack"}](https://tanstack.com/table){target="_blank" rel="noopener"} [![](images/logo-leaflet.svg){fig-alt="Leaflet"}](https://leafletjs.com){target="_blank" rel="noopener"}
+:::
+
+::: {.notes}
+A MASSIVE ecosystem of proven components, ready for production environments. It
+dwarfs what R and Python readily have available.
+
+Thirty million repositories on GitHub depend on React.
+
+And react alone pulled 170 million downloads *last week* — more than three times
+Shiny's entire 14-year total on CRAN, which is about 50 million.
+
+*Show off existing libraries.*
+:::
+
 ## Why Shiny **+** React? {auto-animate="true" auto-animate-unmatched="false"}
 
 <!-- The two marks as a corner lockup. They are the same `[data-id]` elements on
@@ -420,13 +426,23 @@ Hold on to those two lines. In a few minutes the only thing that changes is
 <div class="hexplus">+</div>
 <div class="hexreact lockup" data-id="hexreact"><div class="hr-atom"></div></div>
 
-- If you've found yourself writing custom HTML and JavaScript, React is the framework that scales those projects
-- "We picked it up off the shelf to not write JS… happy with the tradeoffs"
-- AI does better building on top of existing frameworks
+- 🚫 Hand-rolled HTML and JavaScript in Shiny
+- 🧰 Use the proper tool for the job
+- 🤖 AI excels at building well-known frameworks
 
 ::: {.notes}
-If you've found yourself writing custom HTML and JavaScript, React.js is a
-perfect framework to help scale your larger projects.
+Hands up if you've ever hand-rolled HTML and JavaScript into a Shiny app. It
+works — right up until the app gets big, and then you are the framework.
+
+I'm happy to do car maintenance with a multitool. But using the proper tool for
+the job saves time, effort, and the skin on your knuckles. React is that tool:
+it is what the rest of the world reaches for when a UI outgrows being
+hand-assembled.
+
+And it is the tool your assistant already knows. An LLM has seen millions of
+React components and approximately none of your bespoke `tags$div()` scaffolding
+— so building on a well-known framework is the difference between an assistant
+that helps and one that guesses.
 :::
 
 ## The mark {.logo-slide auto-animate="true" auto-animate-unmatched="false"}
@@ -461,11 +477,7 @@ now ends in.
 
 - The Shiny server contains **only reactive data computation**
 - The UI is a React client **you own**
-<!-- The one bullet too long for a line at the master's 52px (1731px of text
-     against 1728px of canvas). Broken by hand rather than left to wrap, so the
-     whole of "it ships zero UI components" lands on the second line instead of
-     the wrap falling between "ships" and "zero". -->
-- `shinyreact` is the bridge between the two —<br>it ships **zero UI components**
+- `shinyreact` ships **zero UI components**
 
 ::: {.notes}
 With `shinyreact`, the Shiny server contains only reactive data computation, and
@@ -486,7 +498,7 @@ these frameworks a joy to work in.
 Experimental package for the brave few.
 :::
 
-## "You want me to write JavaScript?!?" {.divider}
+## You want me to<br>write JavaScript?!?! {.divider}
 
 <div class="elephant"><span>🐘</span></div>
 
@@ -619,14 +631,51 @@ Now let's look at the UI definitions.
 Note that you're signing up for all UI inputs and outputs living in TypeScript!
 :::
 
-## `ui.tsx` {.code-slide}
+## React {#react-ui .code-slide auto-animate="true"}
 
-::: {.incremental}
-- Built upon `index.html`, but upgraded for React
+<!-- The React-only component from section 02, verbatim, so this and the next
+     slide auto-animate as a pair: the whole JSX body holds still while the two
+     declarations at the top rewrite themselves into the `shinyreact` hooks.
+     Same construction as "The server we started with" above, and deliberately
+     so - the server half of the app gets a before/after, and this is the UI
+     half's. Neither slide may wrap its block in a `.fragment`: an element
+     hidden on arrival has nothing for auto-animate to animate *from*.
+     `useMemo` is written on one line, not the four the app spells it over, so
+     the comparison is line for line: two declarations against two.
+     No highlight steps here - this slide is the recap, and it is the next one
+     that has something to point at. `code-line-numbers="true"` rather than no
+     attribute at all, so the block keeps its line-number gutter: losing the
+     gutter on one half of the pair would slide the whole block sideways. -->
+```{.javascriptreact filename="app.tsx" code-line-numbers="true"}
+function App() {
+  const [binCount, setBinCount] = useState(30);
+  const bins = useMemo(() => bin_data(waiting, binCount), [binCount]);
+
+  return (
+    <main className="layout">
+      <label htmlFor="bin_count">Number of bins:</label>
+      <input id="bin_count" type="range" value={binCount}
+             onChange={(e) => setBinCount(Number(e.target.value))} />
+      <Histogram bins={bins} />
+    </main>
+  );
+}
+```
+
+::: {.notes}
+You have seen this one already — the React-only Old Faithful from section 02.
+One piece of state, one value derived from it, and the markup underneath.
+
+Watch those two declarations at the top. Nothing else in this file is going to
+move.
 :::
 
-::: {.fragment}
-```{.javascriptreact filename="www/ui.tsx" code-line-numbers="|2|3|8-9|10"}
+## `shinyreact` {#shinyreact-ui .code-slide auto-animate="true"}
+
+<!-- Opens lit on line 2 rather than unhighlighted, the way the server's
+     after-slide opens on line 5: the pair has just rewritten that line, so the
+     highlight is already where the eye is. -->
+```{.javascriptreact filename="www/ui.tsx" code-line-numbers="2|3|8-9|10"}
 export default function App() {
   const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
   const bins = useShinyOutputValue<HistData | null>("distPlot", null);
@@ -641,10 +690,13 @@ export default function App() {
   );
 }
 ```
-:::
 
 ::: {.notes}
-`ui.tsx` is Shiny's `index.html` escape hatch, but upgraded for React.
+Same component. The markup did not move — only the two lines that say where the
+values come from.
+
+`ui.tsx` is built upon Shiny's `index.html` escape hatch, but upgraded for
+React.
 :::
 
 ## Two hooks are the whole API {.code-slide}
@@ -741,13 +793,9 @@ IDs and JSON are the contract.
 ## Test coverage at every hop
 
 - **Within the server** — `testServer()` · `test_server()` · `local_server`
-  - set inputs, confirm output values — no browser
 - **Server → client** — `wire_tap`
-  - assert `shinyreact` messages on the websocket
 - **Within the client** — JS unit tests
-  - *agent's choice*
 - **Confirm the client** — `features.md`
-  - a nested list of features you can read and other agents can confirm
 
 ::: {.notes}
 The first hop is in-memory: the app's server function runs, the reactive graph
@@ -770,21 +818,11 @@ result — no polling, no retry loop. That matters here because the React client
 is gone in this test: what you are asserting on is exactly the IDs-and-JSON
 contract the last section drew. The server half of a `shinyreact` app is
 testable without any of the client half existing.
-:::
 
-## Why that contract matters
-
-- The narrow **IDs + JSON** boundary is practical to review and maintain
-- Server logic stays in R: review it, defend it, test it independently
-- Delegate the busy-work UI details to the agent — then verify
-
-::: {.notes}
-Agents today have far more examples of mainstream React patterns than custom
-Shiny UI apps. I trust any frontier model to write React.js code better than I
-can. That narrow IDs-and-JSON contract makes the client boundary practical to
-review and maintain.
-
-You need to be able to describe your UI and review the result.
+The other three hops, in a line each: `wire_tap` asserts on the `shinyreact`
+messages crossing the websocket; the client's own unit tests are the agent's
+choice of JS runner; and `features.md` is a nested list of features you can read
+and other agents can confirm against.
 :::
 
 ## In the wild {.divider data-number="06"}
@@ -1023,23 +1061,31 @@ the custom JS bindings, the manual message passing, the serialization.
 ## Future work: incremental adoption
 
 - Embed React components into **existing** apps
-  - no need to port your whole application to React
-- Opens the door for helper packages down the road
-- Today, writing `shinyreact` apps will feel ad-hoc — that's the tradeoff of experimental
+- Wrap `shinyreact` in your own package!
 
 ::: {.notes}
 Incremental adoption makes it so you don't have to port your whole application
-into React.js. It also opens the door for helper packages down the road.
+into React.js.
 
-Today, everything will feel ad-hoc when writing `shinyreact` apps.
+It also opens the door for helper packages down the road: wrap a component you
+have built in `shinyreact` and ship it as a package, the way `bslib` and
+friends ship theirs.
+
+Today, everything will feel ad-hoc when writing `shinyreact` apps — that is the
+tradeoff of an experimental package.
 :::
 
-## Beyond Bootstrap {.recap}
+## `shinyreact` {#recap .recap}
 
-- Keep **R / Python** for reactive data processing
-- Let an **agent** build the React.js client
-- **IDs and JSON structures** are the communication contract
+<!-- No fragments here: this is the slide that stays up through Q&A, so it
+     arrives whole rather than being clicked into existence. `.nonincremental`
+     is what turns the yaml's `incremental: true` off for one list. -->
+::: {.nonincremental}
+- **R / Python** server processes data
+- Build **React** client using **AI agent**
+- Communicate using **JSON and IDs**
 - [posit-dev/shinyreact](https://github.com/posit-dev/shinyreact){.gh}
+:::
 
 <!-- The lockup the title slide builds from `author:`, written out - this is not
      a quarto title slide, so there is nothing to reuse. -->
@@ -1051,31 +1097,31 @@ posit / Shiny Team
 @schloerke
 :::
 
-## Q & A {.divider data-number="08"}
+## Q & A {.divider data-number="08" visibility="hidden"}
 
-## Is node.js needed?
+## Is node.js needed? {visibility="hidden"}
 
 - **No** — but highly recommended
 - TSX is much more readable than vanilla JavaScript
 - A build system can lint and strongly type your code
 
-## How do I review generated code?
+## How do I review generated code? {visibility="hidden"}
 
 - Unit tests help with drift — but they confirm *existing* behavior
 - The logic you care about lives server-side: review it, defend it, write independent tests
 - I'm comfortable delegating busy-work UI details to the LLM
 
-## What about my existing apps?
+## What about my existing apps? {visibility="hidden"}
 
 - Agent Skills are available to convert Shiny apps to `shinyreact`
 
-## Can I keep my existing outputs?
+## Can I keep my existing outputs? {visibility="hidden"}
 
 - **Yup.** Use regular render methods, just like normal
 - Pair them with `<ShinyOutput id="distPlot" />` in your React code
 - Don't reinvent the wheel — your UI app becomes more about **layout** than outputs
 
-## Thanks {.divider .end data-number="09"}
+## Thanks {.divider .end data-number="09" visibility="hidden"}
 
 ::: {.handle}
 @schloerke
