@@ -487,15 +487,9 @@ two and ships zero UI components itself.
 Two frameworks, one reactive model: pure functional programming makes logic easy
 to reason about as apps scale up in complexity, and that is what makes *both* of
 these frameworks a joy to work in.
-:::
 
-## Two frameworks, one reactive model
-
-- Build the whole UI from the ground up in React / TypeScript
-- *Experimental package, for the brave few*
-
-::: {.notes}
-Experimental package for the brave few.
+You build the whole UI from the ground up in React / TypeScript. It is an
+experimental package, for the brave few.
 :::
 
 ## You want me to<br>write JavaScript?!?! {.divider}
