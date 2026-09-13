@@ -15,11 +15,11 @@
 
     | app | live | source | DOI |
     |---|---|---|---|
-    | tahoe-explorer | [🚀 live](https://posit-tahoe-explorer.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/tahoe-explorer) | [📄 10.5281/zenodo.21950641](https://doi.org/10.5281/zenodo.21950641) |
-    | genescout | [🚀 live](https://posit-genescout.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/genescout) | [📄 10.5281/zenodo.21950644](https://doi.org/10.5281/zenodo.21950644) |
-    | variant-reviewer | [🚀 live](https://posit-variant-reviewer.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/variant-reviewer) | [📄 10.5281/zenodo.21950635](https://doi.org/10.5281/zenodo.21950635) |
-    | gene-list-builder | [🚀 live](https://posit-gene-list-builder.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/gene-list-builder) | [📄 10.5281/zenodo.21950640](https://doi.org/10.5281/zenodo.21950640) |
-    | Plotomics Live | [🚀 live](https://posit-plotomics-live.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/plotomics-live) | [📄 10.5281/zenodo.21950647](https://doi.org/10.5281/zenodo.21950647) |
+    | tahoe-explorer | [🚀 live](https://posit-tahoe-explorer.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/tahoe-explorer) | [📄 10.5281/zenodo.21926312](https://doi.org/10.5281/zenodo.21926312) |
+    | genescout | [🚀 live](https://posit-genescout.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/genescout) | [📄 10.5281/zenodo.21352389](https://doi.org/10.5281/zenodo.21352389) |
+    | variant-reviewer | [🚀 live](https://posit-variant-reviewer.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/variant-reviewer) | [📄 10.5281/zenodo.21934011](https://doi.org/10.5281/zenodo.21934011) |
+    | gene-list-builder | [🚀 live](https://posit-gene-list-builder.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/gene-list-builder) | [📄 10.5281/zenodo.21936035](https://doi.org/10.5281/zenodo.21936035) |
+    | Plotomics Live | [🚀 live](https://posit-plotomics-live.share.connect.posit.cloud/) | [🐙 source](https://github.com/samuelbharti/plotomics-live) | [📄 10.5281/zenodo.21936926](https://doi.org/10.5281/zenodo.21936926) |
 
 
 

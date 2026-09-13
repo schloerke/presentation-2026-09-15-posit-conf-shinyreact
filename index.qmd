@@ -895,7 +895,7 @@ the app two slides from now.
 :::
 
 ::: {.notes}
-Nine apps in the gallery; these are the five with public source. Every name
+Ten apps in the gallery; these are the five with public source. Every name
 here is a link — the app name goes to the deployment on Connect Cloud, the
 sub-bullet to the source — and each one is archived on Zenodo too, so there is
 a DOI to cite as well as an address. The README of this repo has all three
@@ -951,6 +951,18 @@ Two things to say out loud about that:
 - `app.R` is **compute-only** — one `reactive_output()` per visualization, and
   not one line of it is UI
 - the entire UI, in R, is **one line**: `page_react_html("www/index.html")`
+
+If there is time, the Xenium page is not even the biggest thing here. Another
+page draws a UMAP of 584,000 cells, and it ships as about **seven megabytes of
+binary typed arrays** — R to the browser to the GPU, rather than
+server-rendering the view. And because React owns the component, a new
+selection updates the data in place: the visualization is never re-mounted, so
+the GPU buffers are not reallocated on every click. That is the part you cannot
+get from an htmlwidget without writing the lifecycle yourself.
+
+Samuel puts it better than I do: R stays the analysis engine, React becomes the
+visualization layer, and `shinyreact` removes what used to sit between them —
+the custom JS bindings, the manual message passing, the serialization.
 :::
 
 ## What's next {.divider data-number="07"}
