@@ -167,9 +167,12 @@ $presentation-block-margin: 44px !default;
   // 6: bullets are a 5px cyan rule with 42px of padding, running the height of
   // the item, so a wrapped bullet stays aligned.
   ul, ol { margin: 60px 0 0; }
-  // Depth 3 hangs off a single line of its parent rather than off a heading, so
-  // the 60px above reads as a paragraph break in the middle of one thought.
-  ul ul ul { margin-top: 16px; }
+  // A *nested* list hangs off a single line of its parent rather than off a
+  // heading, so the 60px above reads as a paragraph break in the middle of one
+  // thought. It also costs the slide 44px a sub-bullet: "Test coverage at every
+  // hop" is four bullets each with one, and at 60px it ran 157px past the
+  // canvas and lost its last line.
+  li > ul { margin-top: 16px; }
   ul { list-style: none; }
   ul > li {
     position: relative;
@@ -401,7 +404,7 @@ $presentation-block-margin: 44px !default;
   }
 }
 
-// Two demos keep their heading: both apps' pages are white from the first
+// The three demos keep their heading: those apps' pages are white from the first
 // pixel, so full-bleed left the corner mark floating on nothing. Flex rather
 // than a computed height - the section is a fixed 1080px border-box, so
 // `flex: 1` hands the app whatever the heading leaves. The `display` needs
@@ -776,6 +779,16 @@ $presentation-block-margin: 44px !default;
 .reveal .state-stack {
   height: 190px;
   margin-top: 243px;
+
+  // The second row replaces the first, which is what `.fade-in-then-out` is
+  // for - but that class hides a fragment as soon as it stops being the
+  // *current* one, and the first row's own three build-in clicks do exactly
+  // that. So the swap is keyed off the second row being visible instead.
+  // Reveal's own fragment transition carries the fade.
+  &:has(> .state-viz:last-child.visible) > .state-viz:first-child {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 // Quarto puts the labels and the svg in one `<p>`, so that is the flex row -
 // styling the fragment div itself only lays out the paragraph.
@@ -811,6 +824,24 @@ $presentation-block-margin: 44px !default;
   // The arrows are the whole claim - the data on one side, the UI it implies
   // on the other - so they sit between the panels, not inside them.
   .state-arrow { flex: none; font-size: 48px; color: rgba($cyan, .5); }
+  // The first row builds in three clicks - state, the `bins` it reduces to,
+  // the chart that array *is* - so each hop after the first is a span wrapping
+  // its arrow *and* what the arrow points at, and that span is the fragment. A
+  // flex row of its own with the parent's own gap, so grouping two items into
+  // one costs the layout nothing (`display: contents` would, since opacity has
+  // nothing to apply to). Everything is laid out from the first click and only
+  // fades in, so no panel moves as the row builds.
+  // `align-self: stretch` is what keeps the chart the height of the row: the
+  // svg is `height: 100%`, and inside a wrapper sized to its own content that
+  // resolves against the bars rather than against the 190px.
+  .state-part {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    gap: 24px;
+    flex: none;
+  }
+  .state-part.state-chart { flex: 1; min-width: 0; }
   // The `bins` panel is `flex: none`, so it was as wide as its own string -
   // and `[1, 8, 7, 10, …]` is seven characters shorter than
   // `[13, 19, 31, 20, …]`. Stepping from 12 bins to 30 therefore shrank the
@@ -823,6 +854,40 @@ $presentation-block-margin: 44px !default;
   .state-arrow + .state-json code { min-width: 26ch; }
   svg { flex: 1; height: 100%; min-width: 0; }
   rect { fill: $cyan-text; }
+}
+
+// -- deck-local: a slide that opens with a tagline in the quote treatment -----
+// The `shinyreact` slide carries the package's own tagline as a `>` inside a
+// `.nonincremental` bullet - the same double rule React's two quotes get, the
+// bullet's cyan one and the blockquote's own - and then three bullets. That
+// costs the slide the quote's box *and* a second 60px list margin, which ran
+// the last bullet 85px off the canvas. Both numbers are measured, not tidied:
+// 44px is what fits the tagline on one line inside the 1380px the corner hex
+// leaves (at 52px it wrapped, for 68px), and 40px is the paragraph break
+// between the tagline and the points that follow it.
+.reveal .slides section.tagline {
+  // On the `p`, not the blockquote: quarto sizes the paragraph itself, so a
+  // size on the quote is inherited and then overridden. And not under
+  // `.nonincremental` either - quarto's incremental filter consumes that div,
+  // leaving the list with no class of its own; the slide's only blockquote is
+  // the tagline.
+  // Quarto's block margins on that `p` are 54px top and bottom *inside* the
+  // quote's own box - 108px of air for two lines of text, which is most of
+  // what ran the slide off the canvas.
+  blockquote p { font-size: 46px; margin: 0; }   // a subtitle, under the 52px bullets
+  // The *second* list - the tagline keeps the master's 60px under the heading.
+  > ul + ul {
+    margin-top: 40px;
+    // The bullets keep the master's 52px and take the full 1728px content
+    // width: the `:has(.hexlogo.corner)` cap of 1380px is **off** here, since
+    // it exists so a bullet does not run under the corner mark and the mark
+    // ends at y=366 while these bullets start below 700. That is what puts the
+    // first two on one line each (1657px and 1533px of text, measured with
+    // `white-space: nowrap`). The third is 1731px - three over - and is broken
+    // by hand in the qmd rather than shrunk to fit. Re-measure if one is
+    // reworded.
+    max-width: none;
+  }
 }
 
 // -- deck-local: the chain under a stepped code block ------------------------

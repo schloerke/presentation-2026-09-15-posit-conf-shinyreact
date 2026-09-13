@@ -64,7 +64,12 @@ And this app is still Old Faithful in another sense: dependable, familiar, and
 exactly the UI we have all seen before.
 :::
 
-## Old Faithful, live {.demo-slide}
+## Old Faithful {.demo-slide .demo-titled}
+
+<!-- Plain Shiny, so the mark is Shiny's own sticker: `.lb-shiny` over the
+     `.hexlogo` box, which also turns the shinyreact ring off. No `data-id` -
+     that would enlist it in the logo build's auto-animate chain. -->
+<div class="hexlogo corner"><div class="lb-shiny"></div></div>
 
 ```{shinylive-r}
 #| standalone: true
@@ -185,7 +190,7 @@ Use a modern UI ecosystem — **React.js** — for the interface.
 
 ## React.js {.divider data-number="02"}
 
-## What is React? {.code-slide}
+## What is React?
 
 <!-- The atom marks every slide in section 02 as a React slide. `.hexreact` is
      atom-only by design (see the theme) and `.corner` parks it where
@@ -195,6 +200,19 @@ Use a modern UI ecosystem — **React.js** — for the interface.
 
 - > The library for web and native user interfaces
 - > "…build user interfaces out of individual pieces called **components**"
+
+::: {.notes}
+React calls itself "the library for web and native user interfaces", and you
+build those interfaces out of individual pieces called components.
+:::
+
+## Components {.code-slide}
+
+<div class="hexreact corner"><div class="hr-atom"></div></div>
+
+::: {.incremental}
+- A component is a function that returns markup.
+:::
 
 <!-- One component, defined once and used twice - the smallest honest picture of
      "user interfaces out of individual pieces". The right-hand panel is not a
@@ -239,9 +257,6 @@ function Stat({ label, value }) {
 :::
 
 ::: {.notes}
-React calls itself "the library for web and native user interfaces", and you
-build those interfaces out of individual pieces called components.
-
 A component is a function that returns markup. Define `Stat` once, and you use
 it as `<Stat>` — twice here, and it draws twice. That is the whole idea: you
 name a piece of UI, and then you reuse it.
@@ -308,12 +323,16 @@ Shiny's entire 14-year total on CRAN, which is about 50 million.
      they reduce to, and the bars that data draws. Every number is real -
      `waiting` and the counts both come from apps/02-react-only/www/data.js -
      and the bars are written straight into the svg; no chart library for two
-     static pictures. Both fragments are unindexed so they queue after the
-     bullets in DOM order; see CLAUDE.md on why indices would hoist them. -->
+     static pictures. Every fragment here is unindexed so they queue in DOM
+     order; see CLAUDE.md on why indices would hoist them.
+     The first row builds in three clicks - state, `bins`, chart - so it cannot
+     be `.fade-in-then-out`: reveal hides such a fragment the moment it stops
+     being the *current* one, which its own children would do. The theme swaps
+     the rows with `:has()` instead. -->
 ::: {.r-stack .state-stack}
-::: {.fragment .fade-in-then-out .state-viz}
-[[`waiting = [79, 54, 74, 62, …]`]{.state-src}[`bin_count = 12`]{.state-count}]{.state-json} [→]{.state-arrow} [`bins = [13, 19, 31, 20, …]`]{.state-json} [→]{.state-arrow}
-<svg viewBox="0 0 900 300" preserveAspectRatio="xMinYMid meet" role="img" aria-label="Histogram with 12 bars"><rect x="0" y="222" width="65.8" height="78" rx="3"/><rect x="75.8" y="186" width="65.8" height="114" rx="3"/><rect x="151.7" y="114" width="65.8" height="186" rx="3"/><rect x="227.5" y="180" width="65.8" height="120" rx="3"/><rect x="303.3" y="216" width="65.8" height="84" rx="3"/><rect x="379.2" y="264" width="65.8" height="36" rx="3"/><rect x="455" y="198" width="65.8" height="102" rx="3"/><rect x="530.8" y="0" width="65.8" height="300" rx="3"/><rect x="606.7" y="42" width="65.8" height="258" rx="3"/><rect x="682.5" y="72" width="65.8" height="228" rx="3"/><rect x="758.3" y="204" width="65.8" height="96" rx="3"/><rect x="834.2" y="270" width="65.8" height="30" rx="3"/></svg>
+::: {.fragment .state-viz}
+[[`waiting = [79, 54, 74, 62, …]`]{.state-src}[`bin_count = 12`]{.state-count}]{.state-json} [[→]{.state-arrow} [`bins = [13, 19, 31, 20, …]`]{.state-json}]{.fragment .state-part} [[→]{.state-arrow}
+<svg viewBox="0 0 900 300" preserveAspectRatio="xMinYMid meet" role="img" aria-label="Histogram with 12 bars"><rect x="0" y="222" width="65.8" height="78" rx="3"/><rect x="75.8" y="186" width="65.8" height="114" rx="3"/><rect x="151.7" y="114" width="65.8" height="186" rx="3"/><rect x="227.5" y="180" width="65.8" height="120" rx="3"/><rect x="303.3" y="216" width="65.8" height="84" rx="3"/><rect x="379.2" y="264" width="65.8" height="36" rx="3"/><rect x="455" y="198" width="65.8" height="102" rx="3"/><rect x="530.8" y="0" width="65.8" height="300" rx="3"/><rect x="606.7" y="42" width="65.8" height="258" rx="3"/><rect x="682.5" y="72" width="65.8" height="228" rx="3"/><rect x="758.3" y="204" width="65.8" height="96" rx="3"/><rect x="834.2" y="270" width="65.8" height="30" rx="3"/></svg>]{.fragment .state-part .state-chart}
 :::
 ::: {.fragment .state-viz}
 [[`waiting = [79, 54, 74, 62, …]`]{.state-src}[`bin_count = 30`]{.state-count}]{.state-json} [→]{.state-arrow} [`bins = [1, 8, 7, 10, …]`]{.state-json} [→]{.state-arrow}
@@ -427,33 +446,43 @@ That *is* the logo. Nothing about Shiny changed — React is just what the swoos
 now ends in.
 :::
 
-## `shinyreact` {auto-animate="true" auto-animate-unmatched="false"}
+## `shinyreact` {.tagline auto-animate="true" auto-animate-unmatched="false"}
 
 <div class="hexlogo corner" data-id="hexlogo"></div>
 
-*Shiny UI infrastructure for React-based component rendering*
+<!-- The package's own tagline, in the quote treatment React's two get on "What
+     is React?": a `>` inside a bullet, so the bullet's cyan rule and the
+     blockquote's own border read as one double line. `.nonincremental` keeps it
+     off the click sequence - it is the slide's subtitle, not its first point -
+     and its own list, so the three bullets below stay a list of three. -->
+::: {.nonincremental}
+- > Shiny UI infrastructure for React-based component rendering
+:::
 
 - The Shiny server contains **only reactive data computation**
 - The UI is a React client **you own**
-- `shinyreact` is the bridge between the two — it ships **zero UI components**
+<!-- The one bullet too long for a line at the master's 52px (1731px of text
+     against 1728px of canvas). Broken by hand rather than left to wrap, so the
+     whole of "it ships zero UI components" lands on the second line instead of
+     the wrap falling between "ships" and "zero". -->
+- `shinyreact` is the bridge between the two —<br>it ships **zero UI components**
 
 ::: {.notes}
 With `shinyreact`, the Shiny server contains only reactive data computation, and
 the UI is a React client you own. `shinyreact` provides the bridge between the
 two and ships zero UI components itself.
+
+Two frameworks, one reactive model: pure functional programming makes logic easy
+to reason about as apps scale up in complexity, and that is what makes *both* of
+these frameworks a joy to work in.
 :::
 
 ## Two frameworks, one reactive model
 
-- Pure functional programming keeps logic easy to reason about as apps grow
-- That's what makes *both* frameworks a joy to work in
 - Build the whole UI from the ground up in React / TypeScript
 - *Experimental package, for the brave few*
 
 ::: {.notes}
-Pure functional programming makes logic easy to reason about as apps scale up in
-complexity. This makes both of these frameworks a joy to work in.
-
 Experimental package for the brave few.
 :::
 
@@ -544,8 +573,7 @@ server.
 
 - No corresponding UI component on the server side
 - Convert your data and send it to the client **as JSON**
-- `hist(x, plot = FALSE)` returns `breaks` and `counts` — send exactly what's needed
-- That shape is **the contract** the browser receives
+- Send **only what is needed**
 - Let React display your data's state in the UI
 
 ::: {.notes}
