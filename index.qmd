@@ -582,9 +582,12 @@ just send the required data — that is the contracted shape the browser receive
 Let React display your data's state within the UI.
 
 There is no directly corresponding UI component. This is a new concept!
+Where `renderPlot()` returns a regulated payload — HTML, or an image the
+`plotOutput()` on the other end knows how to place — `reactive_output()`
+returns nonregulated, raw **data**.
 
 With this model, we are strongly encouraging the server to pass data directly to
-the front end. Then let React handle the data from there.
+the front end. The server sends facts; React does presentation.
 :::
 
 ## The UI moves to TypeScript {.code-slide}
