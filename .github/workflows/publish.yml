@@ -34,11 +34,18 @@ jobs:
       # There is no package here, so `packages` replaces the `local::.` default.
       - uses: rstudio/shiny-workflows/setup-r-package@v1
         with:
-          # Must match webR's R series - see the wasm-repo/ notes in CLAUDE.md.
+          # The host R, which only renders. It does *not* have to match webR's
+          # own R (4.6.0 at the pinned shinylive); wasm-repo/ carries a pure-R
+          # build, which loads across the series. See CLAUDE.md.
           r-version: "4.5"
           cache: always
+          # `shinylive` is pinned: the R package decides which web assets the
+          # deck ships, and those decide webR's own R version. Left unpinned, an
+          # upstream release re-cuts the published deck's runtime on the next
+          # push - not a thing to discover on the morning of the talk.
+          # 0.5.0 -> shinylive assets 0.10.12 -> webR R 4.6.0.
           packages: |
-            any::shinylive
+            cran::shinylive@0.5.0
             posit-dev/shinyreact/pkg-r
 
       # shinylive's web assets are deliberately *not* cached. They live outside

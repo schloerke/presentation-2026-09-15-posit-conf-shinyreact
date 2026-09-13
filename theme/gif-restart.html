@@ -20,8 +20,15 @@
     var replay = function () {
       var slide = Reveal.getCurrentSlide();
       if (!slide) return;
+      // Under `prefers-reduced-motion` the clip is left on its first frame
+      // instead: it loops for ever, and `controls` on the element is what lets
+      // anyone start it. Done here rather than in the markup because this is
+      // the one place that starts playback - dropping the `autoplay` attribute
+      // alone would just be undone by the `play()` below.
+      var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       slide.querySelectorAll("video").forEach(function (v) {
         v.currentTime = 0;
+        if (still) { v.loop = false; v.pause(); return; }
         var p = v.play();
         if (p && p.catch) p.catch(function () {});
       });

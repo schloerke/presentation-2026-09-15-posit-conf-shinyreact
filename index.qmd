@@ -36,6 +36,7 @@ format:
       - theme/jsx-tokens.html
       - theme/gif-restart.html
       - theme/qr-links.html
+      - theme/a11y.html
     # Pre-render mermaid to svg: left to the browser, mermaid measures its
     # labels while reveal has the slide display:none'd and draws empty boxes.
     mermaid-format: svg
@@ -93,13 +94,13 @@ Let's dig into the code.
 ui <- bslib::page_sidebar(
   sidebar = bslib::sidebar(
     sliderInput(
-      inputId = "bin_count",
+      "bin_count",
       label = "Number of bins:",
       min = 1, max = 50,
       value = 30
     )
   ),
-  plotOutput(outputId = "distPlot")
+  plotOutput("distPlot")
 )
 ```
 :::
@@ -218,7 +219,7 @@ your app; it is taking the JavaScript you already wrote *out of the string*.
      proposed, and the rest of section 02 is the answer to it. The picture is
      the whole slide, so it is a reveal background and the heading (which
      quarto needs to split the slide, and which carries the notes) is hidden. -->
-## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519"}
+## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519" aria-label="Wait… what? A two-panel reaction meme: a smiling face looking down, then a hard zoom on the same face doing a double take."}
 
 ::: {.notes}
 At this point you might be thinking… "You want me to write JavaScript?!?"
@@ -643,9 +644,9 @@ the front end. The server sends facts; React does presentation.
 ```{.r filename="app.R (classic)"}
 ui <- bslib::page_sidebar(
   sidebar = bslib::sidebar(
-    sliderInput(inputId = "bin_count", ...)
+    sliderInput("bin_count", ...)
   ),
-  plotOutput(outputId = "distPlot")
+  plotOutput("distPlot")
 )
 ```
 :::
@@ -754,7 +755,7 @@ Just like `useState` — except the state comes from R / python.
 
 ::: {.fragment .spaced}
 ```{.javascriptreact filename="read an output"}
-const bins = useShinyOutputValue<HistData>("distPlot", null);
+const bins = useShinyOutputValue<HistData | null>("distPlot", null);
 ```
 :::
 
@@ -897,7 +898,7 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 
 ::: {.columns}
 ::: {.column width="32%"}
-![](images/samuel-bharti.png){width="440"}
+![](images/samuel-bharti.png){width="440" fig-alt="Samuel Bharti"}
 :::
 ::: {.column width="68%"}
 ::: {.nonincremental}
@@ -915,7 +916,7 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
      opens in a new tab, as the repo QR does: a click mid-talk must not
      navigate the deck away and lose the slide you were on. -->
 
-[![](theme/qr-showcase.svg){.qr-inline}](https://posit-shiny-showcase-bioinformatics.share.connect.posit.cloud/){target="_blank" rel="noopener"}
+[![](theme/qr-showcase.svg){.qr-inline fig-alt="QR code: the deployed Shiny showcase gallery"}](https://posit-shiny-showcase-bioinformatics.share.connect.posit.cloud/){target="_blank" rel="noopener"}
 :::
 :::
 
@@ -952,16 +953,16 @@ its own if you wait a beat.
 ::: {.columns}
 ::: {.column width="62%"}
 ::: {.fragment .nonincremental fragment-index=1}
-- [biobouncer](https://www.samuelbharti.com/biobouncer/r/) [![](images/lang-r.svg)![](images/lang-py.svg)]{.langs} – Is this a valid ID?
+- [biobouncer](https://www.samuelbharti.com/biobouncer/r/) [![](images/lang-r.svg){fig-alt="R"}![](images/lang-py.svg){fig-alt="Python"}]{.langs} – Is this a valid ID?
 :::
 ::: {.fragment .nonincremental fragment-index=2}
-- [bioclients](https://www.samuelbharti.com/bioclients/) [![](images/lang-r.svg)]{.langs} – What do the sources say?
+- [bioclients](https://www.samuelbharti.com/bioclients/) [![](images/lang-r.svg){fig-alt="R"}]{.langs} – What do the sources say?
 :::
 ::: {.fragment .nonincremental fragment-index=3}
-- [biohttp](https://www.samuelbharti.com/biohttp/) [![](images/lang-r.svg)]{.langs} – Move bytes, cache results
+- [biohttp](https://www.samuelbharti.com/biohttp/) [![](images/lang-r.svg){fig-alt="R"}]{.langs} – Move bytes, cache results
 :::
 ::: {.fragment .nonincremental fragment-index=4}
-- [plotomics](https://www.samuelbharti.com/plotomics/) [![](images/lang-r.svg)![](images/lang-py.svg)]{.langs} – 26 GPU-accelerated charts
+- [plotomics](https://www.samuelbharti.com/plotomics/) [![](images/lang-r.svg){fig-alt="R"}![](images/lang-py.svg){fig-alt="Python"}]{.langs} – 17 GPU-accelerated charts
 :::
 :::
 ::: {.column width="38%"}
@@ -972,10 +973,10 @@ its own if you wait a beat.
      biobouncer's own logo.svg is padded inside a 440x500 box, so the vendored
      copy is cropped to the hex itself - otherwise it packs a size small. -->
 ::: {.hexpack}
-![](images/pkg-biobouncer.svg){.fragment fragment-index=1}
-![](images/pkg-bioclients.svg){.fragment fragment-index=2}
-![](images/pkg-biohttp.svg){.fragment fragment-index=3}
-![](images/pkg-plotomics.svg){.fragment fragment-index=4}
+![](images/pkg-biobouncer.svg){fig-alt="" .fragment fragment-index=1}
+![](images/pkg-bioclients.svg){fig-alt="" .fragment fragment-index=2}
+![](images/pkg-biohttp.svg){fig-alt="" .fragment fragment-index=3}
+![](images/pkg-plotomics.svg){fig-alt="" .fragment fragment-index=4}
 :::
 :::
 :::
@@ -1020,7 +1021,7 @@ the app two slides from now.
   - A ranked, cited shortlist · [source](https://github.com/samuelbharti/genescout){.gh}
 :::
 ::: {.fragment .nonincremental fragment-index=3}
-- **[variant-reviewer](https://posit-variant-reviewer.share.connect.posit.cloud/)** · 18 cards
+- **[variant-reviewer](https://posit-variant-reviewer.share.connect.posit.cloud/)** · 23 cards
   - Public APIs, fanned out async · [source](https://github.com/samuelbharti/variant-reviewer){.gh}
 :::
 ::: {.fragment .nonincremental fragment-index=4}
@@ -1034,15 +1035,15 @@ the app two slides from now.
 :::
 ::: {.column width="54%"}
 ::: {.r-stack .app-stack}
-![](images/app-tahoe-explorer.png){.fragment .fade-in-then-out fragment-index=1}
+![](images/app-tahoe-explorer.png){fig-alt="tahoe-explorer: a screenshot of its cell-line table and controls" .fragment .fade-in-then-out fragment-index=1}
 
-![](images/app-genescout.png){.fragment .fade-in-then-out fragment-index=2}
+![](images/app-genescout.png){fig-alt="genescout: a screenshot of a ranked, cited gene shortlist" .fragment .fade-in-then-out fragment-index=2}
 
-![](images/app-variant-reviewer.png){.fragment .fade-in-then-out fragment-index=3}
+![](images/app-variant-reviewer.png){fig-alt="variant-reviewer: a screenshot of its annotation cards" .fragment .fade-in-then-out fragment-index=3}
 
-![](images/app-gene-list-builder.png){.fragment .fade-in-then-out fragment-index=4}
+![](images/app-gene-list-builder.png){fig-alt="gene-list-builder: a screenshot of its source weights and ranked list" .fragment .fade-in-then-out fragment-index=4}
 
-![](images/app-plotomics-live.png){.fragment fragment-index=5}
+![](images/app-plotomics-live.png){fig-alt="Plotomics Live: a screenshot of a million transcripts drawn on the GPU" .fragment fragment-index=5}
 :::
 :::
 :::
@@ -1065,7 +1066,7 @@ That is the point — the last one is the only one that reaches for
      the app the package from two slides ago draws. Markup rather than a
      `url()` in the scss, because quarto does not trace url()s out of an scss
      file and `images/` is not a project resource. -->
-![](images/pkg-plotomics.svg){.corner-hex}
+![](images/pkg-plotomics.svg){fig-alt="" .corner-hex}
 
 [**1,000,000** transcripts on the GPU · 26 visualizations · 65+ `reactive_output()`]{.gif-caption}
 
@@ -1075,8 +1076,13 @@ That is the point — the last one is the only one that reaches for
      colours and 6fps, and posterized), where h264 holds full colour at 25fps
      in 4 MB. Local file, so it is still offline-safe. See CLAUDE.md. -->
 ```{=html}
+<!-- `controls` is WCAG 2.2.2: 9s of looping motion alongside other content has
+     to be pausable. Chrome fades the bar out while the pointer is elsewhere,
+     so it costs the slide nothing - and it gives you a pause during Q&A. -->
 <video class="app-gif" src="images/plotomics-live.mp4"
-       autoplay loop muted playsinline></video>
+       aria-label="Plotomics Live: a million Xenium transcripts drawn on the GPU - the points arrive, a hover names the molecule under the cursor, then a zoom and back out to the whole section."
+       autoplay loop muted playsinline controls
+       controlslist="nodownload noplaybackrate"></video>
 ```
 
 ::: {.notes}
@@ -1088,8 +1094,8 @@ a million of those are drawn here, on the GPU, from React.
 Watch the loop. They arrive — a million points streamed as binary blobs and
 painted in one go. Hover one and you get the molecule under the cursor. Then
 zoom, and back out to the whole section: the red is tumour epithelium, the
-teal is stroma, and none of that structure is drawn by anything in R. R sent
-the numbers.
+green is stroma, the teal is immune cells, and none of that structure is drawn
+by anything in R. R sent the numbers.
 
 The ggplot2 toggle is right there in the same panel, and on this page it has
 to fall back to a subsample. That contrast is the argument.
