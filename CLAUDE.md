@@ -786,14 +786,16 @@ render:
   what holds them at the master's 52px.** The cap exists so a bullet does not
   run under the corner mark; the mark ends at y=366 and these bullets start
   below 700, so they can have the full 1728px content width. Nothing else gives
-  it back. The first two then measure 1657px and 1533px of text — one line
-  each.
-- **The third is 1731px, three over, and is broken by hand** — a `<br>` before
-  "it ships" in the qmd, so the whole of "it ships zero UI components" lands on
-  the second line instead of the wrap falling between "ships" and "zero".
-  Shrinking the bullets to fit instead was tried and reverted: 46px is the
-  largest size that holds all three on one line, and buying those three pixels
-  with six points of body text is a bad trade. Re-measure if one is reworded.
+  it back. The three now measure 1449px, 794px and 940px of text — one line
+  each, with the widest 279px inside the canvas.
+- **That headroom is recent and is the reason to re-measure after any
+  rewording.** The third bullet used to read "`shinyreact` is the bridge between
+  the two — it ships zero UI components", which was 1731px: three pixels over,
+  and hand-broken with a `<br>` so the wrap fell in a chosen place rather than
+  between "ships" and "zero". Shrinking the bullets to fit instead was tried and
+  reverted — 46px is the largest size that holds a 1731px line, and buying three
+  pixels with six points of body text is a bad trade. The bullet is now just
+  "`shinyreact` ships zero UI components", so the `<br>` is gone.
 - The tagline is **46px**, a subtitle under the 52px bullets.
 
 Two gotchas if this is reused: quarto's
@@ -1017,6 +1019,24 @@ Do not "clean these up" — each one silently breaks the layout:
 - A trailing `|` in `code-line-numbers` ("|6|7|4,8|") adds a step that clears
   the highlight. Use one before an `auto-animate` pair so the transition only
   has to move the changed lines instead of un-highlighting *and* rewriting.
+- **An `auto-animate` code pair needs both blocks laid out identically**, or
+  reveal slides the whole panel instead of the lines that changed. Section 04
+  has two of these — `#the-server-we-started-with` → the `shinyreact` server,
+  and `#react-ui` → `#shinyreact-ui` (the UI half, added later so the `ui.tsx`
+  hooks are read against the `useState`/`useMemo` they replace, twelve slides
+  after section 02 showed them). Three things that pair needs:
+  - **Neither block may be wrapped in a `.fragment`**, and neither slide may
+    carry a lead-in bullet the other lacks. An element hidden on arrival has
+    nothing to animate *from*, and a bullet above the panel changes the panel's
+    own top. Both panels measure top 255 / bottom 947 here; check that before
+    trusting a transition.
+  - **The "before" block is written to the shape of the "after"** — its
+    `useMemo` is on one line rather than the four `apps/02-react-only` spells
+    it over — so both are 13 lines and only 1–3 differ. It is a slide, not the
+    file; `#react-code` in section 02 still shows the app's own formatting.
+  - **A block with no highlight steps still needs `code-line-numbers="true"`.**
+    Dropping the attribute drops the line-number gutter too, and half a pair
+    without a gutter slides sideways into the half with one.
 - To land text on the *same* click as one of those steps, do **not** reach for
   `.fragment fragment-index=N`. Reveal's `sortFragments` puts every
   explicitly-indexed fragment ahead of the unindexed ones, and the

@@ -382,7 +382,7 @@ $presentation-block-margin: 44px !default;
 .reveal:has(#title-slide.present) .footer { display: none !important; }
 
 // -- deck-local: the elephant in the room ------------------------------------
-// The "You want me to write JavaScript?!?" beat is a divider used as a reaction
+// The "You want me to write JavaScript?!?!" beat is a divider used as a reaction
 // shot, so the elephant walks the whole width of the bottom edge, right to
 // left, over 6s - on at one side, off at the other. Walking off is what ends
 // it; no fade needed.
@@ -399,14 +399,21 @@ $presentation-block-margin: 44px !default;
 // transforms are compositor work: no layout, and the filter rasterizes once.
 // Hence also `will-change` on both, so the layers exist before the walk starts.
 // The emoji faces left, which is the way it is travelling.
-// Its height overlaps the headline's last line, so the `h2` is lifted into a
-// layer of its own and the elephant walks *behind* the words - otherwise it
-// crosses in front and bites the descenders off "JavaScript?!?". `position` on
-// the heading, never on the section (reveal positions those absolutely).
+// The `h2` is lifted into a layer of its own so the elephant passes *behind*
+// the words. At the 176px top below they no longer meet, but a third line of
+// headline would put them back in contact - and at 300px the elephant bites the
+// descenders off "JavaScript" when it crosses in front. `position` on the
+// heading, never on the section (reveal positions those absolutely).
 // The resting offset clears the bottom edge so all four feet are on the canvas
 // - `bottom: 0` alone buries them, since the emoji sits on the line box's
 // baseline and its descender space hangs below the glyph.
 $elephant-rest: -6%;
+// This one is a reaction shot rather than a section opener, and it is two lines
+// of headline, so it takes the *content* master's 176px top rather than master
+// 2's 636px baseline - which parked the question in the bottom third with the
+// elephant. `!important` and an element name, because the divider's own padding
+// is `!important` and lands later in the cascade.
+.reveal .slides section.divider:has(.elephant) { padding-top: 176px !important; }
 .reveal section.divider:has(.elephant) > h2 { position: relative; z-index: 1; }
 .reveal section.divider .elephant {
   position: absolute;
@@ -712,6 +719,13 @@ $elephant-rest: -6%;
 // parser, and without it that pass dies (SCSSParsingError) and takes the
 // revealjs libs out of the render with it. See CLAUDE.md.
 @keyframes dotcom-in { from { opacity: 0; } to { opacity: 1; } }
+// Section 02's opener wears the same gag - "React" becomes "React.dev" - but
+// it has to outlast the quotes being read aloud, so it waits 5s rather than
+// Samuel's 2.2s. Scoped by id, so the shorthand above still supplies the rest.
+.reveal section#what-is-react.present h2 .dotcom { animation-delay: 5s; }
+// A heading that is also a link is a heading first: the deck is published, so
+// the title of that slide is `react.dev`, but it must not take the link colour.
+.reveal h2 a { color: inherit; text-decoration: none; }
 
 // A QR inside the content of a slide (the gallery, on "Samuel Bharti"), as
 // opposed to the furniture QR the title and recap slides carry as a background
@@ -1386,6 +1400,10 @@ $elephant-rest: -6%;
     border: 2px solid rgba($cyan, .18);
     border-radius: 20px;
     box-shadow: none;
+    // Content-box + `width: 100%` makes the panel its column's width *plus* its
+    // own 44px padding and 2px border - 92px of overflow, which on a right-hand
+    // column runs the panel into the edge of the canvas.
+    box-sizing: border-box;
     width: 100%;
     margin: 0;
     padding: 40px 44px;
