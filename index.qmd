@@ -710,14 +710,37 @@ IDs and JSON are the contract.
 
 ## Test coverage at every hop
 
-- **Within the server** — `test_server()`
-  - set inputs, confirm output values
+- **Within the server** — `testServer()` · `test_server()` · `local_server`
+  - set inputs, confirm output values — no browser
 - **Server → client** — `wire_tap`
   - assert `shinyreact` messages on the websocket
 - **Within the client** — JS unit tests
   - *agent's choice*
 - **Confirm the client** — `features.md`
   - a nested list of features you can read and other agents can confirm
+
+::: {.notes}
+The first hop is in-memory: the app's server function runs, the reactive graph
+flushes, and you read the values back. No browser, no port, no waiting.
+
+R has had `shiny::testServer()` for years. Shiny for Python shipped its own
+`shiny.testserver.test_server()` in **1.8.0, released 2026-09-12** — three days
+before this talk — plus a `local_server`
+pytest fixture: name it as a test argument and you get a started session for the
+`app.py` next to the test file.
+
+```python
+def test_doubling_app(local_server):
+    local_server.set_inputs(name="Ada", n=10)
+    assert local_server.get_output("greeting") == "Hello, Ada!"
+```
+
+`set_inputs()` returns once the graph has settled, so the next line reads the
+result — no polling, no retry loop. That matters here because the React client
+is gone in this test: what you are asserting on is exactly the IDs-and-JSON
+contract the last section drew. The server half of a `shinyreact` app is
+testable without any of the client half existing.
+:::
 
 ## Why that contract matters
 

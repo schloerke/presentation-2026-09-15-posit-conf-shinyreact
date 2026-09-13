@@ -187,8 +187,8 @@
   * > Agents today have far more examples of mainstream React patterns than custom Shiny UI apps. I trust any frontier model to write react.js code better than I can
     * > That narrow IDs and JSON contract makes the client boundary practical to review and maintain
   * > You need to be able to describe your UI and review the result.
-  * within server - test_server()
-    * set inputs, confirm output values
+  * within server - testServer() (R) / test_server() + local_server fixture (py-shiny 1.8.0)
+    * set inputs, confirm output values - no browser
   * from server to client - wire_tap
     * assert shinyreact messages within the websocket
   * within client - js unit tests
