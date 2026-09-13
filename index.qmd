@@ -486,23 +486,22 @@ these frameworks a joy to work in.
 Experimental package for the brave few.
 :::
 
-## "You want me to write JavaScript?!?"
+## "You want me to write JavaScript?!?" {.divider}
 
-- Joe: "Shiny authors shouldn't need to write JavaScript"
-- Barret: **I believe this still holds true!**
-- Agents have far more examples of mainstream React patterns than custom Shiny UI apps
-  - I trust any frontier model to write React code better than I can
-- Your job: **describe your UI, review the result**
+<div class="elephant"><span>🐘</span></div>
 
 ::: {.notes}
 At this point you might be thinking… "You want me to write JavaScript?!?"
+
+There's the elephant in the room. Joe Cheng has always said Shiny authors
+shouldn't need to write JavaScript — and I believe that still holds true.
 
 Agents today have far more examples of mainstream React patterns than custom
 Shiny UI apps. I trust any frontier model to write React.js code better than I
 can. That narrow IDs-and-JSON contract makes the client boundary practical to
 review and maintain.
 
-You need to be able to describe your UI and review the result.
+Your job is to describe your UI and review the result.
 :::
 
 ## Old Faithful, remixed {.divider data-number="04"}
