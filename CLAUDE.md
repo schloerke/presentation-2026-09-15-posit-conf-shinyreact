@@ -60,6 +60,41 @@ from its heading, so `index.html#/two-hooks-are-the-whole-api` lands on one
 directly. The browser caches `index.html` hard between renders — add a
 `?v=N` that changes, or a re-render appears to have done nothing.
 
+**Nothing warns you when a slide runs off the bottom** — reveal clips it in
+silence, and `quarto render` is happy. So audit the whole deck rather than the
+slide you touched, by walking it in the browser and measuring each present
+section's lowest descendant against the canvas:
+
+```js
+for (let i = 0; i < Reveal.getTotalSlides(); i++) {
+  Reveal.slide(i); await new Promise(r => setTimeout(r, 100));
+  const s = document.querySelector('section.present');
+  s.querySelectorAll('.fragment').forEach(e => e.classList.add('visible'));
+  const top = s.getBoundingClientRect().top, sc = Reveal.getScale();
+  let max = 0;
+  s.querySelectorAll('*').forEach(e => {           // skip svg: a <g>'s rect lies
+    if (e.closest('svg')) return;
+    const c = getComputedStyle(e);
+    if (c.display === 'none' || c.position === 'fixed' || c.visibility === 'hidden') return;
+    max = Math.max(max, e.getBoundingClientRect().bottom);
+  });
+  console.log(i, s.id, Math.round((max - top) / sc));   // > 1080 = check it
+}
+```
+
+Show every fragment first or a slide measures short. Three kinds of false
+positive come back over 1080 and are fine: the title and `.recap` slides (their
+lockup is anchored to the *bottom*, so it sits at canvas height − 30), the
+`.demo-slide`s (the app flexes to the canvas), and a block whose last
+*margin* crosses the line while its ink does not. Everything else is a real
+clip. The deck currently has none.
+
+The audit has to be run at **1080**, not at whatever window is open. A window
+that is taller than 16:9 gets a canvas *taller* than 1080 from
+`theme/fit-width.html` (a 1728x1084 laptop window gives 1204), so a slide that
+overflows the design canvas can still look fine there and be clipped on the
+projector.
+
 A render can come out **incomplete**: exit 0 and "Output created", but
 `_site/index_files/libs/` has no `revealjs/` in it, so the served deck is
 unstyled markdown with ~19 console errors. The tell is quarto's own line
@@ -179,6 +214,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `img.used-by` — a screenshot inline in a bullet |
 | (none — deck-local) | `.logo-strip` — a row of linked brand marks under a bullet |
 | (none — deck-local) | `.render-out` — a code panel holding rendered UI, not code |
+| (none — deck-local) | `.tagline` — a quote bullet as a slide's subtitle |
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
@@ -199,7 +235,7 @@ slides on `##`, and it carries the slide id and speaker notes) but hidden, and
 padding, wrapper margin and footer all go to zero so the app fills 1920x1080.
 Pair it with `#| viewerHeight: 1080`.
 
-`.demo-titled` is the variant that keeps the heading, on both Old Faithful
+`.demo-titled` is the variant that keeps the heading, on all three Old Faithful
 demos: those apps' pages are white from the first pixel, so full-bleed left the
 corner mark floating on nothing. The section becomes a flex column and the app
 `flex: 1`, so it takes whatever the heading leaves with no measured height to
@@ -209,14 +245,28 @@ own `padding: 0` already is. The shinylive demo is three wrappers deep and
 one is overridden with `!important` too; leave `viewerHeight: 1080` alone, it
 is what the block is worth full-bleed and this only shrinks it.
 
-Each carries the mark of what it is running: the React-only slide a bare
-`.hexreact.corner` atom, the `shinyreact` one a `.hexlogo.corner` hex. Neither
+Each carries the mark of what it is running: the plain-Shiny slide a
+`.hexlogo.corner` carrying a `.lb-shiny` layer, which is Shiny's own sticker
+(and turns the shinyreact ring off for free); the React-only slide a bare
+`.hexreact.corner` atom; the `shinyreact` one a `.hexlogo.corner` hex. None
 takes a `data-id` — that would enlist it in the logo build's auto-animate
 chain. `:has(.hexlogo.corner)` caps the heading at 1380px alongside the body
 text, so a longer one wraps instead of running into the hex.
 
-**Both demo apps are sized for a projector, not a laptop**, because they run at
-1:1 with the 1920x1080 canvas. `.layout` is left-aligned and full-width (a
+**All three demo apps are sized for a projector, not a laptop**, because they
+run at 1:1 with the 1920x1080 canvas. `apps/00-old-faithful-trim` is plain
+bslib, so its levers are its own: `bs_theme(font_scale = 1.6)` for the page,
+`sidebar(width = 420)` for room, and `res = 130` on `renderPlot()` — base
+graphics draw in device pixels, so the chart's text is the one thing
+`font_scale` does not reach. Its slider needs a fourth: ionRangeSlider's parts
+are fixed px whatever the font size (11px bubble, 10px min/max, 9px grid, a 3px
+bar, a 19px handle), so a `tags$style` block resizes each and re-centres its
+`top` on the same axis. Scaling the whole widget with a `transform` was tried
+first and is worse — it shrinks the track by exactly what it magnifies, so you
+get a laptop-sized slider with cartoon bubbles. `.irs-bar` needs `!important`:
+bslib's own rule lands after the `tags$style`.
+
+The other two: `.layout` is left-aligned and full-width (a
 centred `max-width: 60rem` block parked ~400px of uncollapsible white beside
 the sidebar and shrank the chart to nothing), and `html { font-size: 26px }` is
 the single lever behind the page's rem sizes. Two things do *not* follow that
@@ -276,7 +326,7 @@ likewise out — 12.7 MB for the Plotomics gallery tour against the 4.0 MB Xeniu
 clip, and a tour rather than the four beats that slide is cut to.
 
 Two lines per app is the ceiling: five apps at two lines each already reach
-966px of the 1080 canvas, so a wrapped sub-bullet pushes the fifth caption off
+948px of the 1080 canvas, so a wrapped sub-bullet pushes the fifth caption off
 the bottom. Keep them short and re-check the last fragment after any edit. Screenshots rather than iframes: those apps are Connect
 Cloud deployments, and a served render makes no off-origin request. Three things
 make the swap work, and it breaks if any one goes:
@@ -694,6 +744,14 @@ below, and the heading's margin shrinks to 16px. That rhythm is what makes a
 which reads on a projector as the code simply ending early. Check the tail of
 the longest block after any change here.
 
+**A lead-in bullet is all the text a code slide has room for.** "What is
+React?" carried two blockquotes *and* the `Stat.jsx` panel and ran 1358px —
+278px past the canvas, with the bottom of the code silently gone. It is now two
+slides: the quotes keep "What is React?" (a plain content slide, so it takes
+the swoosh back), and the panel moved to `## Components` under the one-line
+lead-in "A component is a function that returns markup." Nothing was shrunk or
+cut; both slides carry the corner atom.
+
 When you do that check, **measure the rendered block; do not compute it from
 `$code-block-font-size`.** That variable is 34px, but the effective size on a
 slide is **36px** — quarto's own revealjs css beats `.reveal pre`'s declaration.
@@ -709,6 +767,39 @@ cannot drift. It joins `pre` in the 6.4 panel selector rather than restating the
 panel's six values. Every span in it sits on its own markdown line, so quarto
 wraps each in a `<p>`; those block margins are zeroed, and forgetting that is
 what pushed the panel 120px off the canvas first time round.
+
+`.tagline` is a slide whose subtitle is a **quote bullet** — `- > text` in a
+`::: {.nonincremental}` div, so the bullet's own cyan rule and the blockquote's
+border read as the double line React's two quotes carry on "What is React?",
+and it costs no click. Only the `shinyreact` slide uses it. Everything else in
+the rule is what that quote's box costs the slide, all of it measured on the
+render:
+
+- **The quote `p`'s block margins are zeroed.** Quarto puts 54px above *and*
+  below it *inside* the quote's own box — 108px of air for two lines of text,
+  which is most of what ran the slide 85px off the canvas (1165px) when the
+  tagline first became a quote.
+- **The second list drops to a 40px top margin**, the tagline keeping the
+  master's 60px under the heading — hence `> ul + ul` rather than `> ul`.
+- **The `:has(.hexlogo.corner)` 1380px cap is off for the bullets, and that is
+  what holds them at the master's 52px.** The cap exists so a bullet does not
+  run under the corner mark; the mark ends at y=366 and these bullets start
+  below 700, so they can have the full 1728px content width. Nothing else gives
+  it back. The first two then measure 1657px and 1533px of text — one line
+  each.
+- **The third is 1731px, three over, and is broken by hand** — a `<br>` before
+  "it ships" in the qmd, so the whole of "it ships zero UI components" lands on
+  the second line instead of the wrap falling between "ships" and "zero".
+  Shrinking the bullets to fit instead was tried and reverted: 46px is the
+  largest size that holds all three on one line, and buying those three pixels
+  with six points of body text is a bad trade. Re-measure if one is reworded.
+- The tagline is **46px**, a subtitle under the 52px bullets.
+
+Two gotchas if this is reused: quarto's
+incremental filter **consumes the `.nonincremental` div**, so the list it wraps
+carries no class to hook (target the blockquote instead), and the size has to
+go on the `p` — quarto sizes the paragraph, so a size on the `blockquote` is
+inherited and then overridden.
 
 `img.used-by` is a screenshot **inline in a bullet** (GitHub's "Used by 30M"
 badge, on "Why React?"). It was shot over an `$ink` ground so it needs no frame
@@ -809,6 +900,23 @@ because `flex: none` sized it to its own string and `[1, 8, 7, 10, …]` is seve
 characters shorter than `[13, 19, 31, 20, …]` — so stepping 12 → 30 bins shrank
 the panel and slid the arrow and histogram left, which reads as the chart being
 redrawn rather than the numbers changing.
+
+**The first row builds in three clicks** — the state, the `bins` it reduces to,
+the chart that array *is* — so each hop after the first is a `.state-part` span
+wrapping its arrow **and** what the arrow points at, and that span is the
+fragment. The wrapper is a flex row of its own carrying the parent's 24px gap,
+so grouping two items into one costs the layout nothing; `display: contents`
+would have been tidier and cannot work, since opacity needs a box to apply to.
+It also needs `align-self: stretch`, or the chart's `height: 100%` resolves
+against a wrapper sized to its own content instead of the 190px row.
+
+That build is also why the first row is **not** `.fade-in-then-out`: reveal
+hides such a fragment as soon as it stops being the *current* one, and its own
+children do exactly that — the row vanished on its second click. The theme
+swaps the rows with `:has(> .state-viz:last-child.visible)` instead, which
+reverses correctly and rides reveal's own fragment transition. Everything is
+laid out from the first click and only fades in, so no panel moves as the row
+builds.
 
 ### Reveal quirks this theme already works around
 
