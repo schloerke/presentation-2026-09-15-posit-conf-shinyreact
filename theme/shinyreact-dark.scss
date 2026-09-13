@@ -138,6 +138,22 @@ $presentation-block-margin: 44px !default;
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 24"><g fill="%23a3acbb" fill-opacity=".85"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/><path transform="translate(32 1.2) scale(.9)" d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></g></svg>');
 }
 
+// The posit mark, left of the `posit / Shiny Team` line - the same simple-icons
+// glyph, the same muted see-through fill and the same 6px gap as the social
+// marks above, so the two lockup lines read as one set.
+@mixin posit-mark($height) {
+  content: "";
+  display: inline-block;
+  width: $height;
+  height: $height;
+  // 10px, not the social marks' 6px: this line starts with a `p`, which has
+  // none of the `@`'s own side bearing to open the gap for it.
+  margin-right: 10px;
+  vertical-align: -.32em;
+  background: no-repeat center / contain
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23a3acbb" fill-opacity=".85" d="M0 .953v6.393l4.852 2.066-3.27 1.447v2.283l3.215 1.432L0 16.615v6.432l11.918-5.256.082-.035.082.035L24 23.047v-6.432l-4.797-2.04 3.215-1.433v-2.283l-3.27-1.447L24 7.346V.953L12 6.25Zm.879 1.352 10.039 4.431-4.96 2.19L.879 6.763Zm22.242 0v4.458l-5.066 2.162-4.973-2.19 10.04-4.431ZM12 7.209l4.945 2.19-4.95 2.107-4.94-2.108zM5.959 9.885l4.926 2.093-.006.002.006.002-4.979 2.12-3.446-1.529v-1.148l3.5-1.541zm12.082 0 3.514 1.54v1.15l-3.448 1.526-1.107.487-4.994 2.21L7 14.589l4.994-2.133L17 14.588l1.094-.487-4.973-2.12zM5.906 15.06l5.012 2.215-.066.03-9.973 4.404v-4.512zm12.201 0 5.014 2.137v4.512l-9.959-4.404-.066-.03z"/></svg>');
+}
+
 /*-- scss:rules --*/
 
 .reveal {
@@ -252,7 +268,7 @@ $presentation-block-margin: 44px !default;
     text-align: right;
     .quarto-title-author {
       display: block;
-      font-size: 30px;
+      font-size: 36px;
       font-weight: 400;
       line-height: 1.45;
       color: $muted;
@@ -263,7 +279,12 @@ $presentation-block-margin: 44px !default;
     // `nowrap` because the lockup's box is only as wide as its longest line.
     .quarto-title-author:last-child .quarto-title-author-name {
       white-space: nowrap;
-      &::before { @include social-marks(38px); }
+      &::before { @include social-marks(46px); }
+    }
+    // The affiliation line is the second `author:` entry; same treatment.
+    .quarto-title-author:nth-child(2) .quarto-title-author-name {
+      white-space: nowrap;
+      &::before { @include posit-mark(46px); }
     }
   }
   .date { display: none; }
@@ -1599,23 +1620,23 @@ $elephant-rest: -6%;
   background-repeat: no-repeat;
   background-position:
     $margin calc(100% - 30px),
-    #{$margin + 170px} calc(100% - 30px);
-  background-size: 130px 76px, 110px 110px;
+    #{$margin + 202px} calc(100% - 30px);
+  background-size: 162px 95px, 138px 138px;
 }
 
 // The repo QR, as a link. A background layer cannot be clicked, so
 // `theme/qr-links.html` appends a transparent anchor to each of the three
 // slides above and this parks it exactly over the layer - the same
-// `$margin + 170px` / 30px / 110px the background-position and -size use, so
+// `$margin + 202px` / 30px / 138px the background-position and -size use, so
 // the two move together. Absolute against the section, which reveal has
 // already positioned; no `position: relative` on the section (that would push
 // it back into flow and off-canvas).
 .reveal .qr-link {
   position: absolute;
-  left: $margin + 170px;
+  left: $margin + 202px;
   bottom: 30px;
-  width: 110px;
-  height: 110px;
+  width: 138px;
+  height: 138px;
 }
 
 // The speaker lockup where a slide has no `author:` to build one from: the
@@ -1628,7 +1649,7 @@ $elephant-rest: -6%;
   right: $margin;
   bottom: 30px; // as the title lockup
   text-align: right;
-  font-size: 30px;
+  font-size: 36px;
   font-weight: 400; // .reveal sets 500; the title lockup is 400
   line-height: 1.45;
   color: $muted;
@@ -1638,7 +1659,9 @@ $elephant-rest: -6%;
     margin: 0;
     white-space: nowrap;
   }
-  > p:last-child::before { @include social-marks(38px); }
+  > p:last-child::before { @include social-marks(46px); }
+  // The `posit / Shiny Team` line, where the lockup runs to three lines.
+  > p:nth-child(2):not(:last-child)::before { @include posit-mark(46px); }
 }
 
 // -- chrome ------------------------------------------------------------------

@@ -222,13 +222,21 @@ two feet. Anything you cannot read is what the back row cannot read.
   bottom-left, speaker lockup bottom-right, both in `--muted`. Carried over from
   the 2025 deck, where it worked.
 - **Social marks:** the speaker lockup's handle line is preceded by the octocat
-  and the bluesky butterfly, 38px tall, in `--muted` at 85% fill opacity, one
+  and the bluesky butterfly, 46px tall, in `--muted` at 85% fill opacity, one
   mark-width gap apart (they were overlapped first, which read as one blob) and
   6px from the handle. The handle is the same on both services, so one mark
   pair stands for both — the marks have to sit closer to the handle than to
   each other, or they read as a separate thought. The closing divider
   carries the handle line (and these marks) on its own, since master 2 has no
-  footer.
+  footer. The affiliation line above it takes the posit mark the same way: 46px, the
+  same `--muted` at 85% fill, 10px from the text (a `p` has none of the `@`'s
+  side bearing). It appears only where the lockup runs to three lines (title
+  slide and recap), not on the closing divider's handle-only lockup.
+- **Lockup furniture on the title, recap and closing slides is a size up from
+  the 30px footer:** the speaker lockup is 36px, the conf logo 162x95 and the
+  repo QR 138px, all still on the same 30px-from-the-bottom line. They read as
+  the slide's own credits there rather than as page furniture, and the QR is
+  the one thing on the slide the room is meant to act on.
 - **Title underline:** the logo's swoosh, 8px stroke, round caps, as a static
   block below the headline — never absolutely positioned. Absolute positioning is
   what collided it with the lede during mockup.
