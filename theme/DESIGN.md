@@ -1,4 +1,4 @@
-# shinyreact Keynote theme — design spec
+# shinyreact deck theme — design spec
 
 **Date:** 2026-08-18
 **Status:** Implemented — this directory
@@ -9,7 +9,7 @@ is retained as measured reference in case it is ever revived.
 
 ## 1. Purpose and scope
 
-A reusable, shinyreact-branded Keynote theme for posit::conf(2026) talks. **Dark
+A reusable, shinyreact-branded theme for the posit::conf(2026) talk. **Dark
 mode only.** 16:9, 1920×1080 design canvas.
 
 The theme must stay legible from the back row of a conference ballroom. That
@@ -169,9 +169,9 @@ preferred. Dark has no such constraint — a small bonus of going dark-only.)
 
 ### 5.1 Faces and the substitution problem
 
-**Keynote does not embed fonts.** A theme opened on a Mac without the intended
-face silently substitutes and reflows. For a theme meant to be handed to other
-people this is the primary technical risk, so the stack is specified in tiers:
+The deck inlines these faces as woff2 data URIs (`theme/fonts.scss`), so it
+never substitutes. The tiers below are kept for anything that renders without
+them:
 
 | Role | Preferred | Fallback 1 | Fallback 2 |
 |---|---|---|---|
@@ -228,8 +228,7 @@ two feet. Anything you cannot read is what the back row cannot read.
   pair stands for both — the marks have to sit closer to the handle than to
   each other, or they read as a separate thought. The closing divider
   carries the handle line (and these marks) on its own, since master 2 has no
-  footer. Ported to the SCSS only — the Keynote theme does not carry them.
-  The affiliation line above it takes the posit mark the same way: 46px, the
+  footer. The affiliation line above it takes the posit mark the same way: 46px, the
   same `--muted` at 85% fill, 10px from the text (a `p` has none of the `@`'s
   side bearing). It appears only where the lockup runs to three lines (title
   slide and recap), not on the closing divider's handle-only lockup.
@@ -308,16 +307,9 @@ Dark only — no light counterparts.
 
 ## 10. Deferred / open
 
-- **`.kth` production — resolved.** The `.pptx` route won: PowerPoint slide
-  layouts import as Keynote master slides, and `<p:ph>` placeholders import as
-  editable Keynote placeholders. `build_theme.py` generates the deck; the final
-  step is Save Theme in Keynote (see the README).
-- **Masters are the product, not slides.** Save Theme captures master slides and
-  discards content slides. The first build drew the design on slides, so the
-  resulting theme carried only the background colour. Every design element must
-  live on a layout, and every editable region must be a real placeholder whose
-  **list style** (`a:lvl1pPr`) carries the styling — run-level styling alone is
-  lost as soon as the user retypes the text.
+- **Keynote output — dropped.** The spec was originally ported to a `.pptx`
+  Keynote theme as well; that path and its generator are gone. The revealjs
+  SCSS is now the only renderer.
 - **Light variant.** Dropped 2026-08-18. §4.2 holds the measured values if revived.
 - **Licensed faces.** If the conf(2026) pixel display face is ever wanted, CoFo
   Sans Pixel is commercial and would need a license. Currently unused.
@@ -332,5 +324,4 @@ Dark only — no light counterparts.
 Three HTML mockups were built to choose the direction: "Hex & Orbit" (this spec),
 "Docs Projected" (react.dev discipline, no ornament), and a hybrid that leaned on
 conf(2026)'s lime/pixel motifs. They live in the shinyreact repo working tree and
-were not carried over — `preview/` holds Keynote's render of the built result,
-which supersedes them.
+were not carried over — the rendered deck supersedes them.

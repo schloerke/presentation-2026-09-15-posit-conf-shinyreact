@@ -13,11 +13,8 @@ index.qmd                  the deck (Quarto revealjs) - primary authoring surfac
 theme/DESIGN.md            the design spec - single source of truth for the look
 theme/shinyreact-dark.scss revealjs theme, ported from DESIGN.md
 theme/shinyreact-dark.highlight.theme  pandoc code colours (DESIGN.md 4.1)
-theme/build_theme.py       generates the Keynote/pptx theme from the same spec
 theme/fonts.scss           the DESIGN.md faces, inlined as data URIs (generated)
 theme/build_fonts.py       regenerates fonts.scss - run it if 5.1 changes
-theme/shinyreact-dark.theme  `highlight` colours for Keynote clipboard pastes
-theme/preview/*.png        Keynote renders - the reference the SCSS is matched to
 theme/qr-repo.svg          QR to this repo, bottom-centre of the title/end slides
 theme/qr-showcase.svg      QR to the app gallery, on the "Samuel Bharti" slide
 theme/fit-width.html       scales the deck to the window's width, not its box
@@ -31,9 +28,9 @@ _extensions/drop/          quarto-drop (webR console in a drawer)
 _extensions/EmilHvitfeldt/ quarto-revealjs-editable (live slide editing)
 ```
 
-**`theme/DESIGN.md` outranks both renderers.** The SCSS and `build_theme.py` are
-two ports of it. If a colour, size, or margin needs to change, change DESIGN.md
-first, then both ports — otherwise they silently drift.
+**`theme/DESIGN.md` outranks the renderer.** The SCSS is a port of it. If a
+colour, size, or margin needs to change, change DESIGN.md first, then the port —
+otherwise they silently drift.
 
 ## Working on the deck
 
@@ -122,7 +119,7 @@ image in the repo root; if one is already there, delete it rather than adding
 it to a commit or `.gitignore`.
 
 The canvas is **1920x1080** (set in the qmd), which is why the SCSS uses the
-same px values DESIGN.md and `build_theme.py` do. Do not rescale them; reveal
+same px values DESIGN.md does. Do not rescale them; reveal
 fits the canvas to the viewport.
 
 `theme/fit-width.html` (wired in via `include-after-body`) makes the deck scale
@@ -786,14 +783,16 @@ render:
   what holds them at the master's 52px.** The cap exists so a bullet does not
   run under the corner mark; the mark ends at y=366 and these bullets start
   below 700, so they can have the full 1728px content width. Nothing else gives
-  it back. The first two then measure 1657px and 1533px of text — one line
-  each.
-- **The third is 1731px, three over, and is broken by hand** — a `<br>` before
-  "it ships" in the qmd, so the whole of "it ships zero UI components" lands on
-  the second line instead of the wrap falling between "ships" and "zero".
-  Shrinking the bullets to fit instead was tried and reverted: 46px is the
-  largest size that holds all three on one line, and buying those three pixels
-  with six points of body text is a bad trade. Re-measure if one is reworded.
+  it back. The three now measure 1449px, 794px and 940px of text — one line
+  each, with the widest 279px inside the canvas.
+- **That headroom is recent and is the reason to re-measure after any
+  rewording.** The third bullet used to read "`shinyreact` is the bridge between
+  the two — it ships zero UI components", which was 1731px: three pixels over,
+  and hand-broken with a `<br>` so the wrap fell in a chosen place rather than
+  between "ships" and "zero". Shrinking the bullets to fit instead was tried and
+  reverted — 46px is the largest size that holds a 1731px line, and buying three
+  pixels with six points of body text is a bad trade. The bullet is now just
+  "`shinyreact` ships zero UI components", so the `<br>` is gone.
 - The tagline is **46px**, a subtitle under the 52px bullets.
 
 Two gotchas if this is reused: quarto's
@@ -1017,6 +1016,24 @@ Do not "clean these up" — each one silently breaks the layout:
 - A trailing `|` in `code-line-numbers` ("|6|7|4,8|") adds a step that clears
   the highlight. Use one before an `auto-animate` pair so the transition only
   has to move the changed lines instead of un-highlighting *and* rewriting.
+- **An `auto-animate` code pair needs both blocks laid out identically**, or
+  reveal slides the whole panel instead of the lines that changed. Section 04
+  has two of these — `#the-server-we-started-with` → the `shinyreact` server,
+  and `#react-ui` → `#shinyreact-ui` (the UI half, added later so the `ui.tsx`
+  hooks are read against the `useState`/`useMemo` they replace, twelve slides
+  after section 02 showed them). Three things that pair needs:
+  - **Neither block may be wrapped in a `.fragment`**, and neither slide may
+    carry a lead-in bullet the other lacks. An element hidden on arrival has
+    nothing to animate *from*, and a bullet above the panel changes the panel's
+    own top. Both panels measure top 255 / bottom 947 here; check that before
+    trusting a transition.
+  - **The "before" block is written to the shape of the "after"** — its
+    `useMemo` is on one line rather than the four `apps/02-react-only` spells
+    it over — so both are 13 lines and only 1–3 differ. It is a slide, not the
+    file; `#react-code` in section 02 still shows the app's own formatting.
+  - **A block with no highlight steps still needs `code-line-numbers="true"`.**
+    Dropping the attribute drops the line-number gutter too, and half a pair
+    without a gutter slides sideways into the half with one.
 - To land text on the *same* click as one of those steps, do **not** reach for
   `.fragment fragment-index=N`. Reveal's `sortFragments` puts every
   explicitly-indexed fragment ahead of the unindexed ones, and the
@@ -1313,7 +1330,7 @@ Types in use here: `feat` (new slide, demo, or app), `fix`, `docs` (this file,
 `outline.md`, `DESIGN.md` prose), `style` (theme/SCSS/typography), `refactor`,
 `chore` (CI, deps, vendored assets), `build`.
 
-Scopes are the repo's own nouns: `deck`, `theme`, `apps`, `wasm`, `ci`, `keynote`.
+Scopes are the repo's own nouns: `deck`, `theme`, `apps`, `wasm`, `ci`.
 
 ```
 feat(deck): add a React-only Old Faithful demo
@@ -1353,15 +1370,6 @@ These were measured, not estimated (DESIGN.md 9). Verify, don't assume:
 - One motif per slide (hexagon / orbit / swoosh). See DESIGN.md 8.
 - `#00D8FF` is graphic-only; text cyan is `#6FD4E8` (fringing, not contrast).
 - Chart series colours are assigned in fixed order and never cycled.
-
-Check work against `theme/preview/master-N-blank.png`, which is what the Keynote
-theme actually produces.
-
-## The Keynote path
-
-Still live, for when Keynote's presenter tooling is wanted. See
-`theme/README.md` — in particular that Save Theme captures *master slides*, not
-content slides, and must be run from the right window.
 
 ## Reference
 
