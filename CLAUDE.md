@@ -186,7 +186,7 @@ uv run --with segno python -c "import segno; segno.make('https://posit-shiny-sho
 The showcase QR encodes the **deployed gallery**, not the repo the bullet next
 to it links to: one bullet, two doors — the text is the source, the code is the
 thing. Samuel's own site needs no QR; the heading's `[.com]{.dotcom}` gag spells
-his address out, and the four package bullets already link into it.
+his address out, and the five package bullets already link into it.
 
 **Both QRs are links as well as codes**, because the deck is published and a
 viewer reading it on a laptop cannot scan their own screen. Both open in a new
@@ -394,8 +394,8 @@ the rendered slide, not at the crop.
 
 ### `.pkg-slide` — "Summer Packages", as a honeycomb
 
-"Summer Packages" is the app slide's construction reused: four
-one-item `.nonincremental` fragment divs on the left, four hex logos on the
+"Summer Packages" is the app slide's construction reused: five
+one-item `.nonincremental` fragment divs on the left, five hex logos on the
 right, each pair sharing a `fragment-index` so they land on one click. Unlike
 the app slide the hexes **accumulate** (plain `.fragment`, not
 `.fade-in-then-out`), so the honeycomb builds up as the bullets do.
@@ -404,8 +404,23 @@ Its one-liners and its ordering (validate → fetch → transport) are Samuel's
 own, from
 <https://github.com/samuelbharti/bio-packages/blob/main/slides/>; `packages.yml`
 in the showcase repo is the source of truth for what each package is and which
-languages it ships. `plotomics` is the fourth and is not part of that trio — it
-earns its line because it is what Plotomics Live draws two slides later.
+languages it ships. `biocohort` and `plotomics` are fourth and fifth and are
+not part of that trio — `plotomics` earns its line because it is what Plotomics
+Live draws two slides later, and `biocohort` (R only, r-universe rather than
+CRAN) because it is the object the study itself lives in. There is no
+`slides/biocohort.qmd` upstream, so its line was written from the package's own
+DESCRIPTION and README.
+
+**The hex source of truth is each package's `pkg-r/man/figures/logo.svg`.**
+Samuel's site lists `biocohort`'s logo as a **png** (240x277, exactly the
+slide's own hex size but raster), which is not what to vendor — the repo has
+the svg, already drawn on the same 173.2x200 pointy-top viewBox the other
+packs use, so it drops straight in.
+
+**Five hexes means three rows, and rows alternate.** `img:nth-child(n + 3)`
+pulls every row after the first up by 69.3px and shifts it 120px across;
+`img:nth-child(n + 5)` then takes the shift *back* off row 3, which is what
+puts the fifth hex over row 1's columns instead of floating half a width out.
 
 The languages are **the R and Python marks in the slide's own hexagon**, not
 the text `[r, py]`: `images/lang-r.svg` and `images/lang-py.svg`, each a
@@ -439,7 +454,8 @@ slide, not the file, before shrinking them again.
 
 **The languages were checked against the registries, not against prose.**
 `biobouncer` and `plotomics` are each on CRAN and PyPI; `biohttp` is CRAN and R
-only; `bioclients` is R only and is on r-universe rather than CRAN. Both of the
+only; `bioclients` and `biocohort` are R only and are on r-universe rather than
+CRAN. Both of the
 first two are *also* on npm — their repos are monorepos with `pkg-r` /
 `pkg-py` / `pkg-js`, and the JS is the TypeScript core the other two are built
 out of — but the slide deliberately does not tag that: it is an implementation
@@ -449,24 +465,24 @@ would install. Upstream's own `packages.yml` is out of date here (it lists
 re-check the registries rather than copying it.
 
 Each `li` is itself a **three-column grid** — name, language badge, then the
-"– description", which grid wraps in an anonymous item for free — so the four
+"– description", which grid wraps in an anonymous item for free — so the five
 en-dashes line up into a gutter and the block reads as a table. The tracks are
 fixed px, not `max-content`: each bullet is its own one-item list (it has to
 be, to carry a `fragment-index`) and separate grids cannot share a track size.
 Measure the widest name and the widest tag before changing them, and re-check
 that no description wraps — the description column is what is left over.
 The badge cell is `justify-self: start`, so the R hex lands in the same column
-on all four rows and the Python one extends to its right; `end` instead put a
+on all five rows and the Python one extends to its right; `end` instead put a
 lone R under the *second* badge of the rows above it. The dash is an en dash, not the
 em dash the rest of the deck's prose uses: an em dash costs about 15px here,
 which was the difference between `biohttp`'s line fitting and wrapping. The
 cyan rule is `position: absolute`, so it stays out of the tracks.
 
-The pack is one `<p>` (four images, no blank lines between them, so pandoc
+The pack is one `<p>` (five images, no blank lines between them, so pandoc
 keeps them in one paragraph) with `display: grid` **on the `p`**, which is what
 makes the images grid items and lets `nth-child` count them.
 
-- **All four logos are pointy-top hexes on a 173.2x200 viewBox** (ratio 0.866).
+- **All five logos are pointy-top hexes on a 173.2x200 viewBox** (ratio 0.866).
   That is what makes the tessellation exact: pointy-top hexes have vertical
   left and right edges, so two in a row touch at exactly one width, and the
   next row interlocks at 0.75 of a height down and half a width across (hence
@@ -476,11 +492,12 @@ makes the images grid items and lets `nth-child` count them.
 - **`biobouncer`'s own `logo.svg` is padded** inside a 440x500 box, so
   `images/pkg-biobouncer.svg` is the upstream file with its viewBox cropped to
   the hex itself (`41 32 358 416`). Without that it packs a size small and the
-  honeycomb has a hole. The other three are copies of the showcase repo's
-  `thumbnails/`.
+  honeycomb has a hole. `biocohort` comes from its own repo's
+  `pkg-r/man/figures/logo.svg`; the other three are copies of the showcase
+  repo's `thumbnails/`.
 - **Both dimensions are set on the images, with both maxes off.** Quarto caps
   an image at the height of its box; the second row's box is short (negative
-  top margin), so `height: auto` let those two shrink and the four hexes came
+  top margin), so `height: auto` let those two shrink and the hexes came
   out at different sizes.
 
 ### `.gif-slide` — Plotomics Live, as a recording
