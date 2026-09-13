@@ -173,9 +173,19 @@ ui <- bslib::page_sidebar(
 :::
 
 ::: {.notes}
-*Ask it. Wait for the hands.* "Keep them up if that string was more than ten
-lines." *(some stay up)* "Keep them up if you wrote it without one squiggly
-underline telling you you'd made a typo."
+*Ask it. Wait for the hands.* Then thin them out, one question at a time — each
+one should drop some hands and leave the rest more committed:
+
+- "Keep them up if that string was more than **ten** lines." *(most stay up)*
+- "Keep them up if it was more than a **hundred**." *(fewer — and those are the
+  people this talk is for)*
+- "Keep them up if you wrote it without **one squiggly underline** telling you
+  you'd made a typo." *(they all stay up; nothing in R was ever going to
+  underline it)*
+- *(hands down)* "And how many of you have thought about just using a **real
+  JavaScript framework** instead?" *(hands again — this is the turn; the room
+  has already had the idea, and the rest of the talk is permission to act on
+  it)*
 
 `bslib` got us from nothing to something to be proud of. Then a request comes
 in — a distinctive interface, richer interaction, a component from a modern
