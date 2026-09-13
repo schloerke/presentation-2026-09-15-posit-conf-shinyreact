@@ -589,7 +589,7 @@ $presentation-block-margin: 44px !default;
 
 // -- deck-local: the hex pack, on "Summer Packages" -------------------------
 //
-// Four one-item lists on the left, four hex logos on the right, each pair on
+// Five one-item lists on the left, five hex logos on the right, each pair on
 // one click. Same `section.pkg-slide` specificity dodge as `.app-slide`.
 .reveal .slides section.pkg-slide {
   ul { margin: 0 0 44px; }
@@ -659,12 +659,14 @@ $presentation-block-margin: 44px !default;
     box-shadow: none;
     background: none;
   }
-  // The second row: 0.75 of a height down (= -0.25 of the 277.1px height off
-  // the row it would otherwise start at) and half a width across.
+  // Every row after the first: 0.75 of a height down (= -0.25 of the 277.1px
+  // height off the row it would otherwise start at). Rows alternate half a
+  // width across, so row 3 sits back over row 1's columns.
   img:nth-child(n + 3) {
     margin-top: -69.3px;
     transform: translateX(120px);
   }
+  img:nth-child(n + 5) { transform: none; }
 }
 
 // The `.com` on the "Samuel Bharti" heading: his site is his name, so the
