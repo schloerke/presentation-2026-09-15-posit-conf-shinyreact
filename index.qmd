@@ -904,7 +904,7 @@ None of this is theory any more. Over the summer one intern built a shelf of it.
 - Shiny summer '26 intern
 - Ph.D. candidate, UAB
 - Computational biologist
-- 10x Shiny apps, 5x packages this summer
+- 10x Shiny apps, 5x packages
 - [posit-dev/shiny-showcase-bioinformatics](https://github.com/posit-dev/shiny-showcase-bioinformatics){.gh}
 :::
 
