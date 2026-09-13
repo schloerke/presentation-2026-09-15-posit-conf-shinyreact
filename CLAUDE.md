@@ -212,7 +212,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `.logo-strip` — a row of linked brand marks under a bullet |
 | (none — deck-local) | `.render-out` — a code panel holding rendered UI, not code |
 | (none — deck-local) | `.tagline` — a quote bullet as a slide's subtitle |
-| (none — deck-local) | `.divider` + a `.elephant` div — a divider as a reaction shot |
+| (none — deck-local) | `## Wait… what? {.meme background-image=…}` — a full-bleed reaction shot |
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
@@ -918,50 +918,35 @@ reverses correctly and rides reveal's own fragment transition. Everything is
 laid out from the first click and only fades in, so no panel moves as the row
 builds.
 
-### The elephant in the room ("You want me to write JavaScript?!?")
+### The reaction shot (`.meme`, "Wait… what?")
 
-That slide is a **`.divider` used as a reaction shot**: the quote is the whole
-slide, its four bullets live in the speaker notes, and a pink elephant walks the
-bottom edge right to left. It carries no `data-number`, so it gets no ghost
-numeral — it reads as a beat, not as a section opener.
+A full-bleed "Wait… what?" meme, **immediately after the `## React.js`
+divider**. The objection — *you want me to write JavaScript?* — lands the
+moment React is proposed, so the beat is taken there and the rest of section 02
+is the answer to it. It used to sit twelve slides later, at the end of section
+03, as a `.divider` headed "You want me to write JavaScript?!?!" with a walking
+pink elephant along the bottom edge; `git log` has both if either is wanted
+back. Its four bullets are still the speaker notes, unchanged apart from the
+new cue.
 
-- **It is two elements**, `<div class="elephant"><span>🐘</span></div>`, and has
-  to be: the walk and the sway both want `transform`, and two animations cannot
-  write the same property. The div walks (`translateX`), the span sways.
-- **The walk is `translateX`, not `right`.** Animating `right` works
-  geometrically — it was the first cut — but it relayouts the slide every frame
-  *and* forces the `filter` below to re-rasterize with it, which stutters
-  visibly as the elephant crosses the bottom-left corner. Two transforms are
-  compositor work: no layout, and the filter rasterizes once. `will-change:
-  transform` on both, so the layers exist before the walk starts.
-- **The emoji is grey, and `hue-rotate` alone does nothing to it** — the glyph is
-  near-greyscale, and rotating the hue of an unsaturated pixel leaves it
-  unsaturated. `sepia(1)` is what puts a hue there (a brown, ~35°) for the
-  rotate to move; hence `sepia(1) saturate(3.5) hue-rotate(285deg)`.
-- **`bottom: 0` buries its feet.** The emoji sits on the line box's baseline and
-  the descender space hangs below the glyph, so the span is lifted
-  `translateY(-6%)` to put all four feet on the canvas.
-- **The `h2` is lifted into its own layer** (`position: relative; z-index: 1`,
-  scoped by `:has(.elephant)`), so the elephant passes *behind* the words. At
-  300px it overlaps the headline's last line and otherwise crosses in front,
-  biting the descenders off "JavaScript?!?". Position the heading, never the
-  section — reveal positions those absolutely.
-- Timing: `6s 1s linear both`, travelling 2700px from a start 360px past the
-  right edge. Its trailing edge clears x=0 at ~6.35s and the walk runs on to
-  7.0s, so there is no frame where it is parked on canvas, and `both` holds it
-  off-screen afterwards. Walking off is what ends it; there is no fade.
-- Keyed off `section.divider.present`, not a bare `animation-delay` — reveal
-  keeps the coming slides in the DOM, so an unconditional delay would have run
-  out before you ever arrived (the same trap as `.dotcom` and `.logo-strip`).
-  That is also what replays it if you step back onto the slide.
+- **The picture is the whole slide, so it is a reveal *background***
+  (`background-image` + `background-size="contain"` +
+  `background-color="#141519"` as attributes on the `##`), not an `img`. Native
+  reveal, no layout of the theme's own — the only rule is
+  `.reveal section.meme > h2 { display: none }`, hiding the heading quarto needs
+  to split the slide and to carry the notes. `.meme` joins `.divider` and
+  `#title-slide` in the footer-hiding rule.
+- **`#141519` is `$ink-deep`**, so the pillarboxing matches the divider the
+  slide follows rather than reading as a second black bar.
+- **`images/wait-what.jpg`** is the meme cropped free of the letterbox bars it
+  arrived with, and saved as jpg — it is a photograph, and the png was 1.8 MB
+  against 225 KB:
 
-To check a change here, **pause the animations and step the clock** rather than
-sleeping and screenshotting: the two are separate tool calls, and the walk is
-over before the second one fires (which is how a "the elephant is missing"
-screenshot happened). `el.getAnimations().forEach(a => { a.pause();
-a.currentTime = 3800 })` gives you any frame you want. Sampling a *running*
-sway at 500ms also reads ~0° every time — that is aliasing against its 1s
-period, not a stopped animation; sample at 140ms.
+  ```bash
+  magick in.png -crop 1200x1050+0+75 +repage -quality 84 images/wait-what.jpg
+  ```
+
+  1200x1050 `contain`s to 1234x1080 on the canvas, so it is shown at ~1:1.
 
 ### Reveal quirks this theme already works around
 

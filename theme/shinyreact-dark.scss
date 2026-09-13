@@ -400,81 +400,22 @@ $presentation-block-margin: 44px !default;
 }
 // Master 2 has no footer, and master 1 carries its own lockup instead.
 .reveal:has(section.divider.present) .footer,
+.reveal:has(section.meme.present) .footer,
 .reveal:has(#title-slide.present) .footer { display: none !important; }
 
-// -- deck-local: the elephant in the room ------------------------------------
-// The "You want me to write JavaScript?!?!" beat is a divider used as a reaction
-// shot, so the elephant walks the whole width of the bottom edge, right to
-// left, over 6s - on at one side, off at the other. Walking off is what ends
-// it; no fade needed.
-// Keyed off `section.present`, not a bare `animation-delay`: reveal keeps the
-// coming slides in the DOM, so an unconditional delay would have run out before
-// you ever arrived (same trap as `.dotcom` and `.logo-strip`). That is also
-// what makes it replay if you step back onto the slide.
-// It is **two** elements, and has to be: the walk and the sway both want
-// `transform`, and two animations cannot write the same property. So the div
-// carries the walk (`translateX`) and the span inside it carries the sway.
-// Animating `right` instead does work geometrically - it was the first cut -
-// but it relayouts the slide on every frame *and* forces the pink `filter` to
-// re-rasterize with it, which stutters visibly at the left of the canvas. Two
-// transforms are compositor work: no layout, and the filter rasterizes once.
-// Hence also `will-change` on both, so the layers exist before the walk starts.
-// The emoji faces left, which is the way it is travelling.
-// The `h2` is lifted into a layer of its own so the elephant passes *behind*
-// the words. At the 176px top below they no longer meet, but a third line of
-// headline would put them back in contact - and at 300px the elephant bites the
-// descenders off "JavaScript" when it crosses in front. `position` on the
-// heading, never on the section (reveal positions those absolutely).
-// The resting offset clears the bottom edge so all four feet are on the canvas
-// - `bottom: 0` alone buries them, since the emoji sits on the line box's
-// baseline and its descender space hangs below the glyph.
-$elephant-rest: -6%;
-// This one is a reaction shot rather than a section opener, and it is two lines
-// of headline, so it takes the *content* master's 176px top rather than master
-// 2's 636px baseline - which parked the question in the bottom third with the
-// elephant. `!important` and an element name, because the divider's own padding
-// is `!important` and lands later in the cascade.
-.reveal .slides section.divider:has(.elephant) { padding-top: 176px !important; }
-.reveal section.divider:has(.elephant) > h2 { position: relative; z-index: 1; }
-.reveal section.divider .elephant {
-  position: absolute;
-  // The starting mark, off the right of the 1920 canvas; the box is ~330px
-  // wide at this font size, so nothing of it shows here.
-  right: -360px;
-  bottom: 0;
-  margin: 0;
-  font-size: 300px;
-  line-height: 1;
-  will-change: transform;
-  > span {
-    display: block;
-    transform-origin: 50% 100%;
-    transform: translateY($elephant-rest);
-    will-change: transform;
-    // The system emoji ships a *grey* elephant, and this one has to be pink.
-    // `hue-rotate` alone does nothing to it - the glyph is near-greyscale, and
-    // rotating the hue of an unsaturated pixel leaves it unsaturated. `sepia()`
-    // is what puts a hue there (a brown, ~35deg) for the rotate to move.
-    filter: sepia(1) saturate(3.5) hue-rotate(285deg) brightness(1.05);
-  }
-}
-// A beat before it walks on, and both halves wait it out together.
-.reveal section.divider.present .elephant {
-  animation: elephant-walk 6s 1s linear both;
-  > span { animation: elephant-wiggle 1s 1s ease-in-out infinite; }
-}
-@keyframes elephant-walk {
-  from { transform: translateX(0); }
-  // Far enough that the trailing edge is clear of the canvas: it starts 360px
-  // past the right edge, so 2700 puts its right edge ~60px past the left one.
-  to { transform: translateX(-2700px); }
-}
-@keyframes elephant-wiggle {
-  0% { transform: translateY($elephant-rest) rotate(0deg); }
-  25% { transform: translateY($elephant-rest) rotate(-6deg); }
-  75% { transform: translateY($elephant-rest) rotate(6deg); }
-  100% { transform: translateY($elephant-rest) rotate(0deg); }
-}
+// -- deck-local: the reaction shot -------------------------------------------
+// "Wait... what?" is the room's answer to "use React.js", so it sits right
+// after the section-02 divider - the objection lands the moment React is
+// proposed, not twelve slides later - and the picture is the whole slide.
+// So it is a reveal *background* (`background-image` + `background-size:
+// contain` on the heading, native reveal, no layout of our own) and the only
+// styling needed is hiding the `h2` quarto requires to split the slide and
+// carry the speaker notes. A walking pink elephant filled this role first; see
+// `git log` if it is ever wanted back.
+// `images/wait-what.jpg` is the meme cropped free of its letterbox bars:
+// `magick in.png -crop 1200x1050+0+75 +repage -quality 84 images/wait-what.jpg`
+// - jpg because it is a photograph, and the png was 1.8 MB against 225 KB.
+.reveal section.meme > h2 { display: none; }
 
 // -- live demo: the app gets the whole canvas --------------------------------
 // The `##` heading still exists (quarto splits slides on it, and it carries the
