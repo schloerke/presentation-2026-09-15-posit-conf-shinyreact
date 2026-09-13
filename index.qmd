@@ -136,12 +136,12 @@ The R UI is wonderful… until it isn't
      what?" meme two slides later - by the time "You want me to write
      JavaScript?!?" lands, the room has already put its hands up to writing
      it. -->
-## JavaScript, in a string {.code-slide}
+## Custom UI… within a string {.code-slide}
 
 <!-- The question is up on arrival rather than on a click, so the show of hands
      happens while the panel is still blank and the code lands as the answer. -->
 ::: {.nonincremental}
-- How many of you have written JavaScript or CSS as a string in R?
+- How many of you have written JavaScript or CSS within a string in R?
 :::
 
 ::: {.fragment}
@@ -487,7 +487,7 @@ Shiny's entire 14-year total on CRAN, which is about 50 million.
 - 🤖 AI excels at building well-known frameworks
 
 ::: {.notes}
-<!-- Do NOT ask for hands here: the "JavaScript, in a string" slide already did,
+<!-- Do NOT ask for hands here: the "Custom UI… within a string" slide already did,
      and asking twice reads as having forgotten. Refer back instead - the hands
      are the evidence this bullet rests on, and they are already in the room's
      memory. -->
@@ -764,7 +764,7 @@ R computes the value; React decides how it looks.
 :::
 
 ::: {.notes}
-<!-- The visual payoff for "JavaScript, in a string": that slide's
+<!-- The visual payoff for "Custom UI… within a string": that slide's
      `Shiny.setInputValue(...)` and this slide's `useShinyInput<number>(...)` do
      the same job, and the audience has seen both. One was flat green. -->
 Compare the first line to what we had in section 01. Getting a value out of the
@@ -881,7 +881,7 @@ messages crossing the websocket; the client's own unit tests are the agent's
 choice of JS runner; and `features.md` is a nested list of features you can read
 and other agents can confirm against.
 
-<!-- Callback to "JavaScript, in a string": the third hop is only available
+<!-- Callback to "Custom UI… within a string": the third hop is only available
      because the client is a file now. -->
 That third hop is worth a beat. The JavaScript in section 01 had no tests, and
 could not have had any — you cannot unit-test a string. Getting it into a file
