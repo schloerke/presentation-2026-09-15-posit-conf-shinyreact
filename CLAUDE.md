@@ -53,7 +53,7 @@ entries they only resolve under `quarto preview`, which serves the project root
 
 Checking a layout or a colour means rendering and *looking*, not reading the
 SCSS. Serve the render and drive it with a browser tool; every slide has an id
-from its heading, so `index.html#/two-hooks-are-the-whole-api` lands on one
+from its heading, so `index.html#/the-data-cycle` lands on one
 directly. The browser caches `index.html` hard between renders — add a
 `?v=N` that changes, or a re-render appears to have done nothing.
 
@@ -1282,6 +1282,10 @@ bold `$cyan-text` on every row, because matching ids *are* the contract.
 - The whole `.cycle` is `role="img"` with an `aria-label` saying the cycle in a
   sentence; the code inside is not read as a list of tokens.
 - Lowest ink is 816 of 1080 with every fragment shown.
+- **It sits before the live `shinyreact` demo, not after it**: explain the
+  round trip, then show it. The two hooks' glosses and the string-slide
+  callback stay on `#shinyreact-ui`, the slide before; the cycle's notes do not
+  repeat them.
 
 It replaced a mermaid `sequenceDiagram` (in `git log`) that went flowchart →
 vertical flowchart → sequence, each step losing something: a flowchart cannot

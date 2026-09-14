@@ -777,36 +777,6 @@ That is the whole trade: the JavaScript you were already writing, moved
 somewhere it can be read.
 :::
 
-## Old Faithful {.demo-slide .demo-titled}
-
-<!-- The finished mark, in the corner it lands in on the section-03 bullets
-     slide. No `data-id`: this slide is nowhere near the logo build's
-     auto-animate chain, and adding one would enlist it. -->
-<div class="hexlogo corner"></div>
-
-```{shinylive-r}
-#| standalone: true
-#| components: [viewer]
-#| viewerHeight: 1080
-
-## file: app.R
-# shinylive bundles `shinyreact` (and `brio`) into the render at build time,
-# so nothing is installed at runtime. See CLAUDE.md.
-{{< include apps/01-shinyreact/app.R >}}
-
-## file: www/index.html
-## type: text
-{{< include apps/01-shinyreact/www/index.html >}}
-
-## file: www/app.css
-## type: text
-{{< include apps/01-shinyreact/www/app.css >}}
-
-## file: www/app.js
-## type: text
-{{< include apps/01-shinyreact/www/app.js >}}
-```
-
 ## The data cycle {.cycle-slide .nostretch}
 
 <!-- Hand-authored, not mermaid: one row per hop, so the browser's hook, the
@@ -852,6 +822,36 @@ server; outputs now travel back as data, not HTML.
 IDs and JSON are the contract: `"bin_count"` and `"dist_data"` are the same
 string on both sides, and they are the only thing the two sides share.
 :::
+
+## Old Faithful {.demo-slide .demo-titled}
+
+<!-- The finished mark, in the corner it lands in on the section-03 bullets
+     slide. No `data-id`: this slide is nowhere near the logo build's
+     auto-animate chain, and adding one would enlist it. -->
+<div class="hexlogo corner"></div>
+
+```{shinylive-r}
+#| standalone: true
+#| components: [viewer]
+#| viewerHeight: 1080
+
+## file: app.R
+# shinylive bundles `shinyreact` (and `brio`) into the render at build time,
+# so nothing is installed at runtime. See CLAUDE.md.
+{{< include apps/01-shinyreact/app.R >}}
+
+## file: www/index.html
+## type: text
+{{< include apps/01-shinyreact/www/index.html >}}
+
+## file: www/app.css
+## type: text
+{{< include apps/01-shinyreact/www/app.css >}}
+
+## file: www/app.js
+## type: text
+{{< include apps/01-shinyreact/www/app.js >}}
+```
 
 ## Testing {.divider}
 
