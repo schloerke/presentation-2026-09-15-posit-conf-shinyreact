@@ -294,8 +294,10 @@ $presentation-block-margin: 44px !default;
 
 // The title slide's two motifs: the orbit, and the hex ring + logo on the right
 // (DESIGN.md 6.1). Shared with `.recap`, which is dressed as a second title
-// slide. A stroke, not a fill: the logo PNG bakes in its own #1C1D22 hex, so a
-// fill behind it would show as a patch. Cyan, not the old #23252C: grey it read
+// slide. The base ring is a bare stroke: the logo PNG bakes in its own #1C1D22
+// hex, so any fill *other than that* would show behind it as a patch - which is
+// why each caller passes its own ($ink-deep on the title slide, $ink on the
+// recap, below). Cyan, not the old #23252C: grey it read
 // as a smudge the logo's atom happened to cross.
 //
 // The logo is a background layer here rather than
@@ -340,10 +342,16 @@ $presentation-block-margin: 44px !default;
 }
 
 // The recap comes after the reveal, so it carries the finished logo.
+//
+// Filled with `$ink`, which *is* the slide's own background and the ground the
+// PNG bakes in - so the fill is invisible as a patch and its whole job is to
+// stop the orbit watermark (which reaches this corner) from running through the
+// 20px of ring the 520x600 PNG does not cover. An atom's ellipse crossing the
+// cyan border read as a smudge on the mark.
 .reveal section.recap::after {
   background:
     no-repeat center / 520px 600px url('../../../../../theme/shiny-react.png'),
-    no-repeat center / 100% 100% url('#{hex-ring()}');
+    no-repeat center / 100% 100% url('#{hex-ring("%23" + str-slice("#{$ink}", 2))}');
 }
 
 // The recap wears the title slide's furniture - it is the slide that stays up
@@ -370,27 +378,31 @@ $presentation-block-margin: 44px !default;
 // -- master 2: section divider -----------------------------------------------
 .reveal section.divider {
   background: $ink-deep;
-  padding: 636px $margin 0 !important; // heading baseline, per master 2
+  // The section name is now the only thing on the slide, so it takes the
+  // canvas's centre - both ways - rather than master 2's 636px baseline, which
+  // existed to leave the ghost section number the top-left quadrant.
+  // Absolute rather than flex: reveal's own `.reveal .slides > section.present
+  // { display: block }` out-specifies a `display: flex` here, so the section
+  // cannot be a flex container. The section is already absolutely positioned by
+  // reveal, so the heading can position against it as-is (no `position:
+  // relative` - see the reveal quirks in CLAUDE.md).
+  padding: 0 !important;
 
   &::before { @include orbit(750px, .10); top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-  // Ghost number from `data-number`. Decorative - the section name carries the
-  // meaning, so it is exempt from the 7:1 text floor (DESIGN.md 6.2).
-  &[data-number]::after {
-    content: attr(data-number);
+  // Centred on the watermark: the ghost section number used to hold the left
+  // column, and without it a left-aligned name floats off the orbit's axis.
+  text-align: center;
+  h1, h2 {
     position: absolute;
     left: $margin;
-    top: 340px;
-    font-size: 240px;
-    font-weight: 900;
-    line-height: 1;
-    color: rgba($cyan, .22);
-  }
-  h1, h2 {
+    right: $margin;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 96px;
     &::after {
       @include swoosh(640px);
-      margin-top: 44px;
+      margin: 44px auto 0; // auto, or the swoosh stays left of centred text
       transition: opacity .4s ease; // matches reveal's fragment fade
     }
     // A heading whose text is a fragment keeps its swoosh hidden until the
@@ -1343,10 +1355,16 @@ $presentation-block-margin: 44px !default;
 // two lines.
 .reveal .x-mark {
   path { stroke: $mark-red; }
-  left: 131px;
-  top: 506px;
-  width: 1305px;
-  height: 312px;
+  // Measured off the rendered slide: the box spans the *foreign* lines only -
+  // the CSS body (line 3, top 527) down to the end of the JS body (line 8,
+  // bottom 799) - so it never touches `tags$head(tags$style(HTML("`, the
+  // closing R lines, or `uiOutput("cards")`. An X over the R scaffolding reads
+  // as "Shiny is wrong", which is the opposite of the talk's claim.
+  // Re-measure these four if the block's length or font size changes.
+  left: 190px;
+  top: 527px;
+  width: 1250px;
+  height: 272px;
   &.visible path:last-child { animation-delay: .22s; }
 }
 
@@ -1544,6 +1562,18 @@ $presentation-block-margin: 44px !default;
       margin: 0 !important;
     }
   }
+}
+
+// -- deck-local: aligned dashes on "Test coverage at every hop" --------------
+// Each bullet is "**label** - what you use", and the four read as a table only
+// if the dashes line up. An inline-block on the label, not a grid on the `li`:
+// a grid makes *every* inline child its own item, so the three `code` spans
+// after the dash each landed in a column of their own (tried, and it shredded
+// the line). `min-width`, so a label longer than the track pushes the dash out
+// rather than being clipped - measure the widest before changing it.
+.reveal .slides section#test-coverage-at-every-hop ul > li > strong:first-child {
+  display: inline-block;
+  min-width: 460px; // "Confirm the client", the widest of the four, is 455
 }
 
 // -- 6: footer ---------------------------------------------------------------

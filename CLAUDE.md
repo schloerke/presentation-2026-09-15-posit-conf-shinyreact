@@ -220,7 +220,7 @@ Master equivalents, applied as classes on a `##` heading:
 | DESIGN.md master | markdown |
 |---|---|
 | Title | the auto title slide (`title:`/`subtitle:`/`author:` in yaml) |
-| Section divider | `## Name {.divider data-number="01"}` |
+| Section divider | `## Name {.divider}` |
 | Content | `## Name` + a bullet list |
 | Code two-up | `## Name {.code-slide}` + `.columns` with two fenced blocks |
 | Data | `## Name {.data-slide}` + caption, `.stats`, one chart |
@@ -239,13 +239,34 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `.tagline` — a quote bullet as a slide's subtitle |
 | (none — deck-local) | `## Wait… what? {.meme background-image=…}` — a full-bleed reaction shot |
 
+**A divider is its section's name, centred on the canvas, and nothing else.**
+It carried a `data-number` ghost numeral ("05" behind "Testing") in a
+$cyan-.22 240px face down the left; that is gone, along with master 2's 636px
+heading baseline — the name now sits `top: 50%` with a `translateY(-50%)`, over
+the orbit watermark's own centre, and the swoosh under it takes `margin: … auto`
+so it centres with the text. The heading is absolutely positioned rather than
+the section being a flex column: reveal's `.reveal .slides > section.present
+{ display: block }` out-specifies a `display: flex` written here, so the section
+cannot be a flex container (tried; the heading pinned to the top of the slide).
+The sections themselves also lost their numbers, so "07 What's next" no longer
+exists as a slide at all — "Future work: incremental adoption" now follows the
+Plotomics slide directly.
+
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
 shared with `#title-slide` in one rule — but only the *ring* is: the title
 slide holds the mark back (`content: "???"`, white and light-weight, since the
 logo is the payoff of section 03) over an `$ink-deep`-filled hex, and `.recap`,
-coming after the reveal, re-adds the PNG layer over the unfilled ring. Both
-come from the `hex-ring($fill)` function, so the two stay in register.
+coming after the reveal, re-adds the PNG layer over a hex filled with `$ink`.
+Both come from the `hex-ring($fill)` function, so the two stay in register.
+**`.recap`'s fill is `$ink` deliberately, and it is not decorative**: `$ink` is
+that slide's own background *and* the ground the PNG bakes in, so the fill is
+invisible as a patch — its whole job is to stop the orbit watermark, which
+reaches that corner, running its ellipses through the 20px of cyan ring the
+520x600 PNG does not cover. An atom's orbit crossing the border read as a
+smudge on the mark. (The ring was a bare stroke for a long time; the old
+comment "a fill behind it would show as a patch" is only true of a fill that is
+not `$ink`.)
 The lockup is written out as a
 `::: {.handle}` div (three lines) because only a real title slide has `author:`
 to build one from. Its footer is hidden — the lockup takes that corner — and
@@ -275,6 +296,12 @@ Each carries the mark of what it is running: the plain-Shiny slide a
 takes a `data-id` — that would enlist it in the logo build's auto-animate
 chain. `:has(.hexlogo.corner)` caps the heading at 1380px alongside the body
 text, so a longer one wraps instead of running into the hex.
+
+**That mark is why all three demo slides are just headed "Old Faithful".** The
+last one read "Live: Old Faithful w/ `shinyreact`", which is the corner hex
+said twice; the hex signifies it. Quarto therefore deduplicates the slide ids
+(`old-faithful`, `-1`, `-2`, `-3`) — nothing in the theme or the qmd targets
+them, but don't write a rule that assumes one.
 
 **All three demo apps hand the deck's keys back to reveal**, and they have to:
 each runs in an iframe, so the moment you click a slider the keystrokes go to
@@ -872,9 +899,11 @@ test can reach it — and everyone in that room has done it.
 - **The question is `.nonincremental`**, so it is up on arrival rather than on a
   click: the show of hands happens while the panel is still blank and the code
   lands as the answer. At 52px it has to stay on **one line** — "How many of you
-  have written JavaScript or CSS within a string in R?" is 1638px, against a
-  1728px content width — so there are 90px left, and any longer phrasing wraps
-  and costs the panel ~70px it does not have. The code's lowest ink measures
+  have written JavaScript or CSS within a string?" is 1607px, against a
+  1728px content width — so there are 121px left, and any longer phrasing wraps
+  and costs the panel ~70px it does not have. (It used to end "…within a string
+  in R?"; the "in R" went because the escalation is about the *string*, and the
+  same objection is a Python user's.) The code's lowest ink measures
   1003 of 1080 with the question on one line (1054 to the bottom of `pre`'s own
   padding).
 - **Only the first question is on the slide; the escalation is spoken.** The
@@ -884,11 +913,15 @@ test can reach it — and everyone in that room has done it.
   notes deliberately: the panel has 77px of clearance, so a second on-slide
   bullet would clip it, and a printed escalation lets the audience read ahead
   and kills the beat. Whoever adds a question adds it there.
-- **The `.x-mark` covers the two `HTML("…")` bodies only** (131/506, 1305x312),
-  not the panel. An X over all of it reads as "Shiny is wrong", which is the
-  opposite of the talk's claim. Measure those lines specifically — the first cut
-  unioned every `span.st` in the block, which swept in `uiOutput("cards")`'s
-  perfectly ordinary R string and stretched the X over the last two lines.
+- **The `.x-mark` covers the CSS and JS lines only** (190/527, 1250x272) — from
+  the top of `.stat-card { … }` to the bottom of the JS body's `});`. It must
+  not reach the R around them: not `tags$head(tags$style(HTML("`, not the
+  closing `")),`, not `uiOutput("cards")`. An X over the R reads as "Shiny is
+  wrong", which is the opposite of the talk's claim. Measure those lines
+  specifically off the render (each line span's rect against the section's top);
+  an earlier cut unioned every `span.st` in the block, which swept in
+  `uiOutput("cards")`'s perfectly ordinary R string, and the one after it still
+  started on the `tags$head` line and ended on a closing paren.
 - `.circle-mark` is the unused partner of that rule; it said "this stays" on the
   `renderUI` version. Kept because the pair is one rule.
 - **Five later slides call back to it, in their speaker notes only.** The setup
@@ -902,9 +935,13 @@ test can reach it — and everyone in that room has done it.
     first bullet is about hand-rolled HTML. Asking twice reads as having
     forgotten, and the second ask gets half the hands. Its note refers back
     instead. (Barret's bullet text stays as it is; only the note does this.)
-  - **"Two hooks are the whole API"** — the visual payoff:
-    `Shiny.setInputValue('card_clicked', …)` in flat green against
-    `useShinyInput<number>("bin_count", 30)`, same job, typed.
+  - **`#shinyreact-ui`** — the visual payoff:
+    `Shiny.setInputValue('card_clicked', …)` in flat green against that slide's
+    line 2, `useShinyInput<number>("bin_count", 30)` — same job, typed. This
+    note used to live on a "Two hooks are the whole API" slide that followed it;
+    that slide was **dropped** (it restated the two hooks on their own, one per
+    panel, which `#shinyreact-ui`'s four highlight steps already walk) and its
+    notes moved onto `#shinyreact-ui` whole.
   - **"The UI moves to TypeScript"** — half of that "cost" is a refund.
   - **"Test coverage at every hop"** and the Q&A **"Is node.js needed?"** — you
     cannot unit-test or lint a string; a build step buys it back. Note the
@@ -961,6 +998,17 @@ incremental filter **consumes the `.nonincremental` div**, so the list it wraps
 carries no class to hook (target the blockquote instead), and the size has to
 go on the `p` — quarto sizes the paragraph, so a size on the `blockquote` is
 inherited and then overridden.
+
+**"Test coverage at every hop" aligns its four em dashes into a gutter**, so the
+bullets read as a table. One rule, on `#test-coverage-at-every-hop`: the
+bullet's leading `strong` goes `display: inline-block; min-width: 460px`
+("Confirm the client", the widest of the four, measures 455). Not the
+`.pkg-slide` grid trick — a grid makes **every** inline child its own item, so
+the three `code` spans after the dash each landed in a column of their own and
+the line came apart (tried, on the render). `min-width` rather than `width`, so
+a longer label pushes its dash out instead of being clipped; re-measure the four
+after any rewording, and check the first bullet still fits (it is the longest
+line on the slide).
 
 `img.used-by` is a screenshot **inline in a bullet** (GitHub's "Used by 30M"
 badge, on "Why React?"). It was shot over an `$ink` ground so it needs no frame
@@ -1081,7 +1129,7 @@ builds.
 
 ### The reaction shot (`.meme`, "Wait… what?")
 
-A full-bleed "Wait… what?" meme, **immediately after the `## React.js`
+A full-bleed "Wait… what?" meme, **immediately after the `## React`
 divider**. The objection — *you want me to write JavaScript?* — lands the
 moment React is proposed, so the beat is taken there and the rest of section 02
 is the answer to it. It used to sit twelve slides later, at the end of section
@@ -1177,9 +1225,12 @@ Do not "clean these up" — each one silently breaks the layout:
     `useMemo` is on one line rather than the four `apps/02-react-only` spells
     it over — so both are 13 lines and only 1–3 differ. It is a slide, not the
     file; `#react-code` in section 02 still shows the app's own formatting.
-  - **A block with no highlight steps still needs `code-line-numbers="true"`.**
-    Dropping the attribute drops the line-number gutter too, and half a pair
-    without a gutter slides sideways into the half with one.
+  - **Both halves need a `code-line-numbers` attribute**, even one with no
+    steps (`="true"`). Dropping it drops the line-number gutter too, and half a
+    pair without a gutter slides sideways into the half with one. `#react-ui`
+    carries `"|2,3"`: it lands unhighlighted, one click lights the two
+    declarations the partner slide rewrites, and the click after that is the
+    transition — so the eye is already on those two lines when they change.
 - To land text on the *same* click as one of those steps, do **not** reach for
   `.fragment fragment-index=N`. Reveal's `sortFragments` puts every
   explicitly-indexed fragment ahead of the unindexed ones, and the
@@ -1197,9 +1248,11 @@ Do not "clean these up" — each one silently breaks the layout:
   Text left *outside* a `.chain-N` span is visible on arrival, which is how the
   second slide keeps the first two links its auto-animate partner ended on.
   Count the steps before writing those numbers: a trailing `|` is a step, so
-  `"|5|6|"` is four codes (original + three clones) and `"|6|7|4,8|"` is five,
-  which is why `.chain-3` and `.after-code` land on the same click on the first
-  slide and one apart on the second.
+  `"|5|6|"` is four codes (original + three clones) and `"|6|7|4,8|"` is five.
+  **`.after-code` currently has no user in `index.qmd`** — the line it carried
+  ("The computation is unchanged — the value sent changed.") was cut from the
+  `shinyreact` server slide. The rule is kept because it is the documented way
+  to land text on a highlight step; delete it if that stays true.
 
 ### Mermaid (the one diagram, on "The data cycle")
 
