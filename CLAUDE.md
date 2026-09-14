@@ -855,7 +855,7 @@ for (let i = 0; i < Reveal.getTotalSlides(); i++) {
 slide anyway** — both clips above were found by looking, after a width check
 had already passed.
 
-### "JavaScript, in a string" — the hook into section 02
+### "Custom UI… within a string" — the hook into section 02
 
 The slide that turns Old Faithful toward React. It replaced one built on
 `renderUI`, which was **the wrong defendant**: dynamic UI is a perfectly good
@@ -872,14 +872,16 @@ test can reach it — and everyone in that room has done it.
 - **The question is `.nonincremental`**, so it is up on arrival rather than on a
   click: the show of hands happens while the panel is still blank and the code
   lands as the answer. At 52px it has to stay on **one line** — "How many of you
-  have written JavaScript or CSS as a string in R?" is 1621px; adding back "your
-  … code" makes it 1672px, which wraps and costs the panel ~70px it does not
-  have. The slide measures 986 of 1080 with the question on one line.
+  have written JavaScript or CSS within a string in R?" is 1638px, against a
+  1728px content width — so there are 90px left, and any longer phrasing wraps
+  and costs the panel ~70px it does not have. The code's lowest ink measures
+  1003 of 1080 with the question on one line (1054 to the bottom of `pre`'s own
+  padding).
 - **Only the first question is on the slide; the escalation is spoken.** The
   notes carry four more (ten lines → a hundred → without one squiggly underline
   → "thought about just using a real JavaScript framework?"), each thinning the
   hands and the last one turning the room toward section 02. They stay in the
-  notes deliberately: the panel has 94px of clearance, so a second on-slide
+  notes deliberately: the panel has 77px of clearance, so a second on-slide
   bullet would clip it, and a printed escalation lets the audience read ahead
   and kills the beat. Whoever adds a question adds it there.
 - **The `.x-mark` covers the two `HTML("…")` bodies only** (131/506, 1305x312),
