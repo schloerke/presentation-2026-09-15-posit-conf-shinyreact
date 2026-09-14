@@ -228,7 +228,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `## Name {.app-slide .nostretch}` + bullets and a `.r-stack` of screenshots |
 | (none — deck-local) | `## Name {.gif-slide .nostretch}` + a `.gif-caption` span and one `.app-gif` |
 | (none — deck-local) | `## Name {.pkg-slide .nostretch}` + bullets and a `.hexpack` of hex logos |
-| (none — deck-local) | `## Name {.cycle-slide .nostretch}` + a `mermaid` block |
+| (none — deck-local) | `## Name {.cycle-slide .nostretch}` + the `.cycle` raw-html block |
 | (none — deck-local) | `## Name {.recap}` — content master wearing master 1's furniture |
 | (none — deck-local) | `## Name {.logo-slide}` + `.hexlogo` / `.hexreact` divs |
 | (none — deck-local) | bullets + an `.r-stack.state-stack` of `.state-viz` rows |
@@ -1257,62 +1257,38 @@ Do not "clean these up" — each one silently breaks the layout:
   `shinyreact` server slide. The rule is kept because it is the documented way
   to land text on a highlight step; delete it if that stays true.
 
-### Mermaid (the one diagram, on "The data cycle")
+### The data cycle (`.cycle-slide`) — hand-drawn, not mermaid
 
-**TODO — Barret does not like this diagram.** It is checked in to unblock the
-rest of the deck, not because it is right. The layout went flowchart (two
-columns, too wide) → vertical flowchart (needed two `browser` boxes, which ruins
-the point) → this sequence diagram, and each step traded away something. If it
-gets another pass, the honest options are hand-authored svg/html for this one
-slide (full control of a real cycle, at the cost of custom CSS) or `block-beta`
-(manual grid placement, still beta). The notes below are what mermaid will and
-will not do, so a rewrite does not have to rediscover them.
+Three columns — browser, wires, server — each a flex stack of the same
+fixed-height rows, so the hook, the wire's payload and the server's step for
+one id share a line with no grid to keep in sync. The two columns are the
+`.state-json` panel look; the wires are a cyan rule with a border-triangle
+head, flipped on `.cycle-out`. Ids (`"bin_count"`, `"dist_data"`) are the
+bold `$cyan-text` on every row, because matching ids *are* the contract.
 
-`mermaid-format: svg` in the yaml is load-bearing: without it quarto leaves the
-diagram to client-side mermaid, which measures its labels in a slide reveal has
-`display: none`d and renders boxes with no text in them. With it, quarto
-pre-renders the svg at build time. Everything else follows from that svg being
-sized at build time and re-styled at display time:
+- **It is a `{=html}` raw block.** Written as loose raw HTML, pandoc parsed the
+  `$` in `input$bin_count … output$dist_data` as TeX math and ate the server
+  column (a "Could not convert TeX math" warning, exit 0).
+- **Every line is cut to 32 characters** of 32px mono — the column is 660px
+  with 20px side padding, so 620px inside. `useShinyOutputValue("dist_data",
+  null)` is 40, hence the three-line break. The payloads are 19 characters in
+  the 360px wire column, 5px over, which the 24px gaps absorb. Widths were
+  checked with `scrollWidth > clientWidth` on each `code` — that works here
+  because these are plain blocks, not the line-highlight clones the code
+  slides warn about.
+- **Fragments carry explicit indices, all of them**: the send wire and the
+  server column are index 1, the return wire index 2, so arrival shows what the
+  React side wrote, click 1 sends it, click 2 answers it. Verified by stepping.
+- The whole `.cycle` is `role="img"` with an `aria-label` saying the cycle in a
+  sentence; the code inside is not read as a list of tokens.
+- Lowest ink is 816 of 1080 with every fragment shown.
 
-- It is a **`sequenceDiagram`**, not a flowchart, and that is the whole reason
-  the slide works. A flowchart cannot show the round trip with one browser box
-  and one server box: dagre gives a cluster the bounding box of its members, so
-  a browser box holding both hooks encloses the server box sitting between them.
-  A sequence diagram gets both boxes plus time down the page for free.
-- Each side's names sit on its own lifeline as **self-messages** (`B->>B:`,
-  `S->>S:`), not as `Note`s. Notes are their own rows *and* render at 14px
-  rather than 16px, and they overhang the lifelines, so they cost both of the
-  budgets below at once: the note version measured 1200x447 units against this
-  one's 810x420.
-- The sequence renderer writes its font size **inline** (16px messages, 14px
-  notes); the `sequence` config's `actorFontSize`/`messageFontSize` are ignored
-  (both numbers and `"32px"` strings were tried). How big the labels read is
-  therefore set by how far the whole svg is scaled up — `800px / 420 units` ≈
-  x1.9, so 30px. Keep the graph narrow (`actorMargin: 100`) and short (five
-  rows) and the text stays large; every extra row or unit of width shrinks it.
-  Splitting the server's three steps into three self-messages, for instance,
-  takes the graph to 713 units tall and the labels down to 19px.
-- `.cycle-slide` pins **both** svg dimensions. Left to itself the svg takes its
-  aspect ratio from quarto's 960x480 `width`/`height` attributes rather than
-  from the viewBox, and the drawing floats in the middle of an 864px-tall box.
-  (`%%| fig-height:` would change those attributes, but only if it comes
-  *before* `%%{init}%%` — cell options first, or they are silently dropped.)
-- Mermaid does **not** widen the diagram to fit message labels, so a label
-  longer than the gap between the lifelines just overhangs them. That is fine
-  here — there is empty slide either side — but it is why the two hops are one
-  label each rather than a sentence.
-- `.cycle-slide` trims the top pad to 76px and drops the swoosh under the
-  headline, purely to hand those pixels to the diagram's height.
-- The `%%{init}%%` block is JSON: no `//` comments in it, they break the parse.
-  Set `fontFamily` at its top level, **not** in `themeVariables`, where it
-  silently drops the font-family declarations from the generated css. It must
-  also be a font the build host has — Inter is a webfont, so this uses
-  Helvetica/Arial.
-- The flowchart-specific rules in `.cycle-slide` (`foreignObject` overflow, the
-  `font-size: inherit` handback) are still there because a flowchart's labels
-  are html in a `foreignObject` sized to the text *as mermaid measured it*, and
-  reveal restyles them afterwards. Needed again if this ever goes back to
-  `flowchart`; harmless for the sequence renderer, which uses svg `<text>`.
+It replaced a mermaid `sequenceDiagram` (in `git log`) that went flowchart →
+vertical flowchart → sequence, each step losing something: a flowchart cannot
+show the round trip with one browser box, and the sequence renderer's inline
+16px font left the labels at whatever the svg scaled to. `mermaid-format: svg`
+is still in the yaml and now inert; `quarto install chromium` in `publish.yml`
+is only needed if a mermaid block comes back.
 
 ### Editing slides during the talk (installed, off)
 
@@ -1548,8 +1524,9 @@ chore(wasm): refresh the vendored shinyreact build for R 4.5
 `_site/` to GitHub Pages (Settings → Pages → Source: **GitHub Actions**). It
 needs the same two things a local render does, which is all the workflow is:
 
-- Quarto, plus `quarto install chromium` — `mermaid-format: svg` pre-renders
-  the diagram with headless Chrome.
+- Quarto, plus `quarto install chromium` — only for `mermaid-format: svg`,
+  which pre-renders a mermaid block with headless Chrome. The deck has no
+  mermaid block since the data cycle was hand-drawn, so it is currently inert.
 - R with `shinylive` and `shinyreact` installed (the shinylive filter reads the
   app's installed packages). `shinyreact` must be installed **at its release
   tag**, `posit-dev/shinyreact/pkg-r@r/v0.1.0` — see the webR section above; at

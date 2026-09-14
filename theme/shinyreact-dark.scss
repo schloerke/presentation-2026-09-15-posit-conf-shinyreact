@@ -1526,41 +1526,83 @@ $presentation-block-margin: 44px !default;
   }
 }
 
-// -- deck-local: mermaid cycle diagram ---------------------------------------
-// Quarto pre-renders mermaid to an svg whose node boxes are sized to the text
-// *as mermaid measured it*. Reveal then restyles the labels (they are html in a
-// foreignObject), so the text no longer fits the boxes it was measured for:
-// `inherit` hands it back to mermaid's own inline style on the svg root. The
-// font in the `%%{init}%%` block has to be one the render host also has, so
-// Inter (a webfont) is out.
+// -- deck-local: the data cycle, hand-drawn ---------------------------------
+// Three columns - browser, wires, server - each a stack of the same fixed-height
+// rows, so the hook, the payload and the server step for one id share a line
+// with no grid to keep in sync. Panels reuse `.state-json`'s look.
 .reveal section.cycle-slide {
-  // The diagram needs every pixel of height it can get (see the svg rule), so
-  // this master trims the top pad and drops the swoosh under the headline —
-  // the code and data masters have none either.
   padding: 76px $margin 56px;
-  .cell, .cell-output-display, figure, figure > div { margin: 0; }
-  // Both dimensions are pinned: the box is what the drawing is scaled to fit
-  // (`preserveAspectRatio` centres it), and left to itself the svg takes its
-  // aspect ratio from quarto's 960x480 width/height attributes rather than the
-  // viewBox and floats the graph in the middle of a too-tall box.
-  svg[id^="mermaid"] {
+  .cycle {
+    display: grid;
+    // 660 + 360 + 660 + two 24px gaps = the 1728px content width. A box holds
+    // 32 characters of 32px mono (620px inside its 20px padding); every line
+    // in the markup is cut to that. The payloads are 19 characters, 5px over
+    // the wire column, which the gaps absorb.
+    grid-template-columns: 660px 360px 660px;
+    gap: 0 24px;
+    margin-top: 60px;
+  }
+  .cycle-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .cycle-browser, .cycle-server {
+    padding: 24px 20px;
+    border: 2px solid rgba($cyan, .18);
+    border-radius: 20px;
+    background: $ink-deep;
+  }
+  .cycle-title {
+    height: 60px;
+    font-size: 40px;
+    font-weight: 700;
+    color: $text;
+  }
+  code {
+    display: block;
+    height: 140px; // three 32px lines at 1.4
+    font-size: 32px; // DESIGN.md: code never below 32
+    line-height: 1.4;
+    white-space: pre;
+    color: $muted;
+    background: none;
+    padding: 0;
+    b { color: $cyan-text; font-weight: 700; }
+  }
+  .cycle-step { color: $text; }
+  .cycle-gap { height: 140px; }
+  // A wire is its payload over an arrow. The arrow is a cyan rule with a
+  // triangle head; `.cycle-out` flips it to point back at the browser.
+  .cycle-wire {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 140px;
+    code { height: auto; text-align: center; color: $text; }
+  }
+  .cycle-arrow {
+    position: relative;
     width: 100%;
-    max-width: none;
-    // The sequence renderer writes its font size (16px) inline, so how big the
-    // labels read is set by how far the whole svg scales up: 800px on a
-    // 810x420-unit graph is a x1.9 fit, putting them at 30px. Every extra row
-    // (a `Note`, a split self-message) or unit of width shrinks them — the
-    // whole layout is tuned to keep this fit near x2.
-    height: 800px !important;
-    margin: 0 !important;
-    // A few px of measurement drift shouldn't decapitate a label.
-    foreignObject { overflow: visible; }
-    p, span, div {
-      font-size: inherit !important;
-      font-family: inherit !important;
-      line-height: 1.5 !important;
-      margin: 0 !important;
+    height: 5px;
+    margin-top: 12px;
+    background: $cyan;
+    &::after {
+      content: "";
+      position: absolute;
+      top: -12px;
+      right: -2px;
+      border: 14px solid transparent;
+      border-left: 26px solid $cyan;
+      border-right: 0;
     }
+  }
+  .cycle-out .cycle-arrow::after {
+    right: auto;
+    left: -2px;
+    border-left: 0;
+    border-right: 26px solid $cyan;
   }
 }
 
