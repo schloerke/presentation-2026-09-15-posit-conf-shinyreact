@@ -909,7 +909,48 @@ could not have had any — you cannot unit-test a string. Getting it into a file
 is what put it on this list at all.
 :::
 
-## In the wild {.divider data-number="06"}
+## What's next {.divider data-number="06"}
+
+## Future work: incremental adoption
+
+- Embed React components into **existing** apps
+- Wrap `shinyreact` in your own package!
+
+::: {.notes}
+Incremental adoption makes it so you don't have to port your whole application
+into React.js.
+
+It also opens the door for helper packages down the road: wrap a component you
+have built in `shinyreact` and ship it as a package, the way `bslib` and
+friends ship theirs.
+
+Today, everything will feel ad-hoc when writing `shinyreact` apps — that is the
+tradeoff of an experimental package.
+:::
+
+## `shinyreact` {#recap .recap}
+
+<!-- No fragments here: this is the slide that stays up through Q&A, so it
+     arrives whole rather than being clicked into existence. `.nonincremental`
+     is what turns the yaml's `incremental: true` off for one list. -->
+::: {.nonincremental}
+- **R / Python** server processes data
+- Build **React** client using **AI agent**
+- Communicate using **JSON and IDs**
+- [posit-dev/shinyreact](https://github.com/posit-dev/shinyreact){.gh}
+:::
+
+<!-- The lockup the title slide builds from `author:`, written out - this is not
+     a quarto title slide, so there is nothing to reuse. -->
+::: {.handle}
+Barret Schloerke
+
+posit / Shiny Team
+
+@schloerke
+:::
+
+## In the wild {.divider data-number="07"}
 
 ::: {.notes}
 None of this is theory any more. Over the summer one intern built a shelf of it.
@@ -1150,47 +1191,6 @@ get from an htmlwidget without writing the lifecycle yourself.
 Samuel puts it better than I do: R stays the analysis engine, React becomes the
 visualization layer, and `shinyreact` removes what used to sit between them —
 the custom JS bindings, the manual message passing, the serialization.
-:::
-
-## What's next {.divider data-number="07"}
-
-## Future work: incremental adoption
-
-- Embed React components into **existing** apps
-- Wrap `shinyreact` in your own package!
-
-::: {.notes}
-Incremental adoption makes it so you don't have to port your whole application
-into React.js.
-
-It also opens the door for helper packages down the road: wrap a component you
-have built in `shinyreact` and ship it as a package, the way `bslib` and
-friends ship theirs.
-
-Today, everything will feel ad-hoc when writing `shinyreact` apps — that is the
-tradeoff of an experimental package.
-:::
-
-## `shinyreact` {#recap .recap}
-
-<!-- No fragments here: this is the slide that stays up through Q&A, so it
-     arrives whole rather than being clicked into existence. `.nonincremental`
-     is what turns the yaml's `incremental: true` off for one list. -->
-::: {.nonincremental}
-- **R / Python** server processes data
-- Build **React** client using **AI agent**
-- Communicate using **JSON and IDs**
-- [posit-dev/shinyreact](https://github.com/posit-dev/shinyreact){.gh}
-:::
-
-<!-- The lockup the title slide builds from `author:`, written out - this is not
-     a quarto title slide, so there is nothing to reuse. -->
-::: {.handle}
-Barret Schloerke
-
-posit / Shiny Team
-
-@schloerke
 :::
 
 ## Q & A {.divider data-number="08" visibility="hidden"}
