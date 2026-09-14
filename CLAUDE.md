@@ -248,9 +248,12 @@ so it centres with the text. The heading is absolutely positioned rather than
 the section being a flex column: reveal's `.reveal .slides > section.present
 { display: block }` out-specifies a `display: flex` written here, so the section
 cannot be a flex container (tried; the heading pinned to the top of the slide).
-The sections themselves also lost their numbers, so "07 What's next" no longer
-exists as a slide at all — "Future work: incremental adoption" now follows the
-Plotomics slide directly.
+The sections themselves also lost their numbers, so "What's next" no longer
+exists as a slide at all — "Future work: incremental adoption" follows "Test
+coverage at every hop" directly, and the recap follows it. **"In the wild" then
+comes *after* the recap**, so the gallery is what the deck ends on and the
+`#recap` slide is a waypoint rather than the last thing on screen. Keep that
+in mind when moving anything near the tail.
 
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
