@@ -777,6 +777,52 @@ That is the whole trade: the JavaScript you were already writing, moved
 somewhere it can be read.
 :::
 
+## The data cycle {.cycle-slide .nostretch}
+
+<!-- Hand-authored, not mermaid: one row per hop, so the browser's hook, the
+     wire's payload and the server's step for the same id sit on one line.
+     Ids are the contract, so they are the bold cyan on every row. The
+     server column and the return wire are fragments: arrival shows what the
+     React side wrote, click 1 sends it, click 2 answers it. -->
+```{=html}
+<div class="cycle" role="img" aria-label="Browser and server exchange ids with JSON values: useShinyInput sends bin_count to input$bin_count; reactive_output sends dist_data back to useShinyOutputValue.">
+<div class="cycle-col cycle-browser">
+<span class="cycle-title">Browser · React</span>
+<code>const [binCount, setBinCount] =<br>  useShinyInput(<b>"bin_count"</b>, 30)</code>
+<code class="cycle-gap"></code>
+<code>const bins =<br>  useShinyOutputValue(<br>    <b>"dist_data"</b>, null)</code>
+</div>
+<div class="cycle-col cycle-wires">
+<span class="cycle-title"></span>
+<div class="cycle-wire cycle-in fragment" data-fragment-index="1"><code>{ <b>"bin_count"</b>: 30 }</code><span class="cycle-arrow"></span></div>
+<code class="cycle-gap"></code>
+<div class="cycle-wire cycle-out fragment" data-fragment-index="2"><code>{ <b>"dist_data"</b>: {…} }</code><span class="cycle-arrow"></span></div>
+</div>
+<div class="cycle-col cycle-server fragment" data-fragment-index="1">
+<span class="cycle-title">Server · R / Python</span>
+<code>input$<b>bin_count</b></code>
+<code class="cycle-step">bin_count &lt;- reactive(…)</code>
+<code>output$<b>dist_data</b> &lt;-<br>  reactive_output({ … })</code>
+</div>
+</div>
+```
+
+::: {.notes}
+Left to right and back: the React side calls `useShinyInput("bin_count", 30)`,
+and on the click that value goes over the wire as `{ "bin_count": 30 }` — an id
+and a JSON value. That is what `input$bin_count` is on the server. The server
+is the app you already write: `input$bin_count` → `reactive()` → an output —
+except the output is `reactive_output()` in place of `renderFn()`. Its value
+comes back the same way, `{ "dist_data": {…} }` — here `breaks` and `counts` —
+and `useShinyOutputValue("dist_data", null)` hands it to React as data.
+
+Keep R / Python for data work and reactivity. Inputs still travel to the Shiny
+server; outputs now travel back as data, not HTML.
+
+IDs and JSON are the contract: `"bin_count"` and `"dist_data"` are the same
+string on both sides, and they are the only thing the two sides share.
+:::
+
 ## Old Faithful {.demo-slide .demo-titled}
 
 <!-- The finished mark, in the corner it lands in on the section-03 bullets
@@ -806,43 +852,6 @@ somewhere it can be read.
 ## type: text
 {{< include apps/01-shinyreact/www/app.js >}}
 ```
-
-## The data cycle {.cycle-slide .nostretch}
-
-```{mermaid}
-%%{init: {"theme":"base","fontFamily":"Helvetica, Arial, sans-serif",
-  "sequence":{"actorMargin":100,"width":300,"boxMargin":10,"height":50,
-  "messageMargin":30,"mirrorActors":false},
-  "themeVariables":{
-  "actorBkg":"#141519","actorBorder":"#6FD4E8","actorTextColor":"#F2F4F8",
-  "actorLineColor":"#A3ACBB","signalColor":"#00D8FF","signalTextColor":"#F2F4F8",
-  "noteBkgColor":"#141519","noteBorderColor":"#A3ACBB","noteTextColor":"#F2F4F8",
-  "labelBoxBkgColor":"#141519","labelTextColor":"#F2F4F8",
-  "activationBkgColor":"#23252C","activationBorderColor":"#6FD4E8"}}}%%
-sequenceDiagram
-  participant B as browser · React
-  participant S as server · R / Python
-  B->>B: useShinyInput()
-  B->>S: IDs + JSON
-  S->>S: input$value → reactive() → reactive_output()
-  S-->>B: IDs + JSON
-  B->>B: useShinyOutputValue()
-```
-
-::: {.notes}
-Top to bottom: a value leaves the browser through `useShinyInput()`, arrives as
-`input$value`, moves through `reactive()` to `reactive_output()`, and comes back
-to the browser as data through `useShinyOutputValue()`.
-
-In Shiny for R or Python, that middle box is the app you already write:
-`input$value` → `reactive()` → `renderFn()`. The only change is the last hop —
-`reactive_output()` in place of `renderFn()`.
-
-Keep R / Python for data work and reactivity. Inputs still travel to the Shiny
-server; outputs now travel back as data.
-
-IDs and JSON are the contract.
-:::
 
 ## Testing {.divider}
 
