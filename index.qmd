@@ -48,7 +48,7 @@ filters:
   # - editable
 ---
 
-## [Old Faithful]{.fragment} {.divider data-number="DEMO"}
+## [Old Faithful]{.fragment} {.divider}
 
 <!-- Notes before the first `##` become their own blank slide, so the opening
      narration lives on this divider rather than the title slide. -->
@@ -156,7 +156,7 @@ The R UI is wonderful… until it isn't
 <!-- The question is up on arrival rather than on a click, so the show of hands
      happens while the panel is still blank and the code lands as the answer. -->
 ::: {.nonincremental}
-- How many of you have written JavaScript or CSS within a string in R?
+- How many of you have written JavaScript or CSS within a string?
 :::
 
 ::: {.fragment}
@@ -227,7 +227,7 @@ your app; it is taking the JavaScript you already wrote *out of the string*.
 :::
 
 
-## React.js {.divider data-number="02"}
+## React {.divider}
 
 <!-- The room's reaction to the sentence before it, so it sits here rather than
      after `shinyreact` is introduced: the objection lands the moment React is
@@ -567,7 +567,7 @@ You build the whole UI from the ground up in React / TypeScript. It is an
 experimental package, for the brave few.
 :::
 
-## Old Faithful, remixed {.divider data-number="04"}
+## Old Faithful, remixed {.divider}
 
 ## The server we started with {.code-slide auto-animate="true"}
 
@@ -620,22 +620,15 @@ server <- function(input, output) {
 `input$bin_count` → `breaks` [→ `bins`]{.chain-1} [→ `reactive_output()`]{.chain-3}
 :::
 
-<!-- .after-code, not .fragment: this appears on the same click as the code
-     block's trailing `|` step, which clears the highlight. See the theme. -->
-::: {.after-code}
-The computation is unchanged — **the value sent changed.**
-:::
-
 ::: {.notes}
 The reactive computation is unchanged. What has changed is the value sent by the
 server.
 :::
 
-## `reactive_output()` — a [new]{.underline} concept
+## `reactive_output()` — a [new]{.underline} concept!
 
 - No corresponding UI component on the server side
-- Convert your data and send it to the client **as JSON**
-- Send **only what is needed**
+- Construct necessary data and send it to the client **as JSON**
 - Let React display your data's state in the UI
 
 ::: {.notes}
@@ -705,11 +698,12 @@ string, this is not new work. It is the same work, in a file, with types.
      hidden on arrival has nothing for auto-animate to animate *from*.
      `useMemo` is written on one line, not the four the app spells it over, so
      the comparison is line for line: two declarations against two.
-     No highlight steps here - this slide is the recap, and it is the next one
-     that has something to point at. `code-line-numbers="true"` rather than no
-     attribute at all, so the block keeps its line-number gutter: losing the
-     gutter on one half of the pair would slide the whole block sideways. -->
-```{.javascriptreact filename="app.tsx" code-line-numbers="true"}
+     Two steps: the block lands unhighlighted, then lines 2-3 light up - the two
+     declarations the next slide rewrites - and the third click is the
+     transition. A `code-line-numbers` attribute (rather than none at all) is
+     also what keeps the line-number gutter: losing it on one half of the pair
+     would slide the whole block sideways. -->
+```{.javascriptreact filename="app.tsx" code-line-numbers="|2,3"}
 function App() {
   const [binCount, setBinCount] = useState(30);
   const bins = useMemo(() => bin_data(waiting, binCount), [binCount]);
@@ -739,7 +733,7 @@ move.
      after-slide opens on line 5: the pair has just rewritten that line, so the
      highlight is already where the eye is. -->
 ```{.javascriptreact filename="www/ui.tsx" code-line-numbers="2|3|8-9|10"}
-export default function App() {
+function App() {
   const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
   const bins = useShinyOutputValue<HistData | null>("distPlot", null);
 
@@ -754,41 +748,25 @@ export default function App() {
 }
 ```
 
+<!-- This slide absorbed "Two hooks are the whole API", which used to follow it:
+     that slide restated these same two lines on their own, one per panel, and
+     the four highlight steps above already walk them. Its speaker notes moved
+     here whole - including the section-01 callback, which is one of the five
+     the "Custom UI... within a string" slide is only worth its place for. -->
 ::: {.notes}
 Same component. The markup did not move — only the two lines that say where the
-values come from.
+values come from. **Those two hooks are the whole API.** `useShinyInput` reads
+and writes an input — just like `useState`, except the state comes from R or
+Python. `useShinyOutputValue` reads an output: R computes the value, React
+decides how it looks.
 
 `ui.tsx` is built upon Shiny's `index.html` escape hatch, but upgraded for
 React.
-:::
 
-## Two hooks are the whole API {.code-slide}
-
-::: {.fragment .spaced}
-```{.javascriptreact filename="read and write an input"}
-const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
-```
-:::
-
-::: {.fragment}
-Just like `useState` — except the state comes from R / python.
-:::
-
-::: {.fragment .spaced}
-```{.javascriptreact filename="read an output"}
-const bins = useShinyOutputValue<HistData | null>("distPlot", null);
-```
-:::
-
-::: {.fragment}
-R computes the value; React decides how it looks.
-:::
-
-::: {.notes}
 <!-- The visual payoff for "Custom UI… within a string": that slide's
-     `Shiny.setInputValue(...)` and this slide's `useShinyInput<number>(...)` do
-     the same job, and the audience has seen both. One was flat green. -->
-Compare the first line to what we had in section 01. Getting a value out of the
+     `Shiny.setInputValue(...)` and line 2 here do the same job, and the
+     audience has seen both. One was flat green. -->
+Compare line 2 to what we had in section 01. Getting a value out of the
 browser and into R was `Shiny.setInputValue('card_clicked', …)` — inside a
 string, flat green, unchecked by anything.
 
@@ -799,7 +777,7 @@ That is the whole trade: the JavaScript you were already writing, moved
 somewhere it can be read.
 :::
 
-## Live: Old Faithful w/ `shinyreact` {.demo-slide .demo-titled}
+## Old Faithful {.demo-slide .demo-titled}
 
 <!-- The finished mark, in the corner it lands in on the section-03 bullets
      slide. No `data-id`: this slide is nowhere near the logo build's
@@ -866,7 +844,7 @@ server; outputs now travel back as data.
 IDs and JSON are the contract.
 :::
 
-## Testing {.divider data-number="05"}
+## Testing {.divider}
 
 ## Test coverage at every hop
 
@@ -909,8 +887,6 @@ could not have had any — you cannot unit-test a string. Getting it into a file
 is what put it on this list at all.
 :::
 
-## What's next {.divider data-number="06"}
-
 ## Future work: incremental adoption
 
 - Embed React components into **existing** apps
@@ -950,7 +926,7 @@ posit / Shiny Team
 @schloerke
 :::
 
-## In the wild {.divider data-number="07"}
+## In the wild {.divider}
 
 ::: {.notes}
 None of this is theory any more. Over the summer one intern built a shelf of it.
@@ -1193,7 +1169,7 @@ visualization layer, and `shinyreact` removes what used to sit between them —
 the custom JS bindings, the manual message passing, the serialization.
 :::
 
-## Q & A {.divider data-number="08" visibility="hidden"}
+## Q & A {.divider visibility="hidden"}
 
 ## Is node.js needed? {visibility="hidden"}
 
@@ -1225,7 +1201,7 @@ could lint it, type it, or format it. A build step is what buys all three back.
 - Pair them with `<ShinyOutput id="distPlot" />` in your React code
 - Don't reinvent the wheel — your UI app becomes more about **layout** than outputs
 
-## Thanks {.divider .end data-number="09" visibility="hidden"}
+## Thanks {.divider .end visibility="hidden"}
 
 ::: {.handle}
 @schloerke
