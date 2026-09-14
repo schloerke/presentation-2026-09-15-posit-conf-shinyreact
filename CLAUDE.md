@@ -813,6 +813,48 @@ own revealjs css beats `.reveal pre` there). A bare `section.querySelector
 block is fine when it is 66px off the canvas. Measured across all ten code
 slides: every one is 34/36. A line costs ~47px at 34px.
 
+**A code block is also clipped sideways, and that fails even more quietly than
+the bottom of a slide.** `pre` is `white-space: pre`, so a line wider than the
+panel is cut at its right edge with no wrap, no scrollbar and no ellipsis — it
+just looks like you wrote shorter code. Two real ones this caught: `#ownership`
+rendered `input$bin_count +` with the ` 1` gone, and
+`#the-ui-moves-to-typescript` rendered `sliderInput(inputId = "bin_count"`,
+losing the elision *and* the closing paren.
+
+The budget at 34px is **20.4px a character**, so a 50% `.columns` column holds
+**37** (768px of content inside `pre`'s 40px padding) and a full-width block
+holds ~84. Count before writing a long line.
+
+**Do not check this with `scrollWidth`.** `pre.scrollWidth - pre.clientWidth` is
+**0** even for a line 150px too wide, so it reports every block as fine. Measure
+the ink with a range, having forced `white-space: pre` (the clones the
+line-highlight plugin makes can differ), and skip `.notes` — a block in speaker
+notes has zero width and reads as infinitely overflowing:
+
+```js
+for (let i = 0; i < Reveal.getTotalSlides(); i++) {
+  Reveal.slide(i); await new Promise(r => setTimeout(r, 60));
+  const s = document.querySelector('section.present');
+  s.querySelectorAll('.fragment').forEach(e => e.classList.add('visible'));
+  const sc = Reveal.getScale();
+  s.querySelectorAll('div.sourceCode pre').forEach((pre, j) => {
+    if (pre.closest('.notes') || !pre.getBoundingClientRect().width) return;
+    const code = pre.querySelector('code'), cs = getComputedStyle(pre);
+    const content = (pre.getBoundingClientRect().width
+      - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) / sc;
+    const prev = code.style.whiteSpace; code.style.whiteSpace = 'pre';
+    const r = document.createRange(); r.selectNodeContents(code);
+    let w = 0; for (const b of r.getClientRects()) w = Math.max(w, b.width);
+    code.style.whiteSpace = prev;
+    if (w / sc > content) console.log(s.id, j, Math.round(w / sc - content));
+  });
+}
+```
+
+13 on-slide blocks, and the clean result is no output at all. **Screenshot the
+slide anyway** — both clips above were found by looking, after a width check
+had already passed.
+
 ### "Custom UI… within a string" — the hook into section 02
 
 The slide that turns Old Faithful toward React. It replaced one built on
@@ -1298,7 +1340,14 @@ demo skip a bundler.)
 - `www/data.js` holds `faithful$waiting` and `bin_data()`, the JS twin of what
   the R server computes in `01-shinyreact`. `node apps/02-react-only/check.mjs`
   asserts its counts match `hist()`'s for several bin counts — run it if you
-  touch the binning.
+  touch the binning. **That parity is why every R side of this app computes
+  `breaks <- seq(min(x), max(x), length.out = n + 1)` rather than the shorter
+  `hist(x, breaks = n)`**: given a single number `hist()` treats it as a
+  *suggestion* and runs it through `pretty()`, so 30 draws 27 bins and 47 draws
+  53. `bin_data()` bins exactly, and matching `pretty()` in JS would cost far
+  more than the `seq()` line. The slides carry it too, section 01's
+  `#ownership` included — section 04 calls that panel "the server we started
+  with", so it has to be the same code.
 - `www/app.css` is a copy of `01-shinyreact`'s, so the two demos look
   identical. That is the whole point of the pair: the same app, with
   `useState`/`useMemo` swapped for `useShinyInput`/`useShinyOutputValue`.

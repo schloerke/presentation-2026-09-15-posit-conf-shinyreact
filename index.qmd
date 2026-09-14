@@ -105,11 +105,26 @@ ui <- bslib::page_sidebar(
 ```
 :::
 ::: {.column .fragment width="50%"}
+<!-- `breaks` is computed rather than `hist(x, breaks = input$bin_count)`, and
+     that is not optional: `hist()` treats a single number as a *suggestion* and
+     runs it through `pretty()` (30 -> 27 bins, 47 -> 53), so the JS twin in
+     `apps/02-react-only/www/data.js` - which bins exactly - could not match it
+     without reimplementing `pretty()`. `check.mjs` asserts that parity. Section
+     04 calls this slide "the server we started with", so it has to be this
+     code. The 50% column fits **37 characters** at 34px, and a longer line is
+     clipped at the panel's edge in silence - the first cut of this block ran 38
+     and rendered `input$bin_count +` with the ` 1` simply gone. So `n` is
+     hoisted: it is what buys `seq()` a wrap that fits. Section 04 keeps
+     `input$bin_count` inline - it has the full width, and its `.chain` reads
+     `input$bin_count -> breaks`. -->
 ```{.r filename="Server"}
 server <- function(input, output) {
   output$distPlot <- renderPlot({
     x <- faithful$waiting
-    hist(x, breaks = input$bin_count)
+    n <- input$bin_count
+    breaks <- seq(min(x), max(x),
+                  length.out = n + 1)
+    hist(x, breaks = breaks)
   })
 }
 ```
@@ -641,6 +656,12 @@ the front end. The server sends facts; React does presentation.
 
 ::: {.columns}
 ::: {.column width="50%"}
+<!-- Keep these lines short: a 50% column fits 37 characters at 34px, and `pre`
+     is `white-space: pre`, so a longer line is *clipped at the panel's right
+     edge* with nothing to show for it. Spelling the argument names out here
+     ran `sliderInput(inputId = "bin_count", ...)` to 43 and rendered it as
+     `sliderInput(inputId = "bin_count"` - the elision and the closing paren
+     both gone. See CLAUDE.md for the audit that catches this. -->
 ```{.r filename="app.R (classic)"}
 ui <- bslib::page_sidebar(
   sidebar = bslib::sidebar(
