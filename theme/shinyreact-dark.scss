@@ -1204,6 +1204,20 @@ $presentation-block-margin: 44px !default;
 // visible wrap instead of a collision.
 .reveal section:has(.hexreact.corner) > h2 { max-width: 1578px; }
 
+// A code slide has no room for a full-size corner mark: its panel starts at
+// y=255 and runs to the right edge, so the 266px hex (and the 289px atom box)
+// is cut off halfway by the panel, and raising it instead would put it over
+// line 1-2 of the code. So on a `.code-slide` both marks shrink into the band
+// the heading leaves - 150px of ink, clearing the panel by ~45px. The hex keeps
+// its 0.866 ratio; the atom's box is 20% larger than its ink, hence 173x200 for
+// the same 104px the hex's height reads as.
+.reveal section.code-slide .hexlogo.corner {
+  top: 55px; left: 1694px; width: 130px; height: 150px;
+}
+.reveal section.code-slide .hexreact.corner {
+  top: 45px; left: 1651px; width: 173px; height: 200px;
+}
+
 // -- the flight --------------------------------------------------------------
 // `.hexreact` is a `.fragment.fade-out` - visible on arrival, "shown" on the
 // click - so the animation is keyed off `.visible`, and it re-runs from the top

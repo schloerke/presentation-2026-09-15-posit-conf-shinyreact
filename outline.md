@@ -33,9 +33,9 @@
       * > So... I do not want to replace Shiny. I want to keep Shiny for reactive computation while using a modern UI ecosystem (such as react.js) for the interface.
 
 
-* "Wait... what?" - full-bleed meme, straight after the React.js divider.
-  The big question in the room is asked the moment React is proposed, not
-  twelve slides later, so the rest of section 02 is the answer to it.
+* "Wait... what?" - full-bleed meme, immediately before "Why React?".
+  The demos have shown React doing the work, so the big question in the room
+  is at its loudest here - and "Why React?" is the answer to it.
   * "You want me to write JavaScript?!?"
   * Joe: "Shiny authors shouldn't need to write JavaScript"
     * Barret: I believe this still holds true!
