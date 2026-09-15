@@ -820,7 +820,7 @@ somewhere it can be read.
 <div class="cycle-col cycle-server fragment" data-fragment-index="1">
 <span class="cycle-title">Server · R / Python</span>
 <code>input<span class="sc">$</span><b>bin_count</b></code>
-<code class="cycle-step">bin_count <span class="ot">&lt;-</span> <span class="fu">reactive</span>(…)</code>
+<code class="cycle-step">… <span class="ot">&lt;-</span> <span class="fu">reactive</span>(…)</code>
 <code>output<span class="sc">$</span><b>dist_data</b> <span class="ot">&lt;-</span><br>  <span class="fu">reactive_output</span>({ … })</code>
 </div>
 </div>
