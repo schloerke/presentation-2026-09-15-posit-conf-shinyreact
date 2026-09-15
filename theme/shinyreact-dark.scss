@@ -1204,6 +1204,34 @@ $presentation-block-margin: 44px !default;
 // visible wrap instead of a collision.
 .reveal section:has(.hexreact.corner) > h2 { max-width: 1578px; }
 
+// The TypeScript mark, beside that atom on the section's opener: every React
+// file the deck shows is a `.tsx`, and the blue tile says so without a bullet.
+// Absolutely positioned against the section (reveal already positions sections
+// absolutely), with the `<p>` quarto wraps it in zeroed or the empty paragraph
+// pushes the bullets down by a line - the same pattern `.corner-hex` uses. The
+// heading needs `.nostretch`, or quarto's auto-stretch lifts the image out of
+// that `<p>`, tags it `.r-stretch`, and reveal writes an inline width/height
+// that beats this rule (it came out 49px square).
+.reveal p:has(> .ts-mark) { margin: 0; }
+// 130px square, centred on the atom's own centre (52 + 289/2), its right edge
+// 40px clear of the atom's ink at x=1674. Smaller was tried (110) and the tile
+// read as timid beside the atom, which is 150px of ink. The heading cap drops
+// to match.
+.reveal .ts-mark {
+  position: absolute;
+  top: 132px;
+  left: 1504px;
+  width: 130px;
+  height: 130px;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+}
+// Both `:has()`es, or the `.hexreact.corner` cap above out-specifies this one
+// (`:has()` takes its most specific argument, so two classes beat one).
+.reveal section:has(.hexreact.corner):has(.ts-mark) > h2 { max-width: 1408px; }
+
 // A code slide has no room for a full-size corner mark: its panel starts at
 // y=255 and runs to the right edge, so the 266px hex (and the 289px atom box)
 // is cut off halfway by the panel, and raising it instead would put it over
@@ -1216,6 +1244,17 @@ $presentation-block-margin: 44px !default;
 }
 .reveal section.code-slide .hexreact.corner {
   top: 45px; left: 1651px; width: 173px; height: 200px;
+}
+
+// ...unless a lead-in bullet has already pushed the panel down. `#components`
+// is the one such slide carrying a mark: its bullet puts the panel at y=385,
+// which the full-size atom's ink (bottom 272) clears by 113px. It also sits
+// between two plain React slides that carry the full-size atom, so shrinking
+// it read as the mark jumping size from slide to slide. Both `:has()` and the
+// child combinator are needed for the specificity to beat the rule above.
+// Re-measure the panel's top before extending this to another slide.
+.reveal section.code-slide:has(> ul) .hexreact.corner {
+  top: 52px; left: 1624px; width: 250px; height: 289px;
 }
 
 // -- the flight --------------------------------------------------------------

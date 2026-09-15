@@ -1122,6 +1122,32 @@ so a heading on one of these slides has 1578px; `section:has(.hexreact.corner) >
 h2` caps it there so a long one wraps visibly instead of colliding with the mark.
 The divider has no atom: its own centred watermark is already the orbit motif.
 
+**A `.code-slide` shrinks that atom, but only when its panel is high.** The
+shrink rule exists because a code panel normally starts at y=255, which cuts
+the 289px box in half. `#components` carries a lead-in bullet, so *its* panel
+starts at 385 and the full-size atom's ink (bottom 272) clears it by 113px — and
+it sits between two plain React slides that carry the full mark, so shrinking it
+read as the mark jumping size from slide to slide. Hence
+`section.code-slide:has(> ul) .hexreact.corner`, which puts the default geometry
+back. `#react-code` and `#react-ui` have no lead-in bullet and stay at 173px.
+Measure the panel's top before extending that exception to another slide.
+
+**`#what-is-react` carries TypeScript's mark beside the atom** — every React
+file the deck shows is a `.tsx`, and the blue tile says so without spending a
+bullet. `images/logo-ts.svg` is the simple-icons glyph with `#3178C6` baked on
+(same generation as the `.logo-strip` marks) over a white `rect rx="1.125"`, so
+the knocked-out "TS" reads white whatever is behind it. Three things it needs:
+
+- **`.nostretch` on the heading.** Without it quarto's auto-stretch lifts the
+  image out of its `<p>`, tags it `.r-stretch`, and reveal writes an inline
+  width/height that beats the theme — it came out 49px square.
+- **A markdown `![](…)`, not a raw `<img>`**, so quarto traces it into `_site/`.
+  Same trap as the `.logo-strip` and the GIF slide.
+- **The heading cap needs both `:has()`es.** `:has()` takes its most specific
+  argument, so `:has(.hexreact.corner)`'s two classes out-specify
+  `:has(.ts-mark)`'s one; `section:has(.hexreact.corner):has(.ts-mark) > h2` is
+  what actually drops the cap from 1578 to 1408.
+
 On the state row ("UI is assembled from data's state"), `.state-stack`'s
 **`height` is what sizes the chart** — the svg takes 100% of the row's height and
 `preserveAspectRatio` widens it to match. Growing the box to centre the row runs

@@ -235,13 +235,19 @@ your app; it is taking the JavaScript you already wrote *out of the string*.
      it. New tab, as everywhere else: a click mid-talk must not navigate the
      deck away. The id is kept from the old "What is React?" wording so nothing
      linking to this slide breaks. -->
-## [React[.dev]{.dotcom}](https://react.dev){target="_blank" rel="noopener"} {#what-is-react}
+## [React[.dev]{.dotcom}](https://react.dev){target="_blank" rel="noopener"} {#what-is-react .nostretch}
 
 <!-- The atom marks every slide in section 02 as a React slide. `.hexreact` is
      atom-only by design (see the theme) and `.corner` parks it where
      `.hexlogo.corner` parks the finished mark. Never with a `data-id`: that is
      what enlists an element in the logo build's auto-animate chain. -->
 <div class="hexreact corner"><div class="hr-atom"></div></div>
+
+<!-- React is written in TypeScript here - every React file the deck shows is a
+     `.tsx` - so TypeScript's own mark sits beside the atom. A markdown image,
+     not a raw `<img>`: quarto traces `![](images/…)` into `_site/` and does not
+     trace a `src=` in a raw block (see CLAUDE.md). -->
+![](images/logo-ts.svg){fig-alt="TypeScript" .ts-mark}
 
 - > The library for web and native user interfaces
 - > "…build user interfaces out of individual pieces called **components**"
