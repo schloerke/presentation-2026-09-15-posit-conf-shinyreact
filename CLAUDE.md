@@ -237,7 +237,7 @@ Master equivalents, applied as classes on a `##` heading:
 | (none — deck-local) | `.logo-strip` — a row of linked brand marks under a bullet |
 | (none — deck-local) | `.render-out` — a code panel holding rendered UI, not code |
 | (none — deck-local) | `.tagline` — a quote bullet as a slide's subtitle |
-| (none — deck-local) | `## Wait… what? {.meme background-image=…}` — a full-bleed reaction shot |
+| (none — deck-local) | `## Wait… what? {.meme background-image=…}` — a full-bleed meme |
 
 **A divider is its section's name, centred on the canvas, and nothing else.**
 It carried a `data-number` ghost numeral ("05" behind "Testing") in a
@@ -258,10 +258,13 @@ in mind when moving anything near the tail.
 **Every slide that shows code or an app carries the mark of what it runs**:
 Shiny's own sticker (`.hexlogo.corner` wrapping a `.lb-shiny` div), the bare
 React atom (`.hexreact.corner`), or the finished shinyreact hex
-(`.hexlogo.corner`, empty). Section 04's before/after pairs use that: the
-`app.R` pair cross-fades Shiny's sticker into the shinyreact hex, and the
+(`.hexlogo.corner`, empty). Section 04's three before/after pairs use that:
+both `app.R` pairs cross-fade Shiny's sticker into the shinyreact hex, and the
 `.tsx` pair the atom into the hex — the section's whole argument, in the
-corner. A `.code-slide` has no room for the full-size mark (the panel starts at
+corner. **Audit this when adding a code slide**: the retired "The UI moves to
+TypeScript" two-up was the only code slide in the deck carrying no mark at all,
+and nothing caught it for months. Check with `grep '^## \|hexlogo corner\|
+hexreact corner' index.qmd` and read the pairs off. A `.code-slide` has no room for the full-size mark (the panel starts at
 y=255 and runs to the right edge, so the 266px hex is cut in half by it, and
 raising it instead would park it over lines 1-2), so one rule shrinks both
 marks into the band the heading leaves: 130x150 for the hex, 173x200 for the
@@ -866,9 +869,12 @@ slides: every one is 34/36. A line costs ~47px at 34px.
 the bottom of a slide.** `pre` is `white-space: pre`, so a line wider than the
 panel is cut at its right edge with no wrap, no scrollbar and no ellipsis — it
 just looks like you wrote shorter code. Two real ones this caught: `#ownership`
-rendered `input$bin_count +` with the ` 1` gone, and
-`#the-ui-moves-to-typescript` rendered `sliderInput(inputId = "bin_count"`,
-losing the elision *and* the closing paren.
+rendered `input$bin_count +` with the ` 1` gone, and a since-retired two-up
+("The UI moves to TypeScript", now the `#the-ui-we-started-with` pair) rendered
+`sliderInput(inputId = "bin_count"`, losing the elision *and* the closing
+paren. Both were 50% columns; the pair that replaced the second one is
+full-width, which is what let the `sliderInput()` arguments be spelled out
+again.
 
 The budget at 34px is **20.4px a character**, so a 50% `.columns` column holds
 **37** (768px of content inside `pre`'s 40px padding) and a full-width block
@@ -964,7 +970,9 @@ test can reach it — and everyone in that room has done it.
     that slide was **dropped** (it restated the two hooks on their own, one per
     panel, which `#shinyreact-ui`'s four highlight steps already walk) and its
     notes moved onto `#shinyreact-ui` whole.
-  - **"The UI moves to TypeScript"** — half of that "cost" is a refund.
+  - **"Wait… what?"** — that is where the refund is now spoken, and it is the
+    same note as the bullet above. `#shinyreact-ui-r` deliberately does *not*
+    say it: that slide raises the cost and stops.
   - **"Test coverage at every hop"** and the Q&A **"Is node.js needed?"** — you
     cannot unit-test or lint a string; a build step buys it back. Note the
     second of those is on a `visibility="hidden"` slide, which **quarto drops
@@ -1177,15 +1185,58 @@ builds.
 
 ### The reaction shot (`.meme`, "Wait… what?")
 
-A full-bleed "Wait… what?" meme, **immediately before "Why React?"**. The
-objection — *you want me to write JavaScript?* — is loudest once the demos have
-shown React doing the work, so the beat is taken there and "Why React?" answers
-it directly. It sat right after the `## React` divider for a while (`git log`),
-and before that twelve slides later, at the end of section 03, as a `.divider`
-headed "You want me to write JavaScript?!?!" with a walking
-pink elephant along the bottom edge; `git log` has both if either is wanted
-back. Its four bullets are still the speaker notes, unchanged apart from the
-new cue.
+A full-bleed meme, in **section 04, immediately after `#shinyreact-ui-r`** —
+the slide where the room's UI definition becomes one line pointing at a
+TypeScript file. That is where the objection is loudest and at its most
+concrete, so the slide before it raises the cost and *stops*, and the meme is
+the room saying the rest out loud.
+
+**Where it sits is the whole design of this slide, and it has moved three
+times.** All in `git log`: the end of section 03, as a `.divider` headed "You
+want me to write JavaScript?!?!" with a walking pink elephant; then right after
+the `## React` divider; then section 02, between `#react-code` and "Why
+React?". The section-02 position asked the *general* objection — "why React at
+all?" — which "Why React?" then answered on the very next slide. The position
+now asks the specific one, *my UI is a TypeScript file now?*, and what answers
+it is everything after: the server pair, the two hooks, and the app running.
+**The pairing is what matters, not the slide.** An objection slide has to sit
+where its answer follows it; put it anywhere its answer has already been given
+and it reads as asking a settled question.
+
+**The slide has to state the objection, and the picture has to carry dread.**
+It was a "Wait… what?" reaction shot for a while (`git log`) and did neither:
+the face *smiles* in both panels, so the zoom read as delighted surprise rather
+than "you want me to write **JavaScript**?!?", and the only words on the slide
+were the generic "Wait… what?" — the actual objection lived in the notes, so
+the room never saw the thing it was reacting to. It is now an Anakin/Padmé
+four-panel, a format whose whole job is dawning horror at an unanswered
+question:
+
+| panel | |
+|---|---|
+| Anakin | shinyreact moves the UI to React |
+| Padmé, smiling | So I never have to touch JavaScript, right? |
+| Anakin | *(nothing — the silence is the joke)* |
+| Padmé, not smiling | Right? |
+
+**Anything written into these panels has to be true of what the room has
+already been shown**, and panel 1 is the trap. It reads "shinyreact moves the
+UI to React", which only works *here*: the package is introduced in section 03
+and the slide immediately before this one is headed with it. While the meme
+lived in section 02 that line was unparseable — `shinyreact` appears in the
+deck title and then not again until `## Why Shiny + React?` → `## The mark` →
+`` ## `shinyreact` `` — so it was cut to "The UI moves to React" for the
+duration. Moving the slide back into section 02 means cutting it again.
+
+**Leave the third panel empty.** The unanswered question is the beat; writing a
+line there answers it on the slide and there is nothing left for "Why React?"
+to do. For the same reason the notes no longer open by *saying* the objection —
+the slide says it — they open with a cue to let the fourth panel sit. **"You
+already do" stays in the notes**, spoken: it is the payoff for section 01's
+show of hands, and printing it kills the pause.
+
+The heading is still `## Wait… what?`, which keeps the `#wait-what` slide id and
+the five notes elsewhere that call this slide by that name (grep `Wait… what`).
 
 - **The picture is the whole slide, so it is a reveal *background***
   (`background-image` + `background-size="contain"` +
@@ -1194,17 +1245,30 @@ new cue.
   `.reveal section.meme > h2 { display: none }`, hiding the heading quarto needs
   to split the slide and to carry the notes. `.meme` joins `.divider` and
   `#title-slide` in the footer-hiding rule.
-- **`#141519` is `$ink-deep`**, so the pillarboxing matches the divider the
-  slide follows rather than reading as a second black bar.
-- **`images/wait-what.jpg`** is the meme cropped free of the letterbox bars it
-  arrived with, and saved as jpg — it is a photograph, and the png was 1.8 MB
-  against 225 KB:
+- **`#141519` is `$ink-deep`**, a shade under the `$ink` every code slide
+  around it uses, so the pillarbox reads as the slide's own ground rather than
+  as a black bar dropped between two panels. (It was chosen when the meme
+  followed a divider, which is `$ink-deep` too; it still holds now that the
+  slide follows `#shinyreact-ui-r`.)
+- **The heading's `aria-label` is the only alt text the slide has**, because a
+  reveal background carries none and the `h2` is `display: none`. So it spells
+  all four panels out, in order, including the silent one — a label saying "an
+  Anakin meme" describes the picture and withholds the joke.
+- **`images/wait-what.jpg`** is imgflip's blank template with the three lines
+  burned in (jpg, not png: it is a photograph, 177 KB against 1.3 MB). The
+  template is 768x768 and is upscaled *before* the text is drawn, so the faces
+  soften but the type stays sharp:
 
   ```bash
-  magick in.png -crop 1200x1050+0+75 +repage -quality 84 images/wait-what.jpg
+  curl -sL -o t.png https://i.imgflip.com/5c7lwq.png   # id 322841258, api.imgflip.com/get_memes
+  magick t.png -filter Lanczos -resize 1080x1080 base.png
+  # per panel: Impact 46px, white, 6px black stroke, centred, 22px off the
+  # panel's bottom edge; panels are 540x540 at (0,0) (540,0) (0,540) (540,540).
   ```
 
-  1200x1050 `contain`s to 1234x1080 on the canvas, so it is shown at ~1:1.
+  1080x1080 `contain`s to 1080x1080 on the canvas — square, so it pillarboxes
+  more than the 1234x1080 shot it replaced. That is fine; `$ink-deep` already
+  handles it. A higher-res still would only buy sharper faces, not more slide.
 
 ### Reveal quirks this theme already works around
 
@@ -1236,8 +1300,9 @@ Do not "clean these up" — each one silently breaks the layout:
   projector that just looks like the code ends mid-line. The theme resets it
   with the same selector.
 - **Every React file shown in the deck is `.tsx`** — `Stat.tsx`, `app.tsx`,
-  `www/ui.tsx` — so "The UI moves to TypeScript" is not introducing a file
-  extension the audience has not already been reading. Two of the three carry
+  `www/ui.tsx` — so when section 04 says the UI moved to TypeScript (spoken, on
+  `#shinyreact-ui-r`) it is not introducing a file extension the
+  audience has not already been reading. Two of the three carry
   **no type annotations at all**, and that is fine: an untyped prop is valid
   TSX, and `#shinyreact-ui`'s `useShinyInput<number>` is the one place the
   types are the point. A `type Props` alias was tried on `Stat.tsx` and
@@ -1269,10 +1334,31 @@ Do not "clean these up" — each one silently breaks the layout:
   has to move the changed lines instead of un-highlighting *and* rewriting.
 - **An `auto-animate` code pair needs both blocks laid out identically**, or
   reveal slides the whole panel instead of the lines that changed. Section 04
-  has two of these — `#the-server-we-started-with` → the `shinyreact` server,
-  and `#react-ui` → `#shinyreact-ui` (the UI half, added later so the `ui.tsx`
-  hooks are read against the `useState`/`useMemo` they replace, twelve slides
-  after section 02 showed them). Three things that pair needs:
+  has three of these, and **they run server → UI → `.tsx`**:
+  `#the-server-we-started-with` → the `shinyreact` server (which opens the
+  section, since the reactive computation is the half `shinyreact` changes
+  least), then `#the-ui-we-started-with` → `#shinyreact-ui-r` after
+  `reactive_output()`, then `#react-ui` → `#shinyreact-ui` (the `.tsx` half,
+  added later so the `ui.tsx` hooks are read against the `useState`/`useMemo`
+  they replace, twelve slides after section 02 showed them).
+
+  **That order is load-bearing and it was UI-first for a while** (`git log`),
+  which matched app.R's own `ui <-`-then-`server <-` order and was wrong for
+  the room: it put four slides between `page_react_html("www/index.html")` and
+  the file that path names. Now the UI pair, the meme and `ui.tsx` are
+  consecutive, so the one-liner, the objection it provokes, and the answer are
+  never more than a click apart.
+
+  **The UI pair is the deliberate exception to "laid out identically".** It is
+  a *collapse* — 11 lines of `bslib::page_sidebar(…)` against the one
+  `shinyreact::page_react_html("www/index.html")` — so the halves share no
+  shape at all, and the panel shutting is the whole point. Measured on the
+  render: the `pre` is 601px tall, 374 mid-flight, 142 settled, with `top`
+  pinned at 255 and width at 1728 throughout, so it closes upward from the
+  bottom rather than sliding. Don't "fix" this by padding the second block out
+  to match the first.
+
+  Three things every pair needs:
   - **Neither block may be wrapped in a `.fragment`**, and neither slide may
     carry a lead-in bullet the other lacks. An element hidden on arrival has
     nothing to animate *from*, and a bullet above the panel changes the panel's

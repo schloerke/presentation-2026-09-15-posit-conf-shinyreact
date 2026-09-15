@@ -110,8 +110,9 @@ ui <- bslib::page_sidebar(
      runs it through `pretty()` (30 -> 27 bins, 47 -> 53), so the JS twin in
      `apps/02-react-only/www/data.js` - which bins exactly - could not match it
      without reimplementing `pretty()`. `check.mjs` asserts that parity. Section
-     04 calls this slide "the server we started with", so it has to be this
-     code. The 50% column fits **37 characters** at 34px, and a longer line is
+     04 re-shows *both* of these panels - "The UI we started with" and "The
+     server we started with" - so both have to be this code. The 50% column
+     fits **37 characters** at 34px, and a longer line is
      clipped at the panel's edge in silence - the first cut of this block ran 38
      and rendered `input$bin_count +` with the ` 1` simply gone. So `n` is
      hoisted: it is what buys `seq()` a wrap that fits. Section 04 keeps
@@ -148,9 +149,10 @@ The R UI is wonderful… until it isn't
      since `renderUI` is a perfectly good Shiny tool. The thing that hurts is
      authoring a second language inside a quoted string, where no editor,
      linter, formatter or test can reach it. It also pre-pays for the "Wait…
-     what?" meme in section 02 - by the time "You want me to write
-     JavaScript?!?" lands, the room has already put its hands up to writing
-     it. -->
+     what?" meme in *section 04*, fifteen slides later - by the time the room's
+     UI becomes a TypeScript file, it has already put its hands up to writing
+     JavaScript. The meme's own notes cash that in ("you already do"); don't
+     retire one of these slides without the other. -->
 ## Custom UI… within a string {.code-slide}
 
 <!-- The question is up on arrival rather than on a click, so the show of hands
@@ -415,36 +417,6 @@ Hold on to those two lines. In a few minutes the only thing that changes is
 *where they get their values from*.
 :::
 
-<!-- The room's reaction, taken just before "Why React?" answers it: the demos
-     have shown React doing the work, so the objection is at its loudest here
-     and the case for React follows it directly. The picture is
-     the whole slide, so it is a reveal background and the heading (which
-     quarto needs to split the slide, and which carries the notes) is hidden. -->
-## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519" aria-label="Wait… what? A two-panel reaction meme: a smiling face looking down, then a hard zoom on the same face doing a double take."}
-
-::: {.notes}
-At this point you might be thinking… "You want me to write JavaScript?!?"
-
-<!-- The payoff for the show of hands back in section 01, on "Custom UI… within
-     a string" - whose notes promise "we come back to it". This is where. Don't
-     retire one of those slides without the other. -->
-And the honest answer is: **you already do.** Every hand that went up earlier
-was a hand that has written JavaScript. The question was never *whether* —
-it is whether you write it somewhere your tools can see it, or inside a quoted
-string where nothing can.
-
-That is the big question in the room, so let's take it now. Joe Cheng has
-always said Shiny authors shouldn't need to write JavaScript — and I believe
-that still holds true.
-
-Agents today have far more examples of mainstream React patterns than custom
-Shiny UI apps. I trust any frontier model to write React.js code better than I
-can. That narrow IDs-and-JSON contract makes the client boundary practical to
-review and maintain.
-
-Your job is to describe your UI and review the result.
-:::
-
 ## Why React? {.nostretch}
 
 <div class="hexreact corner"><div class="hr-atom"></div></div>
@@ -581,9 +553,17 @@ experimental package, for the brave few.
 
 ## Old Faithful {.divider}
 
-<!-- Plain Shiny still, so the mark is Shiny's own sticker - `.lb-shiny` also
+<!-- The section opens on the server, which is the half `shinyreact` changes
+     least - the reactive computation is identical, only the value it sends
+     moves. The UI pair comes after `reactive_output()` so that the R UI
+     collapsing lands next to the TypeScript it collapsed into: slide, slide,
+     meme, and straight on into `ui.tsx`. It ran UI-first for a while
+     (`git log`), which matched app.R's own order and put four slides between
+     the one-liner and the file it points at.
+     Plain Shiny still, so the mark is Shiny's own sticker - `.lb-shiny` also
      turns the shinyreact ring off. It cross-fades into the next slide's
-     shinyreact hex, which is the section in one gesture. -->
+     shinyreact hex, which is the section in one gesture; the UI pair below
+     makes the same gesture again. -->
 ## The server we started with {.code-slide auto-animate="true"}
 
 <div class="hexlogo corner"><div class="lb-shiny"></div></div>
@@ -664,42 +644,126 @@ With this model, we are strongly encouraging the server to pass data directly to
 the front end. The server sends facts; React does presentation.
 :::
 
-## The UI moves to TypeScript {.code-slide}
+<!-- The section opens on app.R's own order - the UI definition, then the
+     server - and on its headline: the R UI collapses to one line because it
+     moved to TypeScript. This used to be a single two-up slide headed "The UI
+     moves to TypeScript", parked between the server pair and the `.tsx` pair;
+     `git log` has it. Two things were wrong with that. It was the only code
+     slide in the deck carrying no corner mark, and the only place a
+     before/after was squashed side-by-side rather than animated across two
+     slides - so it read as an intruder in a section built entirely out of
+     pairs. And a headline in the middle of a section is a headline nobody
+     hears.
+     Plain Shiny still, so the mark is Shiny's own sticker - `.lb-shiny` also
+     turns the shinyreact ring off. It cross-fades into the next slide's
+     shinyreact hex, which is the section in one gesture; the server pair
+     below makes the same gesture again. -->
+## The UI we started with {.code-slide auto-animate="true"}
 
-::: {.columns}
-::: {.column width="50%"}
-<!-- Keep these lines short: a 50% column fits 37 characters at 34px, and `pre`
-     is `white-space: pre`, so a longer line is *clipped at the panel's right
-     edge* with nothing to show for it. Spelling the argument names out here
-     ran `sliderInput(inputId = "bin_count", ...)` to 43 and rendered it as
-     `sliderInput(inputId = "bin_count"` - the elision and the closing paren
-     both gone. See CLAUDE.md for the audit that catches this. -->
-```{.r filename="app.R (classic)"}
+<div class="hexlogo corner"><div class="lb-shiny"></div></div>
+
+<!-- Section 01's `#ownership` UI panel verbatim, so the pair starts from a
+     block the room has already read.
+     Unlike the deck's other two auto-animate pairs this one is a *collapse* -
+     11 lines against 1 - so the halves deliberately do NOT share a shape. The
+     usual rule ("write the before to the shape of the after") exists so reveal
+     animates the changed lines instead of sliding the panel; here the panel
+     closing up *is* the point. See CLAUDE.md. -->
+```{.r filename="app.R" code-line-numbers="true"}
 ui <- bslib::page_sidebar(
   sidebar = bslib::sidebar(
-    sliderInput("bin_count", ...)
+    sliderInput(
+      "bin_count",
+      label = "Number of bins:",
+      min = 1, max = 50,
+      value = 30
+    )
   ),
   plotOutput("distPlot")
 )
 ```
-:::
-::: {.column width="50%"}
-```{.r filename="app.R (shinyreact)"}
-ui <- shinyreact::page_react_html()
-```
-:::
-:::
 
 ::: {.notes}
-Now let's look at the UI definitions.
+That is the server. Now the other half of the same file.
 
-Note that you're signing up for all UI inputs and outputs living in TypeScript!
+Here is the UI we wrote in R: the page, the sidebar, the slider, the plot
+output. Every one of those is an R function whose job is to write HTML for you.
 
-<!-- Half of that "cost" is a refund, given the section-01 string slide. Say so
-     here or the slide reads as pure downside. -->
-Which sounds like a cost — and some of it is. But remember where we started: if
-you were already writing the interesting parts of the UI as JavaScript in a
-string, this is not new work. It is the same work, in a file, with types.
+*Watch what happens to it.*
+:::
+
+<!-- The shinyreact hex, cross-faded up from Shiny's sticker on the slide
+     before. The argument is the app's own - `apps/01-shinyreact/app.R` line 8
+     - so the file the UI moved *to* is named on screen rather than implied. -->
+<!-- The id is explicit and it has to be: this heading's text would auto-generate
+     `shinyreact-ui`, which the `.tsx` pair's second half already carries as an
+     *explicit* id six slides later. Pandoc does not dedupe an explicit id
+     against an auto one, so both slides would answer to `#/shinyreact-ui` and
+     the earlier one would win. -->
+## `shinyreact` UI {#shinyreact-ui-r .code-slide auto-animate="true"}
+
+<div class="hexlogo corner"></div>
+
+```{.r filename="app.R" code-line-numbers="true"}
+ui <- shinyreact::page_react_html("www/index.html")
+```
+
+<!-- This slide raises the cost and stops. The refund - "you already do" - is on
+     the meme that follows, and saying it here would answer the objection before
+     the room has made it, which leaves the meme with nothing to land on. -->
+::: {.notes}
+That is the whole UI definition now. One line, pointing at the file the UI
+actually lives in.
+
+So you are signing up for all of your UI inputs and outputs living in
+TypeScript.
+
+*Say that flat, and click.*
+:::
+
+<!-- The room's reaction, taken the moment their UI becomes a TypeScript file.
+     The slide before raises the cost and stops, so the objection is at its
+     loudest right here and the meme is the room saying it out loud; the silent
+     third panel is the answer they fear, which is what sets up "you already do"
+     instead of restating it.
+     It sat in section 02 for a while, between `#react-code` and "Why React?"
+     (`git log`). There the objection was the general "why React at all?", and
+     "Why React?" answered it on the next slide. Here it is the sharper,
+     concrete version - *my UI is a TypeScript file now?* - and what answers it
+     is the two slides straight after it: `ui.tsx`, where the whole of that
+     TypeScript turns out to be two hooks. Then the round trip, then the app
+     running. That adjacency is the point of the running order - the objection
+     and its answer are never more than a click apart.
+     Panel 1 names `shinyreact` again, which it could not do in section 02 - the
+     package is not introduced until section 03, so that cut read "The UI moves
+     to React". The slide before this one is now headed with the package, so the
+     original phrasing is back.
+     The picture is the whole slide, so it is a reveal background and the
+     heading (which quarto needs to split the slide, and which carries the
+     notes) is hidden. -->
+## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519" aria-label="A four-panel Anakin and Padmé meme. Anakin: “shinyreact moves the UI to React.” Padmé, smiling: “So I never have to touch JavaScript, right?” Anakin says nothing. Padmé, no longer smiling: “Right?”"}
+
+::: {.notes}
+*Let the fourth panel sit there.* That is the question in the room.
+
+<!-- The payoff for the show of hands back in section 01, on "Custom UI… within
+     a string" - whose notes promise "we come back to it". This is where. Don't
+     retire one of those slides without the other. -->
+And the honest answer is: **you already do.** Every hand that went up earlier
+was a hand that has written JavaScript. The question was never *whether* —
+it is whether you write it somewhere your tools can see it, or inside a quoted
+string where nothing can.
+
+That is the big question in the room, so let's take it now. Joe Cheng has
+always said Shiny authors shouldn't need to write JavaScript — and I believe
+that still holds true.
+
+Agents today have far more examples of mainstream React patterns than custom
+Shiny UI apps. I trust any frontier model to write React.js code better than I
+can. That narrow IDs-and-JSON contract makes the client boundary practical to
+review and maintain.
+
+Your job is to describe your UI and review the result.
 :::
 
 ## React {#react-ui .code-slide auto-animate="true"}
