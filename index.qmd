@@ -148,7 +148,7 @@ The R UI is wonderful… until it isn't
      since `renderUI` is a perfectly good Shiny tool. The thing that hurts is
      authoring a second language inside a quoted string, where no editor,
      linter, formatter or test can reach it. It also pre-pays for the "Wait…
-     what?" meme two slides later - by the time "You want me to write
+     what?" meme in section 02 - by the time "You want me to write
      JavaScript?!?" lands, the room has already put its hands up to writing
      it. -->
 ## Custom UI… within a string {.code-slide}
@@ -229,36 +229,6 @@ your app; it is taking the JavaScript you already wrote *out of the string*.
 
 ## React {.divider}
 
-<!-- The room's reaction to the sentence before it, so it sits here rather than
-     after `shinyreact` is introduced: the objection lands the moment React is
-     proposed, and the rest of section 02 is the answer to it. The picture is
-     the whole slide, so it is a reveal background and the heading (which
-     quarto needs to split the slide, and which carries the notes) is hidden. -->
-## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519" aria-label="Wait… what? A two-panel reaction meme: a smiling face looking down, then a hard zoom on the same face doing a double take."}
-
-::: {.notes}
-At this point you might be thinking… "You want me to write JavaScript?!?"
-
-<!-- The payoff for the show of hands two slides ago, on "JavaScript, in a
-     string" - whose notes promise "we come back to it". This is where. Don't
-     retire one of those slides without the other. -->
-And the honest answer is: **you already do.** Every hand that went up a minute
-ago was a hand that has written JavaScript. The question was never *whether* —
-it is whether you write it somewhere your tools can see it, or inside a quoted
-string where nothing can.
-
-That is the big question in the room, so let's take it now. Joe Cheng has
-always said Shiny authors shouldn't need to write JavaScript — and I believe
-that still holds true.
-
-Agents today have far more examples of mainstream React patterns than custom
-Shiny UI apps. I trust any frontier model to write React.js code better than I
-can. That narrow IDs-and-JSON contract makes the client boundary practical to
-review and maintain.
-
-Your job is to describe your UI and review the result.
-:::
-
 <!-- The heading finishes React's own address a beat after the slide lands, the
      same gag the "Samuel Bharti" heading carries - and it is a link, because
      the deck is published and a viewer should be able to reach react.dev from
@@ -296,10 +266,16 @@ build those interfaces out of individual pieces called components.
      right. 272 is `nrow(faithful)` and 30 is the app's default bin count.
      The labels are written out upper-case there because the JSX upper-cases
      them itself - the point being that a component computes its markup, it is
-     not a template. Change one side and change the other. -->
+     not a template. Change one side and change the other.
+     `.tsx`, like every other React file in the deck, and deliberately with no
+     type annotation on it: this slide teaches "a component is a function", and
+     types are section 04's beat, not this one. A `.tsx` file with an untyped
+     prop is valid TSX (it is what `tsc` without `noImplicitAny` accepts, and
+     what `app.tsx` on `#react-ui` also shows); a `type Props` alias was tried
+     here and reverted - it cost the panel a line and the slide a concept. -->
 ::: {.columns}
 ::: {.column .fragment width="64%"}
-```{.javascriptreact filename="Stat.jsx"}
+```{.javascriptreact filename="Stat.tsx"}
 function Stat({ label, value }) {
   const name = label.toUpperCase();
   return (
@@ -431,6 +407,36 @@ state, new description, and React works out the difference.
 
 Hold on to those two lines. In a few minutes the only thing that changes is
 *where they get their values from*.
+:::
+
+<!-- The room's reaction, taken just before "Why React?" answers it: the demos
+     have shown React doing the work, so the objection is at its loudest here
+     and the case for React follows it directly. The picture is
+     the whole slide, so it is a reveal background and the heading (which
+     quarto needs to split the slide, and which carries the notes) is hidden. -->
+## Wait… what? {.meme background-image="images/wait-what.jpg" background-size="contain" background-color="#141519" aria-label="Wait… what? A two-panel reaction meme: a smiling face looking down, then a hard zoom on the same face doing a double take."}
+
+::: {.notes}
+At this point you might be thinking… "You want me to write JavaScript?!?"
+
+<!-- The payoff for the show of hands back in section 01, on "Custom UI… within
+     a string" - whose notes promise "we come back to it". This is where. Don't
+     retire one of those slides without the other. -->
+And the honest answer is: **you already do.** Every hand that went up earlier
+was a hand that has written JavaScript. The question was never *whether* —
+it is whether you write it somewhere your tools can see it, or inside a quoted
+string where nothing can.
+
+That is the big question in the room, so let's take it now. Joe Cheng has
+always said Shiny authors shouldn't need to write JavaScript — and I believe
+that still holds true.
+
+Agents today have far more examples of mainstream React patterns than custom
+Shiny UI apps. I trust any frontier model to write React.js code better than I
+can. That narrow IDs-and-JSON contract makes the client boundary practical to
+review and maintain.
+
+Your job is to describe your UI and review the result.
 :::
 
 ## Why React? {.nostretch}
@@ -567,9 +573,16 @@ You build the whole UI from the ground up in React / TypeScript. It is an
 experimental package, for the brave few.
 :::
 
-## Old Faithful, remixed {.divider}
+## Old Faithful {.divider}
 
+<div class="hexlogo corner"></div>
+
+<!-- Plain Shiny still, so the mark is Shiny's own sticker - `.lb-shiny` also
+     turns the shinyreact ring off. It cross-fades into the next slide's
+     shinyreact hex, which is the section in one gesture. -->
 ## The server we started with {.code-slide auto-animate="true"}
+
+<div class="hexlogo corner"><div class="lb-shiny"></div></div>
 
 <!-- The trailing `|` is an extra step that clears the highlight, so the
      auto-animate into the next slide only has to move the changed lines. -->
@@ -597,6 +610,8 @@ histogram of the data.
 :::
 
 ## The same server, with `shinyreact` {.code-slide auto-animate="true"}
+
+<div class="hexlogo corner"></div>
 
 <!-- Opens on line 5 rather than unhighlighted: the chain arrives reading
      `input$bin_count → breaks`, so the line that computes it is lit to match. -->
@@ -689,6 +704,8 @@ string, this is not new work. It is the same work, in a file, with types.
 
 ## React {#react-ui .code-slide auto-animate="true"}
 
+<div class="hexreact corner"><div class="hr-atom"></div></div>
+
 <!-- The React-only component from section 02, verbatim, so this and the next
      slide auto-animate as a pair: the whole JSX body holds still while the two
      declarations at the top rewrite themselves into the `shinyreact` hooks.
@@ -728,6 +745,8 @@ move.
 :::
 
 ## `shinyreact` {#shinyreact-ui .code-slide auto-animate="true"}
+
+<div class="hexlogo corner"></div>
 
 <!-- Opens lit on line 2 rather than unhighlighted, the way the server's
      after-slide opens on line 5: the pair has just rewritten that line, so the
@@ -788,9 +807,9 @@ somewhere it can be read.
 <div class="cycle" role="img" aria-label="Browser and server exchange ids with JSON values: useShinyInput sends bin_count to input$bin_count; reactive_output sends dist_data back to useShinyOutputValue.">
 <div class="cycle-col cycle-browser">
 <span class="cycle-title">Browser · React</span>
-<code>const [binCount, setBinCount] =<br>  useShinyInput(<b>"bin_count"</b>, 30)</code>
+<code><span class="kw">const</span> [binCount, setBinCount] =<br>  <span class="fu">useShinyInput</span>(<b>"bin_count"</b>, <span class="dv">30</span>)</code>
 <code class="cycle-gap"></code>
-<code>const bins =<br>  useShinyOutputValue(<br>    <b>"dist_data"</b>, null)</code>
+<code><span class="kw">const</span> bins =<br>  <span class="fu">useShinyOutputValue</span>(<br>    <b>"dist_data"</b>, <span class="kw">null</span>)</code>
 </div>
 <div class="cycle-col cycle-wires">
 <span class="cycle-title"></span>
@@ -800,9 +819,9 @@ somewhere it can be read.
 </div>
 <div class="cycle-col cycle-server fragment" data-fragment-index="1">
 <span class="cycle-title">Server · R / Python</span>
-<code>input$<b>bin_count</b></code>
-<code class="cycle-step">bin_count &lt;- reactive(…)</code>
-<code>output$<b>dist_data</b> &lt;-<br>  reactive_output({ … })</code>
+<code>input<span class="sc">$</span><b>bin_count</b></code>
+<code class="cycle-step">bin_count <span class="ot">&lt;-</span> <span class="fu">reactive</span>(…)</code>
+<code>output<span class="sc">$</span><b>dist_data</b> <span class="ot">&lt;-</span><br>  <span class="fu">reactive_output</span>({ … })</code>
 </div>
 </div>
 ```
@@ -857,7 +876,7 @@ string on both sides, and they are the only thing the two sides share.
 
 ## Test coverage at every hop
 
-- **Within the server** — `testServer()` · `test_server()` · `local_server`
+- **Within the server** — `testServer()` / `test_server()` · `local_server`
 - **Server → client** — `wire_tap`
 - **Within the client** — JS unit tests
 - **Confirm the client** — `features.md`

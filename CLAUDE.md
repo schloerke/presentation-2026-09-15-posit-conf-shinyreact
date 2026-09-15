@@ -255,6 +255,18 @@ comes *after* the recap**, so the gallery is what the deck ends on and the
 `#recap` slide is a waypoint rather than the last thing on screen. Keep that
 in mind when moving anything near the tail.
 
+**Every slide that shows code or an app carries the mark of what it runs**:
+Shiny's own sticker (`.hexlogo.corner` wrapping a `.lb-shiny` div), the bare
+React atom (`.hexreact.corner`), or the finished shinyreact hex
+(`.hexlogo.corner`, empty). Section 04's before/after pairs use that: the
+`app.R` pair cross-fades Shiny's sticker into the shinyreact hex, and the
+`.tsx` pair the atom into the hex — the section's whole argument, in the
+corner. A `.code-slide` has no room for the full-size mark (the panel starts at
+y=255 and runs to the right edge, so the 266px hex is cut in half by it, and
+raising it instead would park it over lines 1-2), so one rule shrinks both
+marks into the band the heading leaves: 130x150 for the hex, 173x200 for the
+atom's box. Re-measure against the panel's top if a code slide's layout moves.
+
 `.recap` is the slide that stays up through Q&A, so it carries the talk title,
 the hex logo, the speaker lockup and the repo QR. The orbit and hex pseudos are
 shared with `#title-slide` in one rule — but only the *ring* is: the title
@@ -302,9 +314,12 @@ text, so a longer one wraps instead of running into the hex.
 
 **That mark is why all three demo slides are just headed "Old Faithful".** The
 last one read "Live: Old Faithful w/ `shinyreact`", which is the corner hex
-said twice; the hex signifies it. Quarto therefore deduplicates the slide ids
-(`old-faithful`, `-1`, `-2`, `-3`) — nothing in the theme or the qmd targets
-them, but don't write a rule that assumes one.
+said twice; the hex signifies it. Section 04's divider is headed "Old Faithful"
+for the same reason — it read "Old Faithful, remixed", and the shinyreact hex
+it now carries says the "remixed" part. So quarto deduplicates the slide ids
+across all four (`old-faithful`, `-1`, `-2`, `-3`) — nothing in the theme or
+the qmd targets them, but don't write a rule that assumes one, and note the
+suffixes shift if a slide is added or moved.
 
 **All three demo apps hand the deck's keys back to reveal**, and they have to:
 each runs in an iframe, so the moment you click a slider the keystrokes go to
@@ -828,7 +843,7 @@ which reads on a projector as the code simply ending early. Check the tail of
 the longest block after any change here.
 
 **A lead-in bullet is all the text a code slide has room for.** "What is
-React?" carried two blockquotes *and* the `Stat.jsx` panel and ran 1358px —
+React?" carried two blockquotes *and* the `Stat.tsx` panel and ran 1358px —
 278px past the canvas, with the bottom of the code silently gone. It is now two
 slides: the quotes keep "What is React?" (a plain content slide, so it takes
 the swoosh back), and the panel moved to `## Components` under the one-line
@@ -930,10 +945,10 @@ test can reach it — and everyone in that room has done it.
 - **Five later slides call back to it, in their speaker notes only.** The setup
   is only worth its slide if they are kept; grep the notes for "string" before
   changing any of them:
-  - **"Wait… what?"** (the meme, two slides later) — the payoff. *You already
-    do.* This is the pair that matters; don't retire either without the other,
-    and keep them close — the callback says "a minute ago", which was true when
-    the objection moved into section 02 and would not be if it moved back.
+  - **"Wait… what?"** (the meme, later in section 02) — the payoff. *You
+    already do.* This is the pair that matters; don't retire either without
+    the other. The callback says "earlier", not "a minute ago" — the two are
+    seven slides apart since the meme moved next to "Why React?".
   - **"Why Shiny + React?"** — must **not** ask for hands again, though its
     first bullet is about hand-rolled HTML. Asking twice reads as having
     forgotten, and the second ask gets half the hands. Its note refers back
@@ -1132,11 +1147,12 @@ builds.
 
 ### The reaction shot (`.meme`, "Wait… what?")
 
-A full-bleed "Wait… what?" meme, **immediately after the `## React`
-divider**. The objection — *you want me to write JavaScript?* — lands the
-moment React is proposed, so the beat is taken there and the rest of section 02
-is the answer to it. It used to sit twelve slides later, at the end of section
-03, as a `.divider` headed "You want me to write JavaScript?!?!" with a walking
+A full-bleed "Wait… what?" meme, **immediately before "Why React?"**. The
+objection — *you want me to write JavaScript?* — is loudest once the demos have
+shown React doing the work, so the beat is taken there and "Why React?" answers
+it directly. It sat right after the `## React` divider for a while (`git log`),
+and before that twelve slides later, at the end of section 03, as a `.divider`
+headed "You want me to write JavaScript?!?!" with a walking
 pink elephant along the bottom edge; `git log` has both if either is wanted
 back. Its four bullets are still the speaker notes, unchanged apart from the
 new cue.
@@ -1189,6 +1205,14 @@ Do not "clean these up" — each one silently breaks the layout:
   the block silently becomes a scroll container and loses its tail — on a
   projector that just looks like the code ends mid-line. The theme resets it
   with the same selector.
+- **Every React file shown in the deck is `.tsx`** — `Stat.tsx`, `app.tsx`,
+  `www/ui.tsx` — so "The UI moves to TypeScript" is not introducing a file
+  extension the audience has not already been reading. Two of the three carry
+  **no type annotations at all**, and that is fine: an untyped prop is valid
+  TSX, and `#shinyreact-ui`'s `useShinyInput<number>` is the one place the
+  types are the point. A `type Props` alias was tried on `Stat.tsx` and
+  reverted — it cost the panel a line and put a second concept on a slide whose
+  one claim is "a component is a function".
 - `.tsx` is not a skylighting language, so a `{.tsx}` block renders unhighlighted.
   Use `{.javascriptreact}`: it tokenises JSX (DOM tag → keyword, component →
   function, props → `ot`, coloured by the theme). `{.typescript}` highlights the
@@ -1269,6 +1293,14 @@ bold `$cyan-text` on every row, because matching ids *are* the contract.
 - **It is a `{=html}` raw block.** Written as loose raw HTML, pandoc parsed the
   `$` in `input$bin_count … output$dist_data` as TeX math and ate the server
   column (a "Could not convert TeX math" warning, exit 0).
+- **The code is hand-highlighted with skylighting's own class names.** Quarto
+  emits the highlight theme as bare `code span.kw { … }` rules — unscoped — so
+  a `<span class="kw">` / `fu` / `dv` / `sc` / `ot` in this raw block picks up
+  exactly the colours the real code slides get, and the panel stops reading as
+  a flat grey mock-up next to them. Tag a token the way quarto tags it (check a
+  rendered block: R's `$` is `sc`, `<-` is `ot`, a call is `fu`; JS `const` and
+  `null` are `kw`, a number is `dv`). The ids stay `<b>` in `$cyan-text` rather
+  than the string green — matching ids are the point of the slide.
 - **Every line is cut to 32 characters** of 32px mono — the column is 660px
   with 20px side padding, so 620px inside. `useShinyOutputValue("dist_data",
   null)` is 40, hence the three-line break. The payloads are 19 characters in
