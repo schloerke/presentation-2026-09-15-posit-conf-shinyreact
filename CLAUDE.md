@@ -249,7 +249,7 @@ the section being a flex column: reveal's `.reveal .slides > section.present
 { display: block }` out-specifies a `display: flex` written here, so the section
 cannot be a flex container (tried; the heading pinned to the top of the slide).
 The sections themselves also lost their numbers, so "What's next" no longer
-exists as a slide at all — "Future work: incremental adoption" follows "Test
+exists as a slide at all — "Future work" follows "Test
 coverage at every hop" directly, and the recap follows it. **"In the wild" then
 comes *after* the recap**, so the gallery is what the deck ends on and the
 `#recap` slide is a waypoint rather than the last thing on screen. Keep that
@@ -315,8 +315,12 @@ text, so a longer one wraps instead of running into the hex.
 **That mark is why all three demo slides are just headed "Old Faithful".** The
 last one read "Live: Old Faithful w/ `shinyreact`", which is the corner hex
 said twice; the hex signifies it. Section 04's divider is headed "Old Faithful"
-for the same reason — it read "Old Faithful, remixed", and the shinyreact hex
-it now carries says the "remixed" part. So quarto deduplicates the slide ids
+for the same reason — it read "Old Faithful, remixed", and the section that
+follows it is the "remixed" part. It **carried** a `.hexlogo.corner` for a
+while and no longer does: a divider is its name and nothing else, and the mark
+also broke the centring — the heading is an abspos box on `left/right: $margin`,
+so the `:has(.hexlogo.corner)` 1380px cap shrank it leftwards and took the text
+174px off centre. So quarto deduplicates the slide ids
 across all four (`old-faithful`, `-1`, `-2`, `-3`) — nothing in the theme or
 the qmd targets them, but don't write a rule that assumes one, and note the
 suffixes shift if a slide is added or moved.
@@ -1311,6 +1315,20 @@ bold `$cyan-text` on every row, because matching ids *are* the contract.
 - **Fragments carry explicit indices, all of them**: the send wire and the
   server column are index 1, the return wire index 2, so arrival shows what the
   React side wrote, click 1 sends it, click 2 answers it. Verified by stepping.
+- **The server column's own flow** (`input$bin_count` → `reactive()` →
+  `reactive_output()`) is drawn with the wires' vocabulary — a cyan rule and a
+  triangle head — turned down the column. Both halves are **pseudo-elements of
+  the row above**, parked in the spare height a one-line row leaves inside its
+  140px box. A real element between the rows would make the server column
+  taller than the other two, and the three hops only read as *rows* because all
+  three stacks are the same height (measured: 592px each).
+- **`"dist_data"` is the output id on every slide that shows the `shinyreact`
+  side** — the cycle, `#shinyreact-ui` and "The same server, with `shinyreact`"
+  — and it is what `apps/01-shinyreact` actually uses. The two code slides said
+  `distPlot` for a while, which contradicted both the cycle and the app. Plain
+  Shiny keeps `distPlot`: those slides are the *before*, and the rename is free
+  there because the line's function changes anyway, so auto-animate is
+  rewriting it either way.
 - The whole `.cycle` is `role="img"` with an `aria-label` saying the cycle in a
   sentence; the code inside is not read as a list of tokens.
 - Lowest ink is 816 of 1080 with every fragment shown.

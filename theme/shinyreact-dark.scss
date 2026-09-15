@@ -1301,6 +1301,13 @@ $presentation-block-margin: 44px !default;
   // the panel ~100px it does not have. Bullet keeps its rule and size.
   ul { margin-top: 0; margin-bottom: 32px; }
 }
+// ...and a code slide with no lead-in bullet has nothing to spend that 16px on,
+// so the heading sits straight on the filename caption. This is the only such
+// slide that can afford the air: the other bullet-less code slides are the two
+// auto-animate pairs, whose panels have to stay at the same top as their
+// partner's (255/947), so the gap is bought here by id rather than by
+// `:not(:has(ul))`. Its lowest ink is ~400 of 1080.
+.reveal section.code-slide#the-ui-moves-to-typescript > h2 { margin-bottom: 64px; }
 
 // Hand-drawn marks over parts of a code panel ("JavaScript, in a string": an X
 // through the two `HTML("…")` bodies). `.circle-mark` is the unused partner -
@@ -1586,6 +1593,23 @@ $presentation-block-margin: 44px !default;
   }
   .cycle-step { color: $text; }
   .cycle-gap { height: 140px; }
+  // The server's own flow, input -> reactive -> reactive_output, drawn the way
+  // the wires are (cyan rule + triangle head) but turned down the column. Both
+  // halves are pseudo-elements of the row above, parked in the spare height a
+  // one-line row leaves inside its 140px box: a real element between the rows
+  // would make the server column taller than the other two, and the three only
+  // read as rows because all three stacks are the same height.
+  .cycle-server code:not(:last-child) {
+    position: relative;
+    &::before, &::after { content: ""; position: absolute; left: 50%; }
+    &::before { bottom: 30px; width: 5px; margin-left: -2.5px; height: 44px; background: $cyan; }
+    &::after {
+      bottom: 8px; margin-left: -14px;
+      border: 14px solid transparent;
+      border-top: 26px solid $cyan;
+      border-bottom: 0;
+    }
+  }
   // A wire is its payload over an arrow. The arrow is a cyan rule with a
   // triangle head; `.cycle-out` flips it to point back at the browser.
   .cycle-wire {

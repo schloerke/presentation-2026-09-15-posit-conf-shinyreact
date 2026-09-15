@@ -1,4 +1,4 @@
-# Beyond Bootstrap: Building Custom Shiny UI with React
+# `shinyreact`: Building Custom Shiny UI with React
 
 📽️ Slides: https://schloerke.com/presentation-2026-09-15-posit-conf-shinyreact/
 
