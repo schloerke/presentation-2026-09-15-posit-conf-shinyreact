@@ -1,5 +1,5 @@
 ---
-title: "Beyond Bootstrap"
+title: "`shinyreact`"
 subtitle: "Building Custom Shiny UI with React"
 author:
   - "Barret Schloerke"
@@ -575,8 +575,6 @@ experimental package, for the brave few.
 
 ## Old Faithful {.divider}
 
-<div class="hexlogo corner"></div>
-
 <!-- Plain Shiny still, so the mark is Shiny's own sticker - `.lb-shiny` also
      turns the shinyreact ring off. It cross-fades into the next slide's
      shinyreact hex, which is the section in one gesture. -->
@@ -619,7 +617,7 @@ histogram of the data.
 x <- faithful$waiting
 
 server <- function(input, output) {
-  output$distPlot <- shinyreact::reactive_output({
+  output$dist_data <- shinyreact::reactive_output({
     breaks <- seq(min(x), max(x), length.out = input$bin_count + 1)
     bins <- hist(x, breaks = breaks, plot = FALSE)
     bins[c("breaks", "counts")]
@@ -642,8 +640,8 @@ server.
 
 ## `reactive_output()` — a [new]{.underline} concept!
 
-- No corresponding UI component on the server side
-- Construct necessary data and send it to the client **as JSON**
+- No 1:1 UI component needed
+- Construct necessary data and send to client **as JSON**
 - Let React display your data's state in the UI
 
 ::: {.notes}
@@ -683,10 +681,6 @@ ui <- bslib::page_sidebar(
 ```{.r filename="app.R (shinyreact)"}
 ui <- shinyreact::page_react_html()
 ```
-
-::: {.fragment}
-UI inputs and outputs now live in TypeScript.
-:::
 :::
 :::
 
@@ -754,7 +748,7 @@ move.
 ```{.javascriptreact filename="www/ui.tsx" code-line-numbers="2|3|8-9|10"}
 function App() {
   const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
-  const bins = useShinyOutputValue<HistData | null>("distPlot", null);
+  const bins = useShinyOutputValue<HistData | null>("dist_data", null);
 
   return (
     <main className="layout">
@@ -915,7 +909,7 @@ could not have had any — you cannot unit-test a string. Getting it into a file
 is what put it on this list at all.
 :::
 
-## Future work: incremental adoption
+## Future work
 
 - Embed React components into **existing** apps
 - Wrap `shinyreact` in your own package!

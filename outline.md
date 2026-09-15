@@ -105,7 +105,7 @@
         ```r
         x <- faithful$waiting
         server <- function(input, output) {
-          output$distPlot <-
+          output$dist_data <-
             shinyreact::reactive_output({ # <<
               breaks <- seq(min(x), max(x), length.out = input$bin_count + 1)
               bins <- hist(x, breaks = breaks, plot = FALSE) # <<
@@ -149,7 +149,7 @@
         // www/ui.tsx
         export default function App() {
           const [binCount, setBinCount] = useShinyInput<number>("bin_count", 30);
-          const bins = useShinyOutputValue<HistData | null>("distPlot", null);
+          const bins = useShinyOutputValue<HistData | null>("dist_data", null);
 
           return (
             <main className="layout">
